@@ -12,11 +12,11 @@ echo "=========================================="
 # 1. Pre-flight checks
 echo "✅ Step 1: Pre-flight checks..."
 
-# Check if we're on main branch
+# Check if we're on master branch
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-if [ "$CURRENT_BRANCH" != "main" ]; then
-  echo "❌ Error: Not on main branch. Current branch: $CURRENT_BRANCH"
-  echo "Please switch to main branch: git checkout main"
+if [ "$CURRENT_BRANCH" != "master" ]; then
+  echo "❌ Error: Not on master branch. Current branch: $CURRENT_BRANCH"
+  echo "Please switch to master branch: git checkout master"
   exit 1
 fi
 
