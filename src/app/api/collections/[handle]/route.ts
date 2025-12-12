@@ -5,10 +5,10 @@ import { eq, and } from 'drizzle-orm';
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { handle: string } }
+  { params }: { params: Promise<{ handle: string }> }
 ) {
   try {
-    const { handle } = params;
+    const { handle } = await params;
 
     // Fetch collection
     const [collection] = await db

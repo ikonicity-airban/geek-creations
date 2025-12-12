@@ -79,7 +79,7 @@ export async function GET(req: NextRequest) {
           compareAtPrice: variant.compareAtPrice || null,
           sku: variant.sku || '',
           inventoryQuantity: variant.inventoryQuantity || 0,
-          weight: variant.weight ? parseFloat(variant.weight) : null,
+          weight: variant.weight ? String(variant.weight) : null,
           weightUnit: variant.weightUnit || 'kg',
           option1: variant.selectedOptions[0]?.value || null,
           option2: variant.selectedOptions[1]?.value || null,
