@@ -12,7 +12,7 @@ export const StatsSection = () => {
   ];
 
   return (
-    <section className="py-20 bg-white dark:bg-gray-950">
+    <section className="py-20" style={{ backgroundColor: '#f8f6f0' }}>
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {stats.map((stat, i) => (
@@ -24,16 +24,17 @@ export const StatsSection = () => {
               viewport={{ once: true }}
               className="text-center"
             >
-              <stat.icon className="w-12 h-12 mx-auto mb-4 text-purple-600" />
+              <stat.icon className="w-12 h-12 mx-auto mb-4" style={{ color: '#401268' }} />
               <motion.h3
                 initial={{ scale: 0 }}
                 whileInView={{ scale: 1 }}
                 transition={{ delay: i * 0.1 + 0.2, type: "spring" }}
-                className="text-5xl font-black text-gray-900 dark:text-white mb-2"
+                className="text-5xl font-black mb-2"
+                style={{ color: '#401268' }}
               >
                 {stat.value}
               </motion.h3>
-              <p className="text-gray-600 dark:text-gray-400 font-medium">
+              <p className="font-medium" style={{ color: 'rgba(64, 18, 104, 0.8)' }}>
                 {stat.label}
               </p>
             </motion.div>

@@ -41,6 +41,13 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  
+  /* Geeks Creation Design System Colors */
+  --color-indigo-ink: #401268;
+  --color-mauve: #c5a3ff;
+  --color-porcelain: #f8f6f0;
+  --color-honey-bronze: #e2ae3d;
+  --color-scarlet-rush: #e21b35;
 }
 
 :root {

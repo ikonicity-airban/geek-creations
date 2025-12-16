@@ -36,7 +36,7 @@ export const HowItWorks = () => {
   ];
 
   return (
-    <section className="py-32 bg-linear-to-br from-purple-50 to-pink-50 dark:from-gray-900 dark:to-gray-800">
+    <section className="py-32" style={{ backgroundColor: '#ffffff' }}>
       <div className="max-w-7xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0 }}
@@ -44,10 +44,13 @@ export const HowItWorks = () => {
           viewport={{ once: true }}
           className="text-center mb-20"
         >
-          <span className="inline-block px-4 py-2 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full font-semibold text-sm mb-4">
+          <span 
+            className="inline-block px-4 py-2 rounded-full font-semibold text-sm mb-4"
+            style={{ backgroundColor: '#c5a3ff', color: '#401268' }}
+          >
             HOW IT WORKS
           </span>
-          <h2 className="text-5xl md:text-6xl font-black text-gray-900 dark:text-white mb-6">
+          <h2 className="text-5xl md:text-6xl font-black mb-6" style={{ color: '#401268' }}>
             Launch in 4 Simple Steps
           </h2>
         </motion.div>
@@ -62,22 +65,41 @@ export const HowItWorks = () => {
               viewport={{ once: true }}
               className="relative"
             >
-              <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all">
-                <span className="text-6xl font-black text-purple-200 dark:text-purple-900/50">
+              <div 
+                className="rounded-2xl p-8 transition-all"
+                style={{
+                  backgroundColor: '#ffffff',
+                  borderRadius: '16px',
+                  boxShadow: '0 4px 20px rgba(64,18,104,0.1)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = '0 12px 32px rgba(64,18,104,0.15)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = '0 4px 20px rgba(64,18,104,0.1)';
+                }}
+              >
+                <span className="text-6xl font-black" style={{ color: 'rgba(197, 163, 255, 0.3)' }}>
                   {step.number}
                 </span>
-                <div className="my-6 p-4 bg-linear-to-br from-purple-500 to-pink-500 rounded-xl inline-block">
-                  <step.icon className="w-8 h-8 text-white" />
+                <div 
+                  className="my-6 p-4 rounded-xl inline-block"
+                  style={{ backgroundColor: '#401268' }}
+                >
+                  <step.icon className="w-8 h-8" style={{ color: '#ffffff' }} />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                <h3 className="text-2xl font-bold mb-4" style={{ color: '#401268' }}>
                   {step.title}
                 </h3>
-                <p className="text-gray-600 dark:text-gray-400">
+                <p style={{ color: 'rgba(64, 18, 104, 0.8)' }}>
                   {step.description}
                 </p>
               </div>
               {i < steps.length - 1 && (
-                <div className="hidden lg:block absolute top-1/2 -right-4 w-8 h-0.5 bg-linear-to-r from-purple-500 to-pink-500" />
+                <div 
+                  className="hidden lg:block absolute top-1/2 -right-4 w-8 h-0.5"
+                  style={{ backgroundColor: '#c5a3ff' }}
+                />
               )}
             </motion.div>
           ))}
