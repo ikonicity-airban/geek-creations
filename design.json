@@ -1,0 +1,174 @@
+{
+  "designSystem": {
+    "name": "Geeks Creation Brand Design System",
+    "description": "Comprehensive visual design profile based on provided palette and branding screenshots. Strictly limited to the exact 5 colors: indigo-ink (#401268), mauve (#c5a3ff), porcelain (#f8f6f0), honey-bronze (#e2ae3d), scarlet-rush (#e21b35). All styling must use these colors only.",
+    "colorPalette": {
+      "primary": "#401268",
+      "secondary": "#c5a3ff",
+      "background": "#f8f6f0",
+      "accentWarm": "#e2ae3d",
+      "accentBold": "#e21b35",
+      "aliases": {
+        "indigo-ink": "#401268",
+        "mauve": "#c5a3ff",
+        "porcelain": "#f8f6f0",
+        "honey-bronze": "#e2ae3d",
+        "scarlet-rush": "#e21b35"
+      }
+    },
+    "gradients": {
+      "paletteStripe": {
+        "type": "linear",
+        "direction": "90deg",
+        "stops": ["#401268", "#c5a3ff", "#f8f6f0", "#e2ae3d", "#e21b35"],
+        "applicationContext": "Full-width hero or section backgrounds only. DO NOT apply to cards, buttons, or icons."
+      }
+    },
+    "elementStyling": {
+      "pageBackground": {
+        "default": "#f8f6f0",
+        "context": "Overall site background in light mode",
+        "doNot": "DO NOT use dark colors like #401268 for full page background unless dark mode"
+      },
+      "cards": {
+        "background": "#ffffff",
+        "border": "none or 1px solid #e0e0e0 (neutral, not from palette if not matching)",
+        "shadow": "subtle, e.g. 0 4px 12px rgba(0,0,0,0.05)",
+        "borderRadius": "12px-16px typical for product/design cards",
+        "context": "Design gallery cards, product cards – white/off-white base for high contrast with designs",
+        "text": {
+          "heading": "#401268",
+          "body": "#333333 or #401268 at 80% opacity",
+          "doNot": "DO NOT use mauve (#c5a3ff) for body text – reserve for accents/hovers"
+        },
+        "hover": {
+          "shadow": "elevated, e.g. 0 8px 24px rgba(64,18,104,0.15)",
+          "transform": "scale(1.03) or lift",
+          "border": "optional 2px #c5a3ff"
+        },
+        "doNot": "DO NOT apply full palette gradient to card backgrounds. DO NOT use #e21b35 or #e2ae3d as card base."
+      },
+      "buttons": {
+        "primary": {
+          "background": "#401268",
+          "text": "#ffffff",
+          "iconFill": "#ffffff",
+          "borderRadius": "8px-12px",
+          "hover": {
+            "background": "darken #401268 or overlay rgba(0,0,0,0.1)",
+            "doNot": "DO NOT shift to #e21b35 on hover unless call-to-action specific"
+          },
+          "active": {
+            "background": "darker #401268",
+            "transform": "scale(0.98)"
+          },
+          "context": "Main CTAs – Buy Now, Add to Cart"
+        },
+        "secondary": {
+          "background": "#c5a3ff",
+          "text": "#401268",
+          "hover": {
+            "background": "darken #c5a3ff slightly"
+          },
+          "context": "Filter buttons, secondary actions"
+        },
+        "accent": {
+          "background": "#e21b35",
+          "text": "#ffffff",
+          "context": "Limited use – urgent actions, sale badges"
+        },
+        "outline": {
+          "background": "transparent",
+          "border": "2px #401268",
+          "text": "#401268",
+          "hover": {
+            "background": "#401268",
+            "text": "#ffffff"
+          }
+        },
+        "doNot": "DO NOT use #e2ae3d as button background unless specifically for warm accents. DO NOT apply gradients to buttons."
+      },
+      "icons": {
+        "navigation": {
+          "fillDefault": "#401268",
+          "fillActive": "#e21b35 or #c5a3ff",
+          "background": "none",
+          "context": "Header nav, footer links"
+        },
+        "action": {
+          "fill": "#ffffff on colored background, or #401268 on light",
+          "containerBackground": "#401268 or #c5a3ff for filled icons"
+        },
+        "decorative": {
+          "fill": "#c5a3ff or #e2ae3d"
+        },
+        "doNot": "DO NOT fill icons with #f8f6f0. DO NOT apply gradients to icon fills."
+      },
+      "textHierarchy": {
+        "h1": {
+          "color": "#401268",
+          "weight": "bold"
+        },
+        "h2_h3": {
+          "color": "#401268"
+        },
+        "body": {
+          "color": "#333333 or rgba(64,18,104,0.8)"
+        },
+        "caption": {
+          "color": "rgba(64,18,104,0.6)"
+        },
+        "accentText": {
+          "color": "#c5a3ff or #e21b35",
+          "context": "Prices, badges, highlights"
+        }
+      },
+      "logo": {
+        "primaryFill": "#401268 with gradient overlay to #c5a3ff possible",
+        "context": "Main logo uses indigo-ink base with mauve highlight",
+        "alternative": "White on dark backgrounds"
+      },
+      "visualEffects": {
+        "shadows": {
+          "cards": "0 4px 20px rgba(64,18,104,0.1)",
+          "buttons": "none or subtle inset on press",
+          "floatingElements": "0 12px 32px rgba(64,18,104,0.15) on hover"
+        },
+        "borderRadius": {
+          "cards": "16px",
+          "buttons": "12px",
+          "images": "12px-16px",
+          "inputs": "8px"
+        },
+        "hoverAnimations": {
+          "cards": "lift + shadow increase + optional mauve border glow",
+          "buttons": "darken background + scale down slightly on press",
+          "links": "underline #c5a3ff or color shift to #e21b35"
+        }
+      },
+      "modeConsiderations": {
+        "lightMode": {
+          "background": "#f8f6f0",
+          "textPrimary": "#401268",
+          "recommended": "Primary mode based on porcelain background"
+        },
+        "darkMode": {
+          "background": "#401268",
+          "textPrimary": "#c5a3ff or #f8f6f0",
+          "accents": "#e2ae3d and #e21b35 for highlights",
+          "note": "Implement toggle if required – reverse contrasts"
+        }
+      },
+      "strictRules": {
+        "doNot": [
+          "DO NOT apply the multi-color palette gradient to any component except full-section heroes.",
+          "DO NOT use scarlet-rush (#e21b35) or honey-bronze (#e2ae3d) as primary backgrounds.",
+          "DO NOT put button gradients on icons or text.",
+          "DO NOT use mauve (#c5a3ff) as main body text color.",
+          "DO NOT forget shadows on cards for depth.",
+          "DO NOT deviate from exact hex values provided."
+        ]
+      }
+    }
+  }
+}
