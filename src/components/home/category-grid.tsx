@@ -1,14 +1,21 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Shirt, Coffee, Smartphone, ShoppingBag, Package, Image as ImageIcon } from "lucide-react";
+import {
+  Shirt,
+  Coffee,
+  Smartphone,
+  ShoppingBag,
+  Package,
+  Image as ImageIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { PageLayout } from "@/components/page-layout";
 
 interface Category {
   id: string;
   name: string;
-  icon: any;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   image?: string;
   count: string;
   handle: string;
@@ -24,7 +31,7 @@ export const CategoryGrid = () => {
       image: "/img/tshirt.jpg",
       count: "150+ designs",
       handle: "t-shirts",
-      size: "large"
+      size: "large",
     },
     {
       id: "2",
@@ -33,7 +40,7 @@ export const CategoryGrid = () => {
       image: "/img/hoodie.jpg",
       count: "80+ designs",
       handle: "hoodies",
-      size: "medium"
+      size: "medium",
     },
     {
       id: "3",
@@ -42,7 +49,7 @@ export const CategoryGrid = () => {
       image: "/img/mug.jpg",
       count: "60+ designs",
       handle: "mugs",
-      size: "small"
+      size: "small",
     },
     {
       id: "4",
@@ -51,7 +58,7 @@ export const CategoryGrid = () => {
       image: "/img/phone-case.jpg",
       count: "120+ designs",
       handle: "phone-cases",
-      size: "medium"
+      size: "medium",
     },
     {
       id: "5",
@@ -60,7 +67,7 @@ export const CategoryGrid = () => {
       image: "/img/tote.jpg",
       count: "40+ designs",
       handle: "tote-bags",
-      size: "small"
+      size: "small",
     },
     // {
     //   id: "6",
@@ -75,11 +82,11 @@ export const CategoryGrid = () => {
   const getSizeClasses = (size: string) => {
     switch (size) {
       case "large":
-        return "md:col-span-2 md:row-span-2";
+        return "md:col-span-5 md:row-span-2";
       case "medium":
-        return "md:col-span-2 md:row-span-1";
+        return "md:col-span-3 md:row-span-1";
       case "small":
-        return "md:col-span-1 md:row-span-1";
+        return "md:col-span-3 md:row-span-1";
       default:
         return "";
     }
@@ -99,7 +106,7 @@ export const CategoryGrid = () => {
   };
 
   return (
-    <section className="py-16" style={{ backgroundColor: '#ffffff' }}>
+    <section className="py-16" style={{ backgroundColor: "#ffffff" }}>
       <PageLayout>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -107,15 +114,21 @@ export const CategoryGrid = () => {
           viewport={{ once: true }}
           className="text-center mb-10"
         >
-          <h2 className="text-3xl md:text-4xl font-black mb-3" style={{ color: '#401268' }}>
+          <h2
+            className="text-3xl md:text-4xl font-black mb-3"
+            style={{ color: "#401268" }}
+          >
             Shop by Category
           </h2>
-          <p className="text-base md:text-lg" style={{ color: 'rgba(64, 18, 104, 0.8)' }}>
+          <p
+            className="text-base md:text-lg"
+            style={{ color: "rgba(64, 18, 104, 0.8)" }}
+          >
             Find your perfect product type
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 auto-rows-fr grid-flow-row-dense">
+        <div className="grid grid-cols-2 md:grid-cols-8 gap-3 md:gap-4">
           {categories.map((category, index) => (
             <motion.div
               key={category.id}
@@ -124,26 +137,28 @@ export const CategoryGrid = () => {
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
               whileHover={{ scale: 1.01, y: -5 }}
-              className={/* getSizeClasses(category.size) */"h-auto"}
+              className={getSizeClasses(category.size) + " h-auto"}
             >
               <Link href={`/collections/${category.handle}`}>
                 <div
                   className="h-full rounded-2xl overflow-hidden cursor-pointer transition-all flex flex-col"
                   style={{
-                    backgroundColor: index % 2 === 0 ? '#f8f6f0' : '#ffffff',
-                    borderRadius: '16px',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-                    border: '1px solid #e0e0e0'
+                    backgroundColor: index % 2 === 0 ? "#f8f6f0" : "#ffffff",
+                    borderRadius: "16px",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                    border: "1px solid #e0e0e0",
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.boxShadow = '0 8px 24px rgba(64,18,104,0.15)';
-                    e.currentTarget.style.borderColor = '#c5a3ff';
-                    e.currentTarget.style.borderWidth = '2px';
+                    e.currentTarget.style.boxShadow =
+                      "0 8px 24px rgba(64,18,104,0.15)";
+                    e.currentTarget.style.borderColor = "#c5a3ff";
+                    e.currentTarget.style.borderWidth = "2px";
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.05)';
-                    e.currentTarget.style.borderColor = '#e0e0e0';
-                    e.currentTarget.style.borderWidth = '1px';
+                    e.currentTarget.style.boxShadow =
+                      "0 4px 12px rgba(0,0,0,0.05)";
+                    e.currentTarget.style.borderColor = "#e0e0e0";
+                    e.currentTarget.style.borderWidth = "1px";
                   }}
                 >
                   {category.image ? (
@@ -153,21 +168,32 @@ export const CategoryGrid = () => {
                         alt={category.name}
                         className="w-full h-full object-cover"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                      <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent" />
                     </div>
                   ) : (
                     <div
-                      className={`${getIconSize(category.size)} mb-3 mt-4 mx-auto rounded-xl flex items-center justify-center`}
-                      style={{ backgroundColor: '#401268' }}
+                      className={`${getIconSize(
+                        category.size
+                      )} mb-3 mt-4 mx-auto rounded-xl flex items-center justify-center`}
+                      style={{ backgroundColor: "#401268" }}
                     >
-                      <category.icon className={getIconSize(category.size)} style={{ color: '#ffffff' }} />
+                      <category.icon
+                        className={getIconSize(category.size)}
+                        style={{ color: "#ffffff" }}
+                      />
                     </div>
                   )}
                   <div className="p-4 md:p-6 flex flex-col items-center justify-center">
-                    <h3 className="text-lg md:text-xl font-bold mb-2 text-center" style={{ color: '#401268' }}>
+                    <h3
+                      className="text-lg md:text-xl font-bold mb-2 text-center"
+                      style={{ color: "#401268" }}
+                    >
                       {category.name}
                     </h3>
-                    <p className="text-xs md:text-sm text-center" style={{ color: 'rgba(64, 18, 104, 0.6)' }}>
+                    <p
+                      className="text-xs md:text-sm text-center"
+                      style={{ color: "rgba(64, 18, 104, 0.6)" }}
+                    >
                       {category.count}
                     </p>
                   </div>
@@ -180,4 +206,3 @@ export const CategoryGrid = () => {
     </section>
   );
 };
-

@@ -31,7 +31,7 @@ export default function CartPage() {
             Your Cart is Empty
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto">
-            Looks like you haven't added any items to your cart yet. Start
+            Looks like you haven&#39;t added any items to your cart yet. Start
             shopping to find your perfect geek gear!
           </p>
           <Link href="/collections/all">

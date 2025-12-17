@@ -1,21 +1,22 @@
-'use client';
+"use client";
+/* eslint-disable react-hooks/set-state-in-effect */
 
-import { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { 
-  Package, 
-  TrendingUp, 
-  DollarSign, 
+import { useState, useEffect, useCallback } from "react";
+import { createClient } from "@supabase/supabase-js";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  Package,
+  TrendingUp,
+  DollarSign,
   Download,
   CheckCircle,
   Clock,
   XCircle,
   Search,
-  RefreshCw
-} from 'lucide-react';
+  RefreshCw,
+} from "lucide-react";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -54,18 +55,33 @@ export default function AdminOrdersPage() {
     avgOrderValue: 0,
   });
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
 
-  const fetchOrders = async () => {
+  const calculateStats = (orderData: Order[]) => {
+    const totalOrders = orderData.length;
+    const totalRevenue = orderData.reduce(
+      (sum, o) => sum + (o.retail_price || 0),
+      0
+    );
+    const totalProfit = orderData.reduce(
+      (sum, o) => sum + (o.profit_margin || 0),
+      0
+    );
+    const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+
+    setStats({ totalOrders, totalRevenue, totalProfit, avgOrderValue });
+  };
+
+  const fetchOrders = useCallback(async () => {
     setLoading(true);
     const { data, error } = await supabase
-      .from('orders_log')
-      .select('*')
-      .order('created_at', { ascending: false });
+      .from("orders_log")
+      .select("*")
+      .order("created_at", { ascending: false });
 
     if (error) {
-      console.error('Error fetching orders:', error);
+      console.error("Error fetching orders:", error);
       setLoading(false);
       return;
     }
@@ -74,16 +90,7 @@ export default function AdminOrdersPage() {
     setFilteredOrders(data || []);
     calculateStats(data || []);
     setLoading(false);
-  };
-
-  const calculateStats = (orderData: Order[]) => {
-    const totalOrders = orderData.length;
-    const totalRevenue = orderData.reduce((sum, o) => sum + (o.retail_price || 0), 0);
-    const totalProfit = orderData.reduce((sum, o) => sum + (o.profit_margin || 0), 0);
-    const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
-
-    setStats({ totalOrders, totalRevenue, totalProfit, avgOrderValue });
-  };
+  }, []);
 
   const handleSearch = (term: string) => {
     setSearchTerm(term);
@@ -107,40 +114,25 @@ export default function AdminOrdersPage() {
       );
     }
 
-    if (status !== 'all') {
+    if (status !== "all") {
       filtered = filtered.filter((o) => o.status === status);
     }
 
     setFilteredOrders(filtered);
   };
 
-  const markAsShipped = async (orderId: number, trackingNumber: string) => {
-    const { error } = await supabase
-      .from('orders_log')
-      .update({
-        status: 'shipped',
-        tracking_number: trackingNumber,
-        shipped_at: new Date().toISOString(),
-      })
-      .eq('id', orderId);
-
-    if (!error) {
-      fetchOrders();
-    }
-  };
-
   const exportToCSV = () => {
     const headers = [
-      'Order ID',
-      'Shopify Order',
-      'Customer Email',
-      'Provider',
-      'Status',
-      'Retail Price',
-      'POD Cost',
-      'Profit',
-      'Tracking',
-      'Created At',
+      "Order ID",
+      "Shopify Order",
+      "Customer Email",
+      "Provider",
+      "Status",
+      "Retail Price",
+      "POD Cost",
+      "Profit",
+      "Tracking",
+      "Created At",
     ];
 
     const rows = filteredOrders.map((o) => [
@@ -149,17 +141,17 @@ export default function AdminOrdersPage() {
       o.customer_email,
       o.fulfillment_provider,
       o.status,
-      o.retail_price?.toFixed(2) || '0.00',
-      o.pod_cost?.toFixed(2) || '0.00',
-      o.profit_margin?.toFixed(2) || '0.00',
-      o.tracking_number || 'N/A',
+      o.retail_price?.toFixed(2) || "0.00",
+      o.pod_cost?.toFixed(2) || "0.00",
+      o.profit_margin?.toFixed(2) || "0.00",
+      o.tracking_number || "N/A",
       new Date(o.created_at).toLocaleString(),
     ]);
 
-    const csv = [headers, ...rows].map((row) => row.join(',')).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
+    const csv = [headers, ...rows].map((row) => row.join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
     a.download = `geeks-creation-orders-${Date.now()}.csv`;
     a.click();
@@ -167,19 +159,39 @@ export default function AdminOrdersPage() {
 
   useEffect(() => {
     fetchOrders();
-  }, []);
+  }, [fetchOrders]);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'success':
-        return <Badge className="bg-green-500"><CheckCircle className="w-3 h-3 mr-1" />Success</Badge>;
-      case 'pending':
-        return <Badge className="bg-yellow-500"><Clock className="w-3 h-3 mr-1" />Pending</Badge>;
-      case 'shipped':
-        return <Badge className="bg-blue-500"><Package className="w-3 h-3 mr-1" />Shipped</Badge>;
-      case 'failed':
-      case 'error':
-        return <Badge className="bg-red-500"><XCircle className="w-3 h-3 mr-1" />Failed</Badge>;
+      case "success":
+        return (
+          <Badge className="bg-green-500">
+            <CheckCircle className="w-3 h-3 mr-1" />
+            Success
+          </Badge>
+        );
+      case "pending":
+        return (
+          <Badge className="bg-yellow-500">
+            <Clock className="w-3 h-3 mr-1" />
+            Pending
+          </Badge>
+        );
+      case "shipped":
+        return (
+          <Badge className="bg-blue-500">
+            <Package className="w-3 h-3 mr-1" />
+            Shipped
+          </Badge>
+        );
+      case "failed":
+      case "error":
+        return (
+          <Badge className="bg-red-500">
+            <XCircle className="w-3 h-3 mr-1" />
+            Failed
+          </Badge>
+        );
       default:
         return <Badge>{status}</Badge>;
     }
@@ -211,7 +223,9 @@ export default function AdminOrdersPage() {
           <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Total Orders</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Total Orders
+                </p>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">
                   {stats.totalOrders}
                 </p>
@@ -223,7 +237,9 @@ export default function AdminOrdersPage() {
           <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Total Revenue</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Total Revenue
+                </p>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">
                   ₦{stats.totalRevenue.toLocaleString()}
                 </p>
@@ -235,7 +251,9 @@ export default function AdminOrdersPage() {
           <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Total Profit</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Total Profit
+                </p>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">
                   ₦{stats.totalProfit.toLocaleString()}
                 </p>
@@ -247,7 +265,9 @@ export default function AdminOrdersPage() {
           <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Avg Order Value</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Avg Order Value
+                </p>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">
                   ₦{stats.avgOrderValue.toLocaleString()}
                 </p>
@@ -271,16 +291,18 @@ export default function AdminOrdersPage() {
             </div>
 
             <div className="flex gap-2">
-              {['all', 'success', 'pending', 'shipped', 'failed'].map((status) => (
-                <Button
-                  key={status}
-                  variant={statusFilter === status ? 'default' : 'outline'}
-                  onClick={() => handleStatusFilter(status)}
-                  size="sm"
-                >
-                  {status.charAt(0).toUpperCase() + status.slice(1)}
-                </Button>
-              ))}
+              {["all", "success", "pending", "shipped", "failed"].map(
+                (status) => (
+                  <Button
+                    key={status}
+                    variant={statusFilter === status ? "default" : "outline"}
+                    onClick={() => handleStatusFilter(status)}
+                    size="sm"
+                  >
+                    {status.charAt(0).toUpperCase() + status.slice(1)}
+                  </Button>
+                )
+              )}
             </div>
 
             <div className="flex gap-2">
@@ -327,16 +349,21 @@ export default function AdminOrdersPage() {
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                 {filteredOrders.map((order) => (
-                  <tr key={order.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                  <tr
+                    key={order.id}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                  >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900 dark:text-white">
                         #{order.shopify_order_id}
                       </div>
-                      <div className="text-xs text-gray-500">ID: {order.id}</div>
+                      <div className="text-xs text-gray-500">
+                        ID: {order.id}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900 dark:text-white">
-                        {order.customer_email || 'N/A'}
+                        {order.customer_email || "N/A"}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -348,10 +375,10 @@ export default function AdminOrdersPage() {
                       {getStatusBadge(order.status)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      ₦{order.retail_price?.toLocaleString() || '0'}
+                      ₦{order.retail_price?.toLocaleString() || "0"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">
-                      ₦{order.profit_margin?.toLocaleString() || '0'}
+                      ₦{order.profit_margin?.toLocaleString() || "0"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {new Date(order.created_at).toLocaleDateString()}
@@ -365,7 +392,9 @@ export default function AdminOrdersPage() {
           {filteredOrders.length === 0 && (
             <div className="text-center py-12">
               <Package className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-              <p className="text-gray-500 dark:text-gray-400">No orders found</p>
+              <p className="text-gray-500 dark:text-gray-400">
+                No orders found
+              </p>
             </div>
           )}
         </div>

@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
-import { useRouter } from 'next/navigation';
-import { Shield, LogOut, Instagram, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { motion } from 'framer-motion';
+import { useEffect, useState, useCallback } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
+import { Shield, LogOut, Instagram, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
 
 export default function AdminLayout({
   children,
@@ -14,60 +14,42 @@ export default function AdminLayout({
 }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const router = useRouter();
   const supabase = createClient();
 
-  useEffect(() => {
-    checkAuth();
-
-    // Listen for auth state changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) {
-        checkAuth();
-      } else {
-        setLoading(false);
-        setIsAuthenticated(false);
-        router.push('/admin/login');
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [router]);
-
-  const checkAuth = async () => {
+  const checkAuth = useCallback(async () => {
     try {
       setLoading(true);
-      const { data: { session }, error } = await supabase.auth.getSession();
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
 
       if (error) {
-        console.error('Error getting session:', error);
+        console.error("Error getting session:", error);
         setLoading(false);
-        router.push('/admin/login');
+        router.push("/admin/login");
         return;
       }
 
       if (!session) {
         setLoading(false);
-        router.push('/admin/login');
+        router.push("/admin/login");
         return;
       }
 
       // Check if user is admin (geekcreations.com or codeoven.tech email)
-      const userEmail = session.user.email || '';
-      const isAdmin = 
-        userEmail.endsWith('@geekcreations.com') ||
-        userEmail.endsWith('@codeoven.tech') ||
-        userEmail === 'admin@geekscreation.com';
+      const userEmail = session.user.email || "";
+      const isAdmin =
+        userEmail.endsWith("@geekcreations.com") ||
+        userEmail.endsWith("@codeoven.tech") ||
+        userEmail === "admin@geekscreation.com";
 
       if (!isAdmin) {
         await supabase.auth.signOut();
         setLoading(false);
-        router.push('/admin/login');
+        router.push("/admin/login");
         return;
       }
 
@@ -75,15 +57,38 @@ export default function AdminLayout({
       setIsAuthenticated(true);
       setLoading(false);
     } catch (error) {
-      console.error('Error in checkAuth:', error);
+      console.error("Error in checkAuth:", error);
       setLoading(false);
-      router.push('/admin/login');
+      router.push("/admin/login");
     }
-  };
+  }, [router, supabase]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void checkAuth();
+
+    // Listen for auth state changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+         
+        void checkAuth();
+      } else {
+        setLoading(false);
+        setIsAuthenticated(false);
+        router.push("/admin/login");
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [checkAuth, router, supabase]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    router.push('/admin/login');
+    router.push("/admin/login");
   };
 
   if (loading) {
@@ -128,10 +133,11 @@ export default function AdminLayout({
       <main className="min-h-[calc(100vh-200px)]">{children}</main>
 
       {/* Admin Footer with Gradient */}
-      <footer 
+      <footer
         className="relative overflow-hidden"
         style={{
-          background: 'linear-gradient(135deg, #401268 0%, #c5a3ff 50%, #e2ae3d 100%)'
+          background:
+            "linear-gradient(135deg, #401268 0%, #c5a3ff 50%, #e2ae3d 100%)",
         }}
       >
         {/* Animated Gloss/Shimmer Effect */}
@@ -139,42 +145,44 @@ export default function AdminLayout({
           className="absolute inset-0 opacity-30"
           animate={{
             background: [
-              'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%)',
-              'linear-gradient(90deg, transparent 100%, rgba(255,255,255,0.1) 50%, transparent 0%)',
+              "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%)",
+              "linear-gradient(90deg, transparent 100%, rgba(255,255,255,0.1) 50%, transparent 0%)",
             ],
           }}
           transition={{
             duration: 3,
             repeat: Infinity,
-            ease: 'linear',
+            ease: "linear",
           }}
           style={{
-            backgroundPosition: '200% 0',
+            backgroundPosition: "200% 0",
           }}
         />
-        
+
         <div className="absolute inset-0 bg-black/20" />
-        
+
         {/* Glow Orbs */}
-        <div 
+        <div
           className="absolute top-0 left-1/4 w-64 h-64 rounded-full blur-3xl opacity-50"
-          style={{ backgroundColor: 'rgba(197, 163, 255, 0.3)' }}
+          style={{ backgroundColor: "rgba(197, 163, 255, 0.3)" }}
         />
-        <div 
+        <div
           className="absolute bottom-0 right-1/4 w-64 h-64 rounded-full blur-3xl opacity-50"
-          style={{ backgroundColor: 'rgba(226, 174, 61, 0.3)' }}
+          style={{ backgroundColor: "rgba(226, 174, 61, 0.3)" }}
         />
-        
+
         <div className="relative z-10 max-w-7xl mx-auto px-6 py-12">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
-              <motion.h3 
+              <motion.h3
                 className="text-2xl font-black mb-4 text-white relative"
                 style={{
-                  textShadow: '0 0 20px rgba(197, 163, 255, 0.5), 0 0 40px rgba(197, 163, 255, 0.3)'
+                  textShadow:
+                    "0 0 20px rgba(197, 163, 255, 0.5), 0 0 40px rgba(197, 163, 255, 0.3)",
                 }}
                 whileHover={{
-                  textShadow: '0 0 30px rgba(197, 163, 255, 0.8), 0 0 60px rgba(197, 163, 255, 0.5)',
+                  textShadow:
+                    "0 0 30px rgba(197, 163, 255, 0.8), 0 0 60px rgba(197, 163, 255, 0.5)",
                   scale: 1.02,
                 }}
                 transition={{ duration: 0.3 }}
@@ -194,10 +202,11 @@ export default function AdminLayout({
                   className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center relative"
                   whileHover={{
                     scale: 1.1,
-                    boxShadow: '0 0 20px rgba(197, 163, 255, 0.6), 0 0 40px rgba(197, 163, 255, 0.3)',
+                    boxShadow:
+                      "0 0 20px rgba(197, 163, 255, 0.6), 0 0 40px rgba(197, 163, 255, 0.3)",
                   }}
                   style={{
-                    boxShadow: '0 0 10px rgba(255, 255, 255, 0.2)',
+                    boxShadow: "0 0 10px rgba(255, 255, 255, 0.2)",
                   }}
                 >
                   <Instagram className="w-5 h-5 text-white" />
@@ -209,10 +218,11 @@ export default function AdminLayout({
                   className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center relative"
                   whileHover={{
                     scale: 1.1,
-                    boxShadow: '0 0 20px rgba(197, 163, 255, 0.6), 0 0 40px rgba(197, 163, 255, 0.3)',
+                    boxShadow:
+                      "0 0 20px rgba(197, 163, 255, 0.6), 0 0 40px rgba(197, 163, 255, 0.3)",
                   }}
                   style={{
-                    boxShadow: '0 0 10px rgba(255, 255, 255, 0.2)',
+                    boxShadow: "0 0 10px rgba(255, 255, 255, 0.2)",
                   }}
                 >
                   <X className="w-5 h-5 text-white" />
@@ -221,62 +231,75 @@ export default function AdminLayout({
             </div>
 
             <div>
-              <h4 className="font-bold mb-4 text-white" style={{ textShadow: '0 0 10px rgba(255, 255, 255, 0.3)' }}>
+              <h4
+                className="font-bold mb-4 text-white"
+                style={{ textShadow: "0 0 10px rgba(255, 255, 255, 0.3)" }}
+              >
                 Platform
               </h4>
               <ul className="space-y-2">
-                {['Start Selling', 'Products', 'Pricing', 'Features'].map((item) => (
-                  <motion.li
-                    key={item}
-                    className="text-white/70 cursor-pointer text-sm relative"
-                    whileHover={{
-                      color: '#ffffff',
-                      x: 4,
-                      textShadow: '0 0 8px rgba(197, 163, 255, 0.6)',
-                    }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    {item}
-                  </motion.li>
-                ))}
+                {["Start Selling", "Products", "Pricing", "Features"].map(
+                  (item) => (
+                    <motion.li
+                      key={item}
+                      className="text-white/70 cursor-pointer text-sm relative"
+                      whileHover={{
+                        color: "#ffffff",
+                        x: 4,
+                        textShadow: "0 0 8px rgba(197, 163, 255, 0.6)",
+                      }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {item}
+                    </motion.li>
+                  )
+                )}
               </ul>
             </div>
 
             <div>
-              <h4 className="font-bold mb-4 text-white" style={{ textShadow: '0 0 10px rgba(255, 255, 255, 0.3)' }}>
+              <h4
+                className="font-bold mb-4 text-white"
+                style={{ textShadow: "0 0 10px rgba(255, 255, 255, 0.3)" }}
+              >
                 Resources
               </h4>
               <ul className="space-y-2">
-                {['Documentation', 'Design Guide', 'Blog', 'Support'].map((item) => (
-                  <motion.li
-                    key={item}
-                    className="text-white/70 cursor-pointer text-sm relative"
-                    whileHover={{
-                      color: '#ffffff',
-                      x: 4,
-                      textShadow: '0 0 8px rgba(197, 163, 255, 0.6)',
-                    }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    {item}
-                  </motion.li>
-                ))}
+                {["Documentation", "Design Guide", "Blog", "Support"].map(
+                  (item) => (
+                    <motion.li
+                      key={item}
+                      className="text-white/70 cursor-pointer text-sm relative"
+                      whileHover={{
+                        color: "#ffffff",
+                        x: 4,
+                        textShadow: "0 0 8px rgba(197, 163, 255, 0.6)",
+                      }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {item}
+                    </motion.li>
+                  )
+                )}
               </ul>
             </div>
 
             <div>
-              <h4 className="font-bold mb-4 text-white" style={{ textShadow: '0 0 10px rgba(255, 255, 255, 0.3)' }}>
+              <h4
+                className="font-bold mb-4 text-white"
+                style={{ textShadow: "0 0 10px rgba(255, 255, 255, 0.3)" }}
+              >
                 Company
               </h4>
               <ul className="space-y-2">
-                {['About Us', 'Contact', 'Terms', 'Privacy'].map((item) => (
+                {["About Us", "Contact", "Terms", "Privacy"].map((item) => (
                   <motion.li
                     key={item}
                     className="text-white/70 cursor-pointer text-sm relative"
                     whileHover={{
-                      color: '#ffffff',
+                      color: "#ffffff",
                       x: 4,
-                      textShadow: '0 0 8px rgba(197, 163, 255, 0.6)',
+                      textShadow: "0 0 8px rgba(197, 163, 255, 0.6)",
                     }}
                     transition={{ duration: 0.2 }}
                   >
@@ -290,13 +313,13 @@ export default function AdminLayout({
           <div
             className="pt-8 border-t text-center relative"
             style={{
-              borderColor: 'rgba(255, 255, 255, 0.2)',
+              borderColor: "rgba(255, 255, 255, 0.2)",
             }}
           >
-            <motion.p 
+            <motion.p
               className="text-white/70 text-sm"
               style={{
-                textShadow: '0 0 10px rgba(255, 255, 255, 0.2)',
+                textShadow: "0 0 10px rgba(255, 255, 255, 0.2)",
               }}
               animate={{
                 opacity: [0.7, 1, 0.7],
@@ -304,7 +327,7 @@ export default function AdminLayout({
               transition={{
                 duration: 2,
                 repeat: Infinity,
-                ease: 'easeInOut',
+                ease: "easeInOut",
               }}
             >
               © 2025 Geeks Creation. All rights reserved. Powered by CodeOven 🔥

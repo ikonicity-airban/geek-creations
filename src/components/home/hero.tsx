@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ShoppingBag, ArrowRight, Grid3x3 } from "lucide-react";
+import { ShoppingBag, ArrowRight, Grid3x3, Wand, Wand2 } from "lucide-react";
 import Link from "next/link";
 import { BackgroundLines } from "@/components/ui/background-lines";
 
@@ -50,7 +50,7 @@ export const Hero = ({ darkMode }: { darkMode: boolean }) => {
             transition={{ delay: 0.7 }}
             className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start"
           >
-            <Link href="/collections/all">
+            <Link href="/editor">
               <button
                 className="group relative px-6 py-3 rounded-xl font-bold text-base shadow-2xl transition-all flex items-center justify-center"
                 style={{
@@ -65,31 +65,33 @@ export const Hero = ({ darkMode }: { darkMode: boolean }) => {
                   (e.currentTarget.style.backgroundColor = "#401268")
                 }
               >
-                <ShoppingBag className="inline-block w-5 h-5 mr-2" />
-                Shop All Designs
+                <Wand2 className="inline-block w-5 h-5 mr-2" />
+                Start designing now
                 <ArrowRight className="inline-block w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
               </button>
             </Link>
-            <button
-              className="px-6 py-3 border-2 rounded-xl font-bold text-base transition-all flex items-center justify-center"
-              style={{
-                borderColor: darkMode ? "rgba(207, 156, 4, 0.5)" : "#401268",
-                color: darkMode ? "#c5a3ff" : "#401268",
-                borderRadius: "12px",
-                backgroundColor: "transparent",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = darkMode
-                  ? "rgba(197, 163, 255, 0.1)"
-                  : "rgba(64, 18, 104, 0.05)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "transparent";
-              }}
-            >
-              <Grid3x3 className="inline-block w-5 h-5 mr-2" />
-              Browse Categories
-            </button>
+            <Link href="#featured">
+              <button
+                className="px-6 py-3 border-2 rounded-xl font-bold text-base transition-all flex items-center justify-center"
+                style={{
+                  borderColor: darkMode ? "rgba(207, 156, 4, 0.5)" : "#401268",
+                  color: darkMode ? "#c5a3ff" : "#401268",
+                  borderRadius: "12px",
+                  backgroundColor: "transparent",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = darkMode
+                    ? "rgba(197, 163, 255, 0.1)"
+                    : "rgba(64, 18, 104, 0.05)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "transparent";
+                }}
+              >
+                <ShoppingBag className="inline-block w-5 h-5 mr-2" />
+                Browse featured
+              </button>
+            </Link>
           </motion.div>
         </motion.div>
 

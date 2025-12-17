@@ -1,40 +1,46 @@
 // app/api/cron/sync-inventory/route.ts
-import { NextRequest, NextResponse } from 'next/server';
-import { db, products, variants, collections } from '@/lib/db';
-import { syncProducts, syncCollections } from '@/lib/shopify';
-import { eq } from 'drizzle-orm';
+import { NextRequest, NextResponse } from "next/server";
+import { db, products, variants, collections } from "@/lib/db";
+import {
+  syncProducts,
+  syncCollections
+} from "@/lib/shopify";
+import { eq } from "drizzle-orm";
 
 export async function GET(req: NextRequest) {
   try {
     // Verify cron secret
-    const authHeader = req.headers.get('authorization');
+    const authHeader = req.headers.get("authorization");
     if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    console.log('Starting inventory sync...');
+    console.log("Starting inventory sync...");
 
     // Sync products
     const shopifyProducts = await syncProducts();
-    
+
     for (const product of shopifyProducts) {
       // Extract Shopify ID from GraphQL ID
-      const shopifyProductId = parseInt(product.id.split('/').pop() || '0');
+      const shopifyProductId = parseInt(product.id.split("/").pop() || "0");
 
       // Prepare product data
       const productData = {
         shopifyProductId,
         title: product.title,
         handle: product.handle,
-        description: product.description || '',
-        vendor: product.vendor || '',
-        productType: product.productType || '',
+        description: product.description || "",
+        vendor: product.vendor || "",
+        productType: product.productType || "",
         tags: product.tags || [],
         status: product.status.toLowerCase(),
-        fulfillmentProvider: product.metafields?.edges?.find(
-          (m: any) => m.node.namespace === 'custom' && m.node.key === 'fulfillment_provider'
-        )?.node.value || 'printful',
-        images: product.images.edges.map((img: any, idx: number) => ({
+        fulfillmentProvider:
+          product.metafields?.edges?.find(
+            (m) =>
+              m.node.namespace === "custom" &&
+              m.node.key === "fulfillment_provider"
+          )?.node.value || "printful",
+        images: product.images.edges.map((img, idx: number) => ({
           id: img.node.id,
           src: img.node.src,
           alt: img.node.altText || product.title,
@@ -69,7 +75,7 @@ export async function GET(req: NextRequest) {
       // Sync variants
       for (const variantEdge of product.variants.edges) {
         const variant = variantEdge.node;
-        const shopifyVariantId = parseInt(variant.id.split('/').pop() || '0');
+        const shopifyVariantId = parseInt(variant.id.split("/").pop() || "0");
 
         const variantData = {
           productId,
@@ -77,10 +83,10 @@ export async function GET(req: NextRequest) {
           title: variant.title,
           price: variant.price,
           compareAtPrice: variant.compareAtPrice || null,
-          sku: variant.sku || '',
+          sku: variant.sku || "",
           inventoryQuantity: variant.inventoryQuantity || 0,
           weight: variant.weight ? String(variant.weight) : null,
-          weightUnit: variant.weightUnit || 'kg',
+          weightUnit: variant.weightUnit || "kg",
           option1: variant.selectedOptions[0]?.value || null,
           option2: variant.selectedOptions[1]?.value || null,
           option3: variant.selectedOptions[2]?.value || null,
@@ -108,13 +114,15 @@ export async function GET(req: NextRequest) {
     const shopifyCollections = await syncCollections();
 
     for (const collection of shopifyCollections) {
-      const shopifyCollectionId = parseInt(collection.id.split('/').pop() || '0');
+      const shopifyCollectionId = parseInt(
+        collection.id.split("/").pop() || "0"
+      );
 
       const collectionData = {
         shopifyCollectionId,
         title: collection.title,
         handle: collection.handle,
-        description: collection.description || '',
+        description: collection.description || "",
         imageUrl: collection.image?.src || null,
         published: true,
         updatedAt: new Date(),
@@ -136,7 +144,7 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    console.log('Inventory sync completed successfully');
+    console.log("Inventory sync completed successfully");
 
     return NextResponse.json({
       success: true,
@@ -146,9 +154,9 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Inventory sync error:', error);
+    console.error("Inventory sync error:", error);
     return NextResponse.json(
-      { error: 'Sync failed', details: String(error) },
+      { error: "Sync failed", details: String(error) },
       { status: 500 }
     );
   }

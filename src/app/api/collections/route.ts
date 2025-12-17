@@ -1,13 +1,15 @@
 // app/api/collections/route.ts
-import { NextRequest, NextResponse } from 'next/server';
-import { db, collections } from '@/lib/db';
-import { eq } from 'drizzle-orm';
-import { getAllCollections } from '@/lib/mock-data/collections';
+import { NextResponse } from "next/server";
+import { db, collections } from "@/lib/db";
+import { eq } from "drizzle-orm";
+import { getAllCollections } from "@/lib/mock-data/collections";
 
-export async function GET(req: NextRequest) {
+type DbCollection = typeof collections.$inferSelect;
+
+export async function GET() {
   try {
     // Try to fetch from database first
-    let dbCollections: any[] = [];
+    let dbCollections: DbCollection[] = [];
 
     try {
       dbCollections = await db
@@ -17,14 +19,14 @@ export async function GET(req: NextRequest) {
         .orderBy(collections.createdAt);
     } catch (dbError) {
       // Database error, fall through to mock data
-      console.log('Database query failed, using mock data:', dbError);
+      console.log("Database query failed, using mock data:", dbError);
     }
 
     // Fallback to mock data if database is empty or has errors
     if (dbCollections.length === 0) {
       const mockCollections = getAllCollections();
       return NextResponse.json({
-        collections: mockCollections.map(c => ({
+        collections: mockCollections.map((c) => ({
           id: c.id,
           shopify_collection_id: c.shopify_collection_id,
           title: c.title,
@@ -40,25 +42,28 @@ export async function GET(req: NextRequest) {
     }
 
     return NextResponse.json({
-      collections: dbCollections.map(c => ({
+      collections: dbCollections.map((c) => ({
         id: c.id,
-        shopify_collection_id: c.shopifyCollectionId,
+        shopify_collection_id: c.shopifyCollectionId ?? undefined,
         title: c.title,
         handle: c.handle,
-        description: c.description || '',
+        description: c.description || "",
         image_url: c.imageUrl,
         product_count: 0, // Would need to count separately
-        published: c.published,
-        created_at: c.createdAt.toISOString(),
-        updated_at: c.updatedAt.toISOString(),
+        published: Boolean(c.published),
+        created_at: c.createdAt
+          ? c.createdAt.toISOString()
+          : new Date().toISOString(),
+        updated_at: c.updatedAt
+          ? c.updatedAt.toISOString()
+          : new Date().toISOString(),
       })),
     });
   } catch (error) {
-    console.error('Error fetching collections:', error);
+    console.error("Error fetching collections:", error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }
 }
-

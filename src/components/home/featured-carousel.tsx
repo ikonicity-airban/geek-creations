@@ -76,7 +76,7 @@ export const FeaturedCarousel = () => {
   };
 
   return (
-    <section className="py-16">
+    <section id="featured" className="py-16">
       <PageLayout>
         <motion.div
           initial={{ opacity: 0, y: 20 }}

@@ -9,8 +9,8 @@ export interface Product {
   vendor: string;
   product_type: string;
   tags: string[];
-  status: 'active' | 'draft' | 'archived';
-  fulfillment_provider: 'printful' | 'printify' | 'ikonshop';
+  status: "active" | "draft" | "archived";
+  fulfillment_provider: "printful" | "printify" | "ikonshop";
   images: ProductImage[];
   variants: Variant[];
   created_at: string;
@@ -87,7 +87,7 @@ export interface Order {
   order_number: string;
   customer_email: string;
   fulfillment_provider: string;
-  status: 'pending' | 'success' | 'shipped' | 'failed' | 'error';
+  status: "pending" | "success" | "shipped" | "failed" | "error";
   profit_margin: number;
   retail_price: number;
   pod_cost: number;
@@ -107,14 +107,14 @@ export interface CustomDesign {
   };
   product_type: string;
   preview_url?: string;
-  status: 'draft' | 'completed' | 'ordered';
+  status: "draft" | "completed" | "ordered";
   created_at: string;
   updated_at: string;
 }
 
 export interface DesignLayer {
   id: string;
-  type: 'text' | 'image' | 'shape';
+  type: "text" | "image" | "shape";
   content: string;
   x: number;
   y: number;
@@ -149,16 +149,22 @@ export interface CheckoutData {
   email: string;
   shipping_address: ShippingAddress;
   billing_address?: ShippingAddress;
-  payment_method: 'card' | 'crypto' | 'bank_transfer';
-  crypto_currency?: 'USDC' | 'SOL';
+  payment_method: "card" | "crypto" | "bank_transfer";
+  crypto_currency?: "USDC" | "SOL";
 }
 
 export interface AnalyticsEvent {
-  event_type: 'page_view' | 'product_view' | 'add_to_cart' | 'remove_from_cart' | 'checkout_start' | 'purchase';
+  event_type:
+    | "page_view"
+    | "product_view"
+    | "add_to_cart"
+    | "remove_from_cart"
+    | "checkout_start"
+    | "purchase";
   user_id?: string;
   session_id: string;
   product_id?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 // API Response types
@@ -190,8 +196,8 @@ export interface ProductFilters {
 }
 
 export interface ProductSort {
-  field: 'title' | 'price' | 'created_at' | 'popularity';
-  direction: 'asc' | 'desc';
+  field: "title" | "price" | "created_at" | "popularity";
+  direction: "asc" | "desc";
 }
 
 // Webhook types

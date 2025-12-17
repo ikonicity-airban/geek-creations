@@ -85,7 +85,7 @@ export const Testimonials = () => {
                 ))}
               </div>
               <p className="mb-6 text-lg leading-relaxed" style={{ color: 'rgba(64, 18, 104, 0.8)' }}>
-                "{testimonial.content}"
+                {testimonial.content}
               </p>
               <div className="flex items-center gap-4">
                 <div

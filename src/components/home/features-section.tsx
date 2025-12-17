@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Package, Truck, Shield, Zap } from "lucide-react";
 
 interface Feature {
-  icon: any;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   title: string;
   description: string;
 }

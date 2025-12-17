@@ -87,7 +87,7 @@ export const DesignGallery = () => {
               <Link href={`/designs/${design.slug}`}>
                 <FollowerPointerCard title={design.name}>
                   <div
-                    className="rounded-2xl overflow-hidden cursor-pointer transition-all bg-white border-2 border-[#c5a3ff] shadow-[0_8px_24px_rgba(64,18,104,0.15)]"
+                    className="rounded-2xl overflow-hidden cursor-pointer transition-all bg-white border-2 border-mauve shadow-[0_8px_24px_rgba(64,18,104,0.15)]"
                     style={{ borderRadius: "16px" }}
                   >
                     {/* Design Image Placeholder */}

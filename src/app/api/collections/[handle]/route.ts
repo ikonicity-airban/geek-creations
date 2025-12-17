@@ -13,7 +13,7 @@ export async function GET(
 
     // Try to fetch from database first
     let collection;
-    let productsWithVariants: any[] = [];
+    let productsWithVariants: unknown[] = [];
 
     try {
       const [dbCollection] = await db
@@ -52,7 +52,7 @@ export async function GET(
 
             return {
               ...product,
-              images: product.images as any,
+              images: product.images as unknown[],
               tags: product.tags || [],
               variants: productVariants.map(v => ({
                 ...v,

@@ -51,7 +51,7 @@ export const ProductsShowcase = () => {
             200+ Premium Products
           </h2>
           <p className="text-xl" style={{ color: 'rgba(64, 18, 104, 0.8)' }}>
-            From apparel to home decor, we've got you covered
+            From apparel to home decor, we&apos;ve got you covered
           </p>
         </motion.div>
 

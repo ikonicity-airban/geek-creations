@@ -2,9 +2,14 @@
 
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
-import { AnimatePresence, motion, useMotionValue } from "framer-motion";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  MotionValue,
+} from "framer-motion";
 import { cn } from "@/lib/utils";
 
 export const FollowerPointerCard = ({
@@ -50,8 +55,8 @@ export const FollowPointer = ({
   y,
   title,
 }: {
-  x: unknown;
-  y: unknown;
+  x: MotionValue<number>;
+  y: MotionValue<number>;
   title?: string | React.ReactNode;
 }) => {
   const colors = [
@@ -63,12 +68,21 @@ export const FollowPointer = ({
     "#ef4444",
     "#eab308",
   ];
+
+  const resolvedTitle =
+    typeof title === "string" ? title : "William Shakespeare";
+  const colorIndex =
+    Array.from(resolvedTitle).reduce(
+      (sum, char) => sum + char.charCodeAt(0),
+      0
+    ) % colors.length;
+
   return (
     <motion.div
       className="fixed z-[9999] h-4 w-4 rounded-full"
       style={{
-        top: y as any,
-        left: x as any,
+        top: y,
+        left: x,
         pointerEvents: "none",
       }}
       initial={{
@@ -98,7 +112,7 @@ export const FollowPointer = ({
       </svg>
       <motion.div
         style={{
-          backgroundColor: colors[Math.floor(Math.random() * colors.length)],
+          backgroundColor: colors[colorIndex],
           translateX: 6,
           translateY: 10,
         }}

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
 type Design = {
@@ -89,7 +90,10 @@ export default function AdminDesignsPage() {
     >
       <section className="max-w-6xl mx-auto px-6 py-12 space-y-10">
         <div>
-          <h1 className="text-3xl font-black" style={{ color: palette.primary }}>
+          <h1
+            className="text-3xl font-black"
+            style={{ color: palette.primary }}
+          >
             Design Manager
           </h1>
           <p style={{ color: "rgba(64, 18, 104, 0.7)" }}>
@@ -161,28 +165,51 @@ export default function AdminDesignsPage() {
           </button>
         </form>
 
-        <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "#e0e0e0" }}>
+        <div
+          className="rounded-2xl border overflow-hidden"
+          style={{ borderColor: "#e0e0e0" }}
+        >
           <div
             className="px-4 py-3 font-semibold"
-            style={{ backgroundColor: "rgba(197,163,255,0.15)", color: palette.primary }}
+            style={{
+              backgroundColor: "rgba(197,163,255,0.15)",
+              color: palette.primary,
+            }}
           >
             Designs ({designs.length})
           </div>
           <div className="divide-y" style={{ color: palette.primary }}>
             {loading ? (
-              <p className="p-4" style={{ color: palette.primary }}>Loading...</p>
+              <p className="p-4" style={{ color: palette.primary }}>
+                Loading...
+              </p>
             ) : designs.length === 0 ? (
-              <p className="p-4" style={{ color: "rgba(64, 18, 104, 0.7)" }}>No designs yet.</p>
+              <p className="p-4" style={{ color: "rgba(64, 18, 104, 0.7)" }}>
+                No designs yet.
+              </p>
             ) : (
               designs.map((d) => (
                 <div key={d.id} className="p-4 flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-lg overflow-hidden border" style={{ borderColor: "#e0e0e0" }}>
-                    <img src={d.thumbnailUrl || d.imageUrl} alt={d.title} className="w-full h-full object-cover" />
+                  <div
+                    className="w-16 h-16 rounded-lg overflow-hidden border"
+                    style={{ borderColor: "#e0e0e0" }}
+                  >
+                    <Image
+                      width={150}
+                      height={150}
+                      src={d.thumbnailUrl || d.imageUrl}
+                      alt={d.title}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <div className="flex-1">
                     <div className="font-semibold">{d.title}</div>
-                    <div className="text-sm" style={{ color: "rgba(64, 18, 104, 0.65)" }}>
-                      {d.category || "General"} · {d.isActive ? "Active" : "Inactive"}
+                    <div
+                      className="text-sm"
+                      style={{ color: "rgba(64, 18, 104, 0.65)" }}
+                    >
+                      {d.category || "General"} ·{" "}
+                      {d.isActive ? "Active" : "Inactive"}
                     </div>
                   </div>
                   <a
@@ -201,4 +228,3 @@ export default function AdminDesignsPage() {
     </main>
   );
 }
-

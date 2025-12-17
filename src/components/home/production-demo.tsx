@@ -33,11 +33,11 @@ export const ProductionDemo = () => {
     sequence();
   }, [controls, steps.length]);
 
-  // Particle positions for zaps
+  // Particle positions for zaps (deterministic for React purity)
   const particles = Array.from({ length: 12 }, (_, i) => ({
     id: i,
     angle: (i * 360) / 12,
-    distance: 60 + Math.random() * 40,
+    distance: 60 + (i % 4) * 10,
   }));
 
   return (

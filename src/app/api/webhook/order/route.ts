@@ -103,9 +103,10 @@ async function getProductMetafield(variantId: number): Promise<string | null> {
       }
     );
     const metafieldData = await metafieldResponse.json();
-    
+
     const fulfillmentField = metafieldData.metafields?.find(
-      (m: any) => m.namespace === 'custom' && m.key === 'fulfillment_provider'
+      (m: { namespace: string; key: string; value: string }) =>
+        m.namespace === 'custom' && m.key === 'fulfillment_provider'
     );
 
     return fulfillmentField?.value || null;
@@ -223,8 +224,8 @@ async function logOrder(
   orderId: number,
   provider: string,
   status: string,
-  response: any
-) {
+  response: unknown
+): Promise<void> {
   await supabase.from('orders_log').insert({
     shopify_order_id: orderId,
     fulfillment_provider: provider,

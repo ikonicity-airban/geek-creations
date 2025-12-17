@@ -11,20 +11,15 @@ export async function GET(request: Request) {
     const category = searchParams.get("category");
     const q = searchParams.get("q");
 
-    let query = db.select().from(designs).where(eq(designs.isActive, true));
-
-    if (category) {
-      query = db
-        .select()
-        .from(designs)
-        .where(eq(designs.isActive, true))
-        .where(eq(designs.category, category));
-    }
-
-    const data = await db
+    const baseQuery = db
       .select()
       .from(designs)
-      .where(eq(designs.isActive, true))
+      .where(eq(designs.isActive, true));
+
+    const data = await (category
+      ? baseQuery.where(eq(designs.category, category))
+      : baseQuery
+    )
       .orderBy(desc(designs.sortOrder), desc(designs.createdAt))
       .limit(limit)
       .offset(offset);

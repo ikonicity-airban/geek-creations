@@ -35,7 +35,7 @@ export async function GET(
 
     const productWithVariants = {
       ...product,
-      images: product.images as any,
+      images: product.images as unknown[],
       tags: product.tags || [],
       variants: productVariants.map(v => ({
         ...v,

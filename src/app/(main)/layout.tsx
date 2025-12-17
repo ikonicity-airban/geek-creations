@@ -10,7 +10,7 @@ export default function MainLayout({
   return (
     <ThemeProvider>
       <div
-        className="relative min-h-screen overflow-x-hidden bg-[#f8f6f0] text-foreground"
+        className="relative min-h-screen overflow-x-hidden bg-porcelain text-foreground"
         data-main-bg="true"
         style={{
           backgroundImage: `
@@ -22,9 +22,17 @@ export default function MainLayout({
           backgroundAttachment: "fixed",
         }}
       >
+        {/* Advert / promo strip slot (60px–10vh tall) */}
+        <div className="w-full h-[60px] md:h-[5vh] lg:h-[10vh] flex items-center justify-center px-4 sticky top-0 z-50">
+          {/* Ad / promo content goes here */}
+        </div>
+
         <Navbar />
-        <main className="pt-20">{children}</main>
-        <Footer />
+
+        <div id="main-content" className="transition-transform duration-300 ease-out">
+          <main className="pt-10">{children}</main>
+          <Footer />
+        </div>
       </div>
     </ThemeProvider>
   );

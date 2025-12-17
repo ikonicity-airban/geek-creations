@@ -1,14 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import {
-  ShoppingCart,
-  Heart,
-  Filter,
-  SlidersHorizontal,
-  X,
-} from "lucide-react";
+import { ShoppingCart, Heart, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
@@ -28,11 +22,7 @@ export default function CollectionPage({
   const [sortBy, setSortBy] = useState("featured");
   const { addToCart, isInCart } = useCart();
 
-  useEffect(() => {
-    fetchCollection();
-  }, [params.handle]);
-
-  const fetchCollection = async () => {
+  const fetchCollection = useCallback(async () => {
     try {
       const res = await fetch(`/api/collections/${params.handle}`);
       const data = await res.json();
@@ -43,7 +33,11 @@ export default function CollectionPage({
     } finally {
       setLoading(false);
     }
-  };
+  }, [params.handle]);
+
+  useEffect(() => {
+    fetchCollection();
+  }, [params.handle, fetchCollection]);
 
   const handleAddToCart = (product: Product, variantId: string) => {
     const variant = product.variants.find((v) => v.id === variantId);
@@ -63,7 +57,7 @@ export default function CollectionPage({
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900">
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-indigo-900 via-purple-900 to-pink-900">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
@@ -77,7 +71,7 @@ export default function CollectionPage({
     <div className="min-h-screen">
       <div className="pt-10" />
       {/* Collection Header */}
-      <section className="relative py-20 px-6 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 overflow-hidden">
+      <section className="relative py-20 px-6 bg-linear-to-br from-background  to-pink-600 overflow-hidden">
         <div className="absolute inset-0 bg-black/30" />
         <div className="relative z-10 max-w-7xl mx-auto text-center">
           <motion.div
