@@ -1,14 +1,25 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ShoppingCart, Menu, X } from "lucide-react";
+import { ShoppingCart, Menu, X, Moon, Sun } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useCart } from "@/lib/cart-context";
+import { useTheme } from "@/lib/theme-context";
 
-export const Navbar = ({ darkMode }: { darkMode: boolean }) => {
+export const Navbar = ({
+  darkMode,
+  onToggleDarkMode,
+}: {
+  darkMode?: boolean;
+  onToggleDarkMode?: () => void;
+}) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { cart } = useCart();
+  const theme = useTheme();
+
+  const resolvedDarkMode = darkMode ?? theme.darkMode;
+  const resolvedToggle = onToggleDarkMode ?? theme.toggleDarkMode;
 
   const navLinks = [
     { href: "/collections/all", label: "Shop" },
@@ -21,12 +32,12 @@ export const Navbar = ({ darkMode }: { darkMode: boolean }) => {
     <nav
       className="sticky top-0 z-50 backdrop-blur-lg border-b transition-all"
       style={{
-        backgroundColor: darkMode 
+        backgroundColor: resolvedDarkMode
           ? 'rgba(15, 23, 42, 0.8)' 
-          : 'rgba(239, 239, 239, 0.8)',
-        borderColor: darkMode 
+          : 'rgba(64, 18, 104, 0.1)',
+        borderColor: resolvedDarkMode
           ? 'rgba(197, 163, 255, 0.2)' 
-          : 'rgba(64, 18, 104, 0.1)'
+          : '#401268'
       }}
     >
       <div className="max-w-[1024px] mx-auto px-8 md:px-12">
@@ -39,7 +50,7 @@ export const Navbar = ({ darkMode }: { darkMode: boolean }) => {
             >
               <h1 
                 className="text-xl md:text-2xl font-black"
-                style={{ color: darkMode ? '#f8f6f0' : '#401268' }}
+                style={{ color: resolvedDarkMode ? '#f8f6f0' : '#401268' }}
               >
                 GEEKS CREATION
               </h1>
@@ -53,10 +64,10 @@ export const Navbar = ({ darkMode }: { darkMode: boolean }) => {
                 <motion.span
                   className="font-semibold text-sm transition-colors"
                   style={{ 
-                    color: darkMode ? 'rgba(248, 246, 240, 0.8)' : 'rgba(64, 18, 104, 0.8)'
+                    color: resolvedDarkMode ? 'rgba(248, 246, 240, 0.8)' : 'rgba(64, 18, 104, 0.8)'
                   }}
                   whileHover={{ 
-                    color: darkMode ? '#c5a3ff' : '#c5a3ff'
+                    color: resolvedDarkMode ? '#c5a3ff' : '#c5a3ff'
                   }}
                 >
                   {link.label}
@@ -67,11 +78,33 @@ export const Navbar = ({ darkMode }: { darkMode: boolean }) => {
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-4">
+            {/* Theme Toggle (moved into header; no longer a fixed floating button) */}
+            <motion.button
+              type="button"
+              className="p-2 rounded-full backdrop-blur-lg border transition-all"
+              style={{
+                backgroundColor: resolvedDarkMode
+                  ? "rgba(197, 163, 255, 0.1)"
+                  : "rgba(64, 18, 104, 0.1)",
+                borderColor: resolvedDarkMode ? "#c5a3ff" : "#401268",
+              }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={resolvedToggle}
+              aria-label={resolvedDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+            >
+              {resolvedDarkMode ? (
+                <Sun className="w-5 h-5" style={{ color: "#e2ae3d" }} />
+              ) : (
+                <Moon className="w-5 h-5" style={{ color: "#401268" }} />
+              )}
+            </motion.button>
+
             <Link href="/cart">
               <motion.button
                 className="relative p-2 rounded-lg transition-all"
                 style={{
-                  color: darkMode ? '#f8f6f0' : '#401268'
+                  color: resolvedDarkMode ? '#f8f6f0' : '#401268'
                 }}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
@@ -97,7 +130,7 @@ export const Navbar = ({ darkMode }: { darkMode: boolean }) => {
             <button
               className="md:hidden p-2"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              style={{ color: darkMode ? '#f8f6f0' : '#401268' }}
+              style={{ color: resolvedDarkMode ? '#f8f6f0' : '#401268' }}
             >
               {isMenuOpen ? (
                 <X className="w-6 h-6" />
@@ -116,7 +149,7 @@ export const Navbar = ({ darkMode }: { darkMode: boolean }) => {
             exit={{ opacity: 0, height: 0 }}
             className="md:hidden border-t py-4"
             style={{
-              borderColor: darkMode 
+              borderColor: resolvedDarkMode
                 ? 'rgba(197, 163, 255, 0.2)' 
                 : 'rgba(64, 18, 104, 0.1)'
             }}
@@ -126,7 +159,7 @@ export const Navbar = ({ darkMode }: { darkMode: boolean }) => {
                 <motion.div
                   className="py-3 px-4 font-semibold text-sm"
                   style={{ 
-                    color: darkMode ? 'rgba(248, 246, 240, 0.8)' : 'rgba(64, 18, 104, 0.8)'
+                    color: resolvedDarkMode ? 'rgba(248, 246, 240, 0.8)' : 'rgba(64, 18, 104, 0.8)'
                   }}
                   whileHover={{ 
                     color: '#c5a3ff',

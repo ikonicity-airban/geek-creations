@@ -1,19 +1,27 @@
 // app/layout.tsx - UPDATED WITH CART PROVIDER
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Orbitron, Poppins, Space_Mono } from "next/font/google";
 import "./globals.css";
 import Script from 'next/script';
 import { CartProvider } from '@/lib/cart-context';
 import { Toaster } from 'sonner';
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const poppins = Poppins({
+  variable: "--font-poppins",
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const orbitron = Orbitron({
+  variable: "--font-orbitron",
   subsets: ["latin"],
+  weight: ["500", "700", "900"],
+});
+
+const spaceMono = Space_Mono({
+  variable: "--font-space-mono",
+  subsets: ["latin"],
+  weight: ["400", "700"],
 });
 
 export const viewport: Viewport = {
@@ -148,7 +156,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${poppins.variable} ${orbitron.variable} ${spaceMono.variable} antialiased`}
       >
         <CartProvider>
           {children}
