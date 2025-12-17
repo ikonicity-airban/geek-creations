@@ -44,7 +44,7 @@ export default function CollectionsPage() {
   return (
     <div className="min-h-screen">
       <div className="pt-10" />
-      
+
       {/* Header */}
       <section className="relative py-20 px-6 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 overflow-hidden">
         <div className="absolute inset-0 bg-black/30" />
@@ -61,7 +61,8 @@ export default function CollectionsPage() {
               Our Collections
             </h1>
             <p className="text-xl text-white/90 max-w-2xl mx-auto">
-              Discover curated collections of our best designs, organized by theme and style
+              Discover curated collections of our best designs, organized by
+              theme and style
             </p>
           </motion.div>
         </div>
@@ -115,14 +116,17 @@ export default function CollectionsPage() {
                         {collection.title}
                       </h3>
                     </Link>
-                    
+
                     <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-2">
                       {collection.description || "Explore this collection"}
                     </p>
 
                     <div className="flex items-center justify-between">
                       <Badge variant="outline" className="text-xs">
-                        {collection.product_count || 0} {collection.product_count === 1 ? "product" : "products"}
+                        {collection.product_count || 0}{" "}
+                        {collection.product_count === 1
+                          ? "product"
+                          : "products"}
                       </Badge>
                       <Link href={`/collections/${collection.handle}`}>
                         <Button variant="ghost" size="sm" className="gap-2">
@@ -141,4 +145,3 @@ export default function CollectionsPage() {
     </div>
   );
 }
-

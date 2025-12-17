@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useParams, useRouter } from "next/navigation";
-import { Heart, Zap, Sparkles, Ruler } from "lucide-react";
+import { Zap, Sparkles, Ruler } from "lucide-react";
 import { Product, Variant } from "@/types";
 import { fetchProduct } from "@/lib/fetchProduct";
 import MockupCarousel from "@/components/pdp/MockupCarousel";
@@ -91,7 +91,9 @@ export default function ProductDetailPage() {
           >
             Product Not Found
           </h1>
-          <p className="mb-6 opacity-70">{error || "This product doesn't exist"}</p>
+          <p className="mb-6 opacity-70">
+            {error || "This product doesn't exist"}
+          </p>
           <button
             onClick={() => router.push("/collections")}
             className="px-6 py-3 rounded-lg font-bold text-white"
@@ -124,7 +126,10 @@ export default function ProductDetailPage() {
         >
           {/* Left: Image Gallery */}
           <div>
-            <MockupCarousel images={product.images} productTitle={product.title} />
+            <MockupCarousel
+              images={product.images}
+              productTitle={product.title}
+            />
           </div>
 
           {/* Right: Product Info */}
@@ -161,17 +166,24 @@ export default function ProductDetailPage() {
             {/* Vendor & Type */}
             <div className="flex items-center gap-4 text-sm opacity-70">
               {product.vendor && (
-                <span style={{ color: COLORS.primary }}>By {product.vendor}</span>
+                <span style={{ color: COLORS.primary }}>
+                  By {product.vendor}
+                </span>
               )}
               {product.product_type && (
-                <span style={{ color: COLORS.primary }}>• {product.product_type}</span>
+                <span style={{ color: COLORS.primary }}>
+                  • {product.product_type}
+                </span>
               )}
             </div>
 
             {/* Price */}
             {selectedVariant && (
               <div className="flex items-center gap-4">
-                <p className="text-4xl font-black" style={{ color: COLORS.primary }}>
+                <p
+                  className="text-4xl font-black"
+                  style={{ color: COLORS.primary }}
+                >
                   ₦{selectedVariant.price.toLocaleString()}
                 </p>
                 {selectedVariant.compare_at_price && (
@@ -244,7 +256,9 @@ export default function ProductDetailPage() {
                   {quantity}
                 </span>
                 <button
-                  onClick={() => setQuantity(Math.min(maxQuantity, quantity + 1))}
+                  onClick={() =>
+                    setQuantity(Math.min(maxQuantity, quantity + 1))
+                  }
                   disabled={quantity >= maxQuantity}
                   className="w-12 h-12 rounded-lg font-bold transition-all hover:opacity-80 disabled:opacity-40"
                   style={{
@@ -292,21 +306,35 @@ export default function ProductDetailPage() {
               style={{ borderColor: `${COLORS.primary}20` }}
             >
               <div className="flex items-start gap-3">
-                <Sparkles className="w-5 h-5 mt-0.5" style={{ color: COLORS.accentWarm }} />
+                <Sparkles
+                  className="w-5 h-5 mt-0.5"
+                  style={{ color: COLORS.accentWarm }}
+                />
                 <div>
-                  <p className="font-semibold" style={{ color: COLORS.primary }}>
+                  <p
+                    className="font-semibold"
+                    style={{ color: COLORS.primary }}
+                  >
                     Crypto Payments Accepted
                   </p>
                   <p className="text-sm opacity-70">USDC, SOL, and more</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <Zap className="w-5 h-5 mt-0.5" style={{ color: COLORS.secondary }} />
+                <Zap
+                  className="w-5 h-5 mt-0.5"
+                  style={{ color: COLORS.secondary }}
+                />
                 <div>
-                  <p className="font-semibold" style={{ color: COLORS.primary }}>
+                  <p
+                    className="font-semibold"
+                    style={{ color: COLORS.primary }}
+                  >
                     Fast Shipping
                   </p>
-                  <p className="text-sm opacity-70">Free shipping on orders over ₦50,000</p>
+                  <p className="text-sm opacity-70">
+                    Free shipping on orders over ₦50,000
+                  </p>
                 </div>
               </div>
             </div>

@@ -1,31 +1,31 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Shield, AlertCircle } from 'lucide-react';
+import { useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Shield, AlertCircle } from "lucide-react";
 
 export default function AdminLoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const router = useRouter();
   const supabase = createClient();
 
   const handleLogin = async () => {
     setLoading(true);
-    setError('');
+    setError("");
 
     // Validate admin email
     if (
-      !email.endsWith('@geekcreations.com') &&
-      !email.endsWith('@codeoven.tech') &&
-      email !== 'admin@geekscreation.com'
+      !email.endsWith("@geekcreations.com") &&
+      !email.endsWith("@codeoven.tech") &&
+      email !== "admin@geekscreation.com"
     ) {
-      setError('Access denied. Admin email required.');
+      setError("Access denied. Admin email required.");
       setLoading(false);
       return;
     }
@@ -43,24 +43,24 @@ export default function AdminLoginPage() {
 
     if (data.session) {
       // Wait a moment for session to be fully established, then redirect
-      await new Promise(resolve => setTimeout(resolve, 100));
-      router.push('/admin/orders');
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      router.push("/admin/orders");
       router.refresh(); // Refresh to ensure session is available
     } else {
-      setError('Failed to create session. Please try again.');
+      setError("Failed to create session. Please try again.");
       setLoading(false);
     }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !loading) {
+    if (e.key === "Enter" && !loading) {
       handleLogin();
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-indigo-900 via-purple-900 to-pink-900">
-      <div className="absolute inset-0 bg-black/40" />
+      {/* <div className="absolute inset-0 bg-black/40" /> */}
 
       <div className="relative z-10 w-full max-w-md p-8">
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8">
@@ -115,7 +115,7 @@ export default function AdminLoginPage() {
               className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-6"
               disabled={loading}
             >
-              {loading ? 'Signing in...' : 'Sign In to Admin Panel'}
+              {loading ? "Signing in..." : "Sign In to Admin Panel"}
             </Button>
           </div>
 

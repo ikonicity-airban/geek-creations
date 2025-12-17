@@ -1,3 +1,5 @@
+"use client";
+
 import { motion } from "framer-motion";
 
 const COLORS = {
@@ -20,7 +22,13 @@ const ImageSkeleton = () => (
   </div>
 );
 
-const TextSkeleton = ({ width = "100%", height = "1rem" }: { width?: string; height?: string }) => (
+const TextSkeleton = ({
+  width = "100%",
+  height = "1rem",
+}: {
+  width?: string;
+  height?: string;
+}) => (
   <div
     className="relative rounded-lg bg-gray-200 overflow-hidden"
     style={{ width, height }}
@@ -139,7 +147,10 @@ export default function ProductLoadingSkeleton() {
             <ButtonSkeleton />
 
             {/* Additional Info */}
-            <div className="space-y-2 pt-4 border-t" style={{ borderColor: `${COLORS.primary}20` }}>
+            <div
+              className="space-y-2 pt-4 border-t"
+              style={{ borderColor: `${COLORS.primary}20` }}
+            >
               <TextSkeleton width="50%" height="1rem" />
               <TextSkeleton width="70%" height="1rem" />
             </div>
@@ -185,4 +196,3 @@ export default function ProductLoadingSkeleton() {
     </div>
   );
 }
-

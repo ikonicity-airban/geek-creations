@@ -1,5 +1,5 @@
 // Mock collection data for development and styling
-import { Collection, Product, Variant, ProductImage } from '@/types';
+import { Collection, Product, Variant, ProductImage } from "@/types";
 
 const now = new Date().toISOString();
 
@@ -8,7 +8,7 @@ const createImages = (src: string, alt?: string): ProductImage[] => [
   {
     id: `img-${Math.random().toString(36).substr(2, 9)}`,
     src,
-    alt: alt || 'Product image',
+    alt: alt || "Product image",
     position: 0,
   },
 ];
@@ -17,28 +17,30 @@ const createImages = (src: string, alt?: string): ProductImage[] => [
 const createVariants = (
   productId: string,
   basePrice: number,
-  sizes: string[] = ['S', 'M', 'L', 'XL'],
-  colors: string[] = ['Black', 'White']
+  sizes: string[] = ["S", "M", "L", "XL"],
+  colors: string[] = ["Black", "White"]
 ): Variant[] => {
   const variants: Variant[] = [];
   let variantIndex = 0;
 
   sizes.forEach((size, sizeIdx) => {
     colors.forEach((color, colorIdx) => {
-      const price = basePrice + (sizeIdx * 500) + (colorIdx * 300);
+      const price = basePrice + sizeIdx * 500 + colorIdx * 300;
       const compareAtPrice = variantIndex % 3 === 0 ? price * 1.3 : undefined; // Some on sale
-      
+
       variants.push({
         id: `var-${productId}-${variantIndex}`,
         product_id: productId,
         shopify_variant_id: 1000 + variantIndex,
         title: `${size} / ${color}`,
         price: Math.round(price),
-        compare_at_price: compareAtPrice ? Math.round(compareAtPrice) : undefined,
+        compare_at_price: compareAtPrice
+          ? Math.round(compareAtPrice)
+          : undefined,
         sku: `SKU-${productId}-${size}-${color}`,
         inventory_quantity: Math.floor(Math.random() * 50) + 10,
         weight: 0.3,
-        weight_unit: 'kg',
+        weight_unit: "kg",
         option1: size,
         option2: color,
         available: true,
@@ -53,132 +55,157 @@ const createVariants = (
 };
 
 // Mock Products
-const mockProducts: Product[] = [
+export const mockProducts: Product[] = [
   {
-    id: 'prod-1',
+    id: "prod-1",
     shopify_product_id: 1001,
-    title: 'Anime Hero Classic Tee',
-    handle: 'anime-hero-classic-tee',
-    description: 'Show off your anime passion with this premium cotton tee featuring iconic hero designs.',
-    vendor: 'Geek Creations',
-    product_type: 'T-Shirt',
-    tags: ['anime', 'hero', 'classic', 'cotton'],
-    status: 'active',
-    fulfillment_provider: 'printful',
-    images: createImages('/img/blank_isolated_white_and_black_t_shirt_front_view.jpg', 'Anime Hero Classic Tee'),
-    variants: createVariants('prod-1', 5500),
+    title: "Anime Hero Classic Tee",
+    handle: "anime-hero-classic-tee",
+    description:
+      "Show off your anime passion with this premium cotton tee featuring iconic hero designs.",
+    vendor: "Geek Creations",
+    product_type: "T-Shirt",
+    tags: ["anime", "hero", "classic", "cotton"],
+    status: "active",
+    fulfillment_provider: "printful",
+    images: createImages(
+      "/img/blank_isolated_white_and_black_t_shirt_front_view.jpg",
+      "Anime Hero Classic Tee"
+    ),
+    variants: createVariants("prod-1", 5500),
     created_at: now,
     updated_at: now,
   },
   {
-    id: 'prod-2',
+    id: "prod-2",
     shopify_product_id: 1002,
-    title: 'Tech Geek Premium Hoodie',
-    handle: 'tech-geek-premium-hoodie',
-    description: 'Stay warm and stylish with this tech-inspired hoodie featuring cutting-edge designs.',
-    vendor: 'Geek Creations',
-    product_type: 'Hoodie',
-    tags: ['tech', 'hoodie', 'premium', 'warm'],
-    status: 'active',
-    fulfillment_provider: 'printful',
-    images: createImages('/img/hoodie-2.jpg', 'Tech Geek Premium Hoodie'),
-    variants: createVariants('prod-2', 12000, ['S', 'M', 'L', 'XL', 'XXL']),
+    title: "Tech Geek Premium Hoodie",
+    handle: "tech-geek-premium-hoodie",
+    description:
+      "Stay warm and stylish with this tech-inspired hoodie featuring cutting-edge designs.",
+    vendor: "Geek Creations",
+    product_type: "Hoodie",
+    tags: ["tech", "hoodie", "premium", "warm"],
+    status: "active",
+    fulfillment_provider: "printful",
+    images: createImages("/img/hoodie-2.jpg", "Tech Geek Premium Hoodie"),
+    variants: createVariants("prod-2", 12000, ["S", "M", "L", "XL", "XXL"]),
     created_at: now,
     updated_at: now,
   },
   {
-    id: 'prod-3',
+    id: "prod-3",
     shopify_product_id: 1003,
-    title: 'Gaming Legend Tee',
-    handle: 'gaming-legend-tee',
-    description: 'Represent your gaming passion with this legendary design on premium fabric.',
-    vendor: 'Geek Creations',
-    product_type: 'T-Shirt',
-    tags: ['gaming', 'legend', 'esports', 'cotton'],
-    status: 'active',
-    fulfillment_provider: 'printful',
-    images: createImages('/img/tshirt.jpg', 'Gaming Legend Tee'),
-    variants: createVariants('prod-3', 6000),
+    title: "Gaming Legend Tee",
+    handle: "gaming-legend-tee",
+    description:
+      "Represent your gaming passion with this legendary design on premium fabric.",
+    vendor: "Geek Creations",
+    product_type: "T-Shirt",
+    tags: ["gaming", "legend", "esports", "cotton"],
+    status: "active",
+    fulfillment_provider: "printful",
+    images: createImages("/img/tshirt.jpg", "Gaming Legend Tee"),
+    variants: createVariants("prod-3", 6000),
     created_at: now,
     updated_at: now,
   },
   {
-    id: 'prod-4',
+    id: "prod-4",
     shopify_product_id: 1004,
-    title: 'Nigerian Pride Phone Case',
-    handle: 'nigerian-pride-phone-case',
-    description: 'Protect your phone with style and show your Nigerian pride.',
-    vendor: 'Geek Creations',
-    product_type: 'Phone Case',
-    tags: ['phone-case', 'nigerian', 'pride', 'protection'],
-    status: 'active',
-    fulfillment_provider: 'printful',
-    images: createImages('/img/phone-case.jpg', 'Nigerian Pride Phone Case'),
-    variants: createVariants('prod-4', 4500, ['iPhone 13', 'iPhone 14', 'Samsung S21', 'Samsung S22'], ['Black', 'Clear', 'Red']),
+    title: "Nigerian Pride Phone Case",
+    handle: "nigerian-pride-phone-case",
+    description: "Protect your phone with style and show your Nigerian pride.",
+    vendor: "Geek Creations",
+    product_type: "Phone Case",
+    tags: ["phone-case", "nigerian", "pride", "protection"],
+    status: "active",
+    fulfillment_provider: "printful",
+    images: createImages("/img/phone-case.jpg", "Nigerian Pride Phone Case"),
+    variants: createVariants(
+      "prod-4",
+      4500,
+      ["iPhone 13", "iPhone 14", "Samsung S21", "Samsung S22"],
+      ["Black", "Clear", "Red"]
+    ),
     created_at: now,
     updated_at: now,
   },
   {
-    id: 'prod-5',
+    id: "prod-5",
     shopify_product_id: 1005,
-    title: 'Afro-Futurism Mug',
-    handle: 'afro-futurism-mug',
-    description: 'Start your day with inspiration from this beautifully designed Afro-futurism mug.',
-    vendor: 'Geek Creations',
-    product_type: 'Mug',
-    tags: ['mug', 'afro-futurism', 'inspiration', 'ceramic'],
-    status: 'active',
-    fulfillment_provider: 'printful',
-    images: createImages('/img/mug.jpg', 'Afro-Futurism Mug'),
-    variants: createVariants('prod-5', 3500, ['11oz', '15oz'], ['White', 'Black']),
+    title: "Afro-Futurism Mug",
+    handle: "afro-futurism-mug",
+    description:
+      "Start your day with inspiration from this beautifully designed Afro-futurism mug.",
+    vendor: "Geek Creations",
+    product_type: "Mug",
+    tags: ["mug", "afro-futurism", "inspiration", "ceramic"],
+    status: "active",
+    fulfillment_provider: "printful",
+    images: createImages("/img/mug.jpg", "Afro-Futurism Mug"),
+    variants: createVariants(
+      "prod-5",
+      3500,
+      ["11oz", "15oz"],
+      ["White", "Black"]
+    ),
     created_at: now,
     updated_at: now,
   },
   {
-    id: 'prod-6',
+    id: "prod-6",
     shopify_product_id: 1006,
-    title: 'Designer Tote Bag',
-    handle: 'designer-tote-bag',
-    description: 'Carry your essentials in style with this spacious and durable tote bag.',
-    vendor: 'Geek Creations',
-    product_type: 'Tote Bag',
-    tags: ['tote', 'bag', 'designer', 'durable'],
-    status: 'active',
-    fulfillment_provider: 'printful',
-    images: createImages('/img/tote-bag.jpg', 'Designer Tote Bag'),
-    variants: createVariants('prod-6', 8000, ['Standard'], ['Black', 'White', 'Navy', 'Red']),
+    title: "Designer Tote Bag",
+    handle: "designer-tote-bag",
+    description:
+      "Carry your essentials in style with this spacious and durable tote bag.",
+    vendor: "Geek Creations",
+    product_type: "Tote Bag",
+    tags: ["tote", "bag", "designer", "durable"],
+    status: "active",
+    fulfillment_provider: "printful",
+    images: createImages("/img/tote-bag.jpg", "Designer Tote Bag"),
+    variants: createVariants(
+      "prod-6",
+      8000,
+      ["Standard"],
+      ["Black", "White", "Navy", "Red"]
+    ),
     created_at: now,
     updated_at: now,
   },
   {
-    id: 'prod-7',
+    id: "prod-7",
     shopify_product_id: 1007,
-    title: 'Cyberpunk Street Hoodie',
-    handle: 'cyberpunk-street-hoodie',
-    description: 'Embrace the future with this cyberpunk-inspired hoodie featuring neon aesthetics.',
-    vendor: 'Geek Creations',
-    product_type: 'Hoodie',
-    tags: ['cyberpunk', 'hoodie', 'neon', 'futuristic'],
-    status: 'active',
-    fulfillment_provider: 'printful',
-    images: createImages('/img/hoodie.jpg', 'Cyberpunk Street Hoodie'),
-    variants: createVariants('prod-7', 13000, ['S', 'M', 'L', 'XL']),
+    title: "Cyberpunk Street Hoodie",
+    handle: "cyberpunk-street-hoodie",
+    description:
+      "Embrace the future with this cyberpunk-inspired hoodie featuring neon aesthetics.",
+    vendor: "Geek Creations",
+    product_type: "Hoodie",
+    tags: ["cyberpunk", "hoodie", "neon", "futuristic"],
+    status: "active",
+    fulfillment_provider: "printful",
+    images: createImages("/img/hoodie.jpg", "Cyberpunk Street Hoodie"),
+    variants: createVariants("prod-7", 13000, ["S", "M", "L", "XL"]),
     created_at: now,
     updated_at: now,
   },
   {
-    id: 'prod-8',
+    id: "prod-8",
     shopify_product_id: 1008,
-    title: 'Minimalist Classic Tee',
-    handle: 'minimalist-classic-tee',
-    description: 'Simple, elegant, and timeless. The perfect everyday tee with a minimalist design.',
-    vendor: 'Geek Creations',
-    product_type: 'T-Shirt',
-    tags: ['minimalist', 'classic', 'simple', 'cotton'],
-    status: 'active',
-    fulfillment_provider: 'printful',
-    images: createImages('/img/tote.jpg', 'Minimalist Classic Tee'),
-    variants: createVariants('prod-8', 5000),
+    title: "Minimalist Classic Tee",
+    handle: "minimalist-classic-tee",
+    description:
+      "Simple, elegant, and timeless. The perfect everyday tee with a minimalist design.",
+    vendor: "Geek Creations",
+    product_type: "T-Shirt",
+    tags: ["minimalist", "classic", "simple", "cotton"],
+    status: "active",
+    fulfillment_provider: "printful",
+    images: createImages("/img/tote.jpg", "Minimalist Classic Tee"),
+    variants: createVariants("prod-8", 5000),
     created_at: now,
     updated_at: now,
   },
@@ -187,60 +214,65 @@ const mockProducts: Product[] = [
 // Mock Collections
 export const mockCollections: Collection[] = [
   {
-    id: 'coll-1',
+    id: "coll-1",
     shopify_collection_id: 2001,
-    title: 'Anime Collection',
-    handle: 'anime',
-    description: 'Celebrate your favorite anime characters and moments with our exclusive anime-themed collection. From classic heroes to modern legends, find the perfect design to express your passion.',
-    image_url: '/img/blank_isolated_white_and_black_t_shirt_front_view.jpg',
+    title: "Anime Collection",
+    handle: "anime",
+    description:
+      "Celebrate your favorite anime characters and moments with our exclusive anime-themed collection. From classic heroes to modern legends, find the perfect design to express your passion.",
+    image_url: "/img/blank_isolated_white_and_black_t_shirt_front_view.jpg",
     product_count: 2,
     published: true,
     created_at: now,
     updated_at: now,
   },
   {
-    id: 'coll-2',
+    id: "coll-2",
     shopify_collection_id: 2002,
-    title: 'Tech & Gaming',
-    handle: 'tech-gaming',
-    description: 'For the tech enthusiasts and gaming legends. Premium quality products featuring cutting-edge designs and gaming culture.',
-    image_url: '/img/hoodie-2.jpg',
+    title: "Tech & Gaming",
+    handle: "tech-gaming",
+    description:
+      "For the tech enthusiasts and gaming legends. Premium quality products featuring cutting-edge designs and gaming culture.",
+    image_url: "/img/hoodie-2.jpg",
     product_count: 3,
     published: true,
     created_at: now,
     updated_at: now,
   },
   {
-    id: 'coll-3',
+    id: "coll-3",
     shopify_collection_id: 2003,
-    title: 'Nigerian Pride',
-    handle: 'nigerian-pride',
-    description: 'Show your love for Nigeria with our exclusive Nigerian Pride collection. Beautiful designs celebrating our culture and heritage.',
-    image_url: '/img/phone-case.jpg',
+    title: "Nigerian Pride",
+    handle: "nigerian-pride",
+    description:
+      "Show your love for Nigeria with our exclusive Nigerian Pride collection. Beautiful designs celebrating our culture and heritage.",
+    image_url: "/img/phone-case.jpg",
     product_count: 2,
     published: true,
     created_at: now,
     updated_at: now,
   },
   {
-    id: 'coll-4',
+    id: "coll-4",
     shopify_collection_id: 2004,
-    title: 'Accessories',
-    handle: 'accessories',
-    description: 'Complete your look with our range of premium accessories. From phone cases to mugs and bags.',
-    image_url: '/img/mug.jpg',
+    title: "Accessories",
+    handle: "accessories",
+    description:
+      "Complete your look with our range of premium accessories. From phone cases to mugs and bags.",
+    image_url: "/img/mug.jpg",
     product_count: 3,
     published: true,
     created_at: now,
     updated_at: now,
   },
   {
-    id: 'coll-5',
+    id: "coll-5",
     shopify_collection_id: 2005,
-    title: 'All Products',
-    handle: 'all',
-    description: 'Browse our complete catalog of geek culture products. Something for everyone!',
-    image_url: '/img/tote-bag.jpg',
+    title: "All Products",
+    handle: "all",
+    description:
+      "Browse our complete catalog of geek culture products. Something for everyone!",
+    image_url: "/img/tote-bag.jpg",
     product_count: 8,
     published: true,
     created_at: now,
@@ -250,26 +282,34 @@ export const mockCollections: Collection[] = [
 
 // Collection to Products mapping
 export const collectionProductMap: Record<string, string[]> = {
-  'anime': ['prod-1', 'prod-3'],
-  'tech-gaming': ['prod-2', 'prod-3', 'prod-7'],
-  'nigerian-pride': ['prod-4', 'prod-5'],
-  'accessories': ['prod-4', 'prod-5', 'prod-6'],
-  'all': ['prod-1', 'prod-2', 'prod-3', 'prod-4', 'prod-5', 'prod-6', 'prod-7', 'prod-8'],
+  anime: ["prod-1", "prod-3"],
+  "tech-gaming": ["prod-2", "prod-3", "prod-7"],
+  "nigerian-pride": ["prod-4", "prod-5"],
+  accessories: ["prod-4", "prod-5", "prod-6"],
+  all: [
+    "prod-1",
+    "prod-2",
+    "prod-3",
+    "prod-4",
+    "prod-5",
+    "prod-6",
+    "prod-7",
+    "prod-8",
+  ],
 };
 
 // Helper function to get products for a collection
 export function getProductsForCollection(handle: string): Product[] {
   const productIds = collectionProductMap[handle] || [];
-  return mockProducts.filter(p => productIds.includes(p.id));
+  return mockProducts.filter((p) => productIds.includes(p.id));
 }
 
 // Helper function to get collection by handle
 export function getCollectionByHandle(handle: string): Collection | undefined {
-  return mockCollections.find(c => c.handle === handle);
+  return mockCollections.find((c) => c.handle === handle);
 }
 
 // Helper function to get all collections
 export function getAllCollections(): Collection[] {
   return mockCollections;
 }
-
