@@ -330,8 +330,11 @@ const MobileNavbarContent = () => {
     const main = document.getElementById("main-content");
     if (!main) return;
     main.style.transition = "transform 0.3s ease, filter 0.3s ease";
-    main.style.transform = open ? "scale(0.95)" : "scale(1)";
+    main.style.transform = open ? "translateX(-75%) scale(0.95)" : "translateX(0) scale(1)";
     main.style.filter = open ? "brightness(0.95)" : "brightness(1)";
+    main.style.transformOrigin = "top right";
+    main.style.borderEndStartRadius = open ? "2rem" : "0";
+    main.style.borderEndEndRadius = open ? "2rem" : "0";
   };
 
   const toggle = () => {
@@ -349,7 +352,7 @@ const MobileNavbarContent = () => {
           className="flex items-center text-lg font-black tracking-tight"
           style={{ color: darkMode ? COLORS.light : COLORS.primary }}
         >
-          GEEKS CREATION
+          <Logo />
         </Link>
 
         <div className="flex items-center gap-3">

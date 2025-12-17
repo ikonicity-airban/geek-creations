@@ -1,14 +1,14 @@
 "use client";
 
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ShoppingBag, ArrowRight, Grid3x3, Wand, Wand2 } from "lucide-react";
+import { ShoppingBag, ArrowRight, Wand2 } from "lucide-react";
 import Link from "next/link";
 import { BackgroundLines } from "@/components/ui/background-lines";
 
 export const Hero = ({ darkMode }: { darkMode: boolean }) => {
   const { scrollY } = useScroll();
-  const y = useTransform(scrollY, [0, 500], [0, 150]);
-  const opacity = useTransform(scrollY, [0, 300], [1, 0]);
+  const y = useTransform(scrollY, [0, 400], [0, 100]);
+  const opacity = useTransform(scrollY, [0, 1000], [1, 0]);
 
   return (
     <BackgroundLines

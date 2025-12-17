@@ -29,7 +29,10 @@ export default function MainLayout({
 
         <Navbar />
 
-        <div id="main-content" className="transition-transform duration-300 ease-out">
+        <div
+          id="main-content"
+          className="transition-transform duration-300 ease-out"
+        >
           <main className="pt-10">{children}</main>
           <Footer />
         </div>

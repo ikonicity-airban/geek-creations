@@ -2,10 +2,11 @@
 
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { PageLayout } from "@/components/page-layout";
 import { FollowerPointerCard } from "@/components/ui/following-pointer";
+import { useWindowSize } from "react-use";
 
 interface FeaturedDesign {
   id: string;
@@ -17,6 +18,7 @@ interface FeaturedDesign {
 
 export const FeaturedCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const { width } = useWindowSize();
 
   // Mock data - replace with actual data from Supabase
   const featuredDesigns: FeaturedDesign[] = [
@@ -64,7 +66,8 @@ export const FeaturedCarousel = () => {
     },
   ];
 
-  const visibleCount = 4;
+  const visibleCount = useMemo(() => (width > 768 ? 4 : 1), [width]);
+
   const maxIndex = Math.max(0, featuredDesigns.length - visibleCount);
 
   const nextSlide = () => {

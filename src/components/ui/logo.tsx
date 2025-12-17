@@ -15,7 +15,7 @@ export function Logo() {
         width={100}
         height={100}
         objectFit="contain"
-        className="w-14 h-14 rounded-full mix-blend-difference drop-shadow-2xl"
+        className="w-10 h-10 md:w-14 md:h-14 rounded-full mix-blend-difference drop-shadow-2xl"
       />
     </motion.div>
   );
