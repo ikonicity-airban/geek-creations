@@ -33,7 +33,7 @@ export const Navbar = () => {
   return (
     <ResizableNavbar>
       {/* Desktop */}
-      <NavBody className="max-w-[1024px] px-6">
+      <NavBody className="px-6">
         <Link
           href="/"
           className="relative z-20 mr-4 flex items-center space-x-2 px-2 py-1 text-sm font-normal"

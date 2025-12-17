@@ -42,7 +42,7 @@ export const CategoryGrid = () => {
       image: "/img/mug.jpg",
       count: "60+ designs",
       handle: "mugs",
-      size: "medium"
+      size: "small"
     },
     {
       id: "4",
@@ -51,7 +51,7 @@ export const CategoryGrid = () => {
       image: "/img/phone-case.jpg",
       count: "120+ designs",
       handle: "phone-cases",
-      size: "small"
+      size: "medium"
     },
     {
       id: "5",
@@ -67,7 +67,7 @@ export const CategoryGrid = () => {
       icon: ImageIcon,
       count: "90+ designs",
       handle: "posters",
-      size: "large"
+      size: "small"
     },
   ];
 
@@ -76,7 +76,7 @@ export const CategoryGrid = () => {
       case "large":
         return "md:col-span-2 md:row-span-2";
       case "medium":
-        return "md:col-span-1 md:row-span-2";
+        return "md:col-span-1 md:row-span-1";
       case "small":
         return "md:col-span-1 md:row-span-1";
       default:
@@ -122,7 +122,7 @@ export const CategoryGrid = () => {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
-              whileHover={{ scale: 1.05, y: -5 }}
+              whileHover={{ scale: 1.01, y: -5 }}
               className={getSizeClasses(category.size)}
             >
               <Link href={`/collections/${category.handle}`}>
@@ -146,7 +146,7 @@ export const CategoryGrid = () => {
                   }}
                 >
                   {category.image ? (
-                    <div className="relative w-full flex-1 min-h-[120px] md:min-h-[160px] overflow-hidden">
+                    <div className="relative w-full flex-1 min-h-[80px] md:min-h-[120px] overflow-hidden">
                       <img
                         src={category.image}
                         alt={category.name}
