@@ -57,6 +57,7 @@ export const CategoryGrid = () => {
       id: "5",
       name: "Tote Bags",
       icon: ShoppingBag,
+      image: "/img/tote.jpg",
       count: "40+ designs",
       handle: "tote-bags",
       size: "small"

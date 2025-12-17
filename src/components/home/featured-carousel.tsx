@@ -115,7 +115,7 @@ export const FeaturedCarousel = () => {
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
                   whileHover={{ y: -10, scale: 1.02 }}
-                  className="flex-shrink-0"
+                  className="shrink-0"
                   style={{ width: `${100 / visibleCount}%` }}
                 >
                   <Link href={`/products/${design.handle}`}>
@@ -123,12 +123,12 @@ export const FeaturedCarousel = () => {
                       title={`${design.name} • ${design.priceRange}`}
                     >
                       <div
-                        className="group relative overflow-hidden rounded-2xl cursor-pointer bg-white/90 backdrop-blur border-2 border-[#c5a3ff] shadow-[0_8px_24px_rgba(64,18,104,0.15)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_14px_40px_rgba(64,18,104,0.22)]"
+                        className="group relative overflow-hidden rounded-2xl cursor-pointer bg-white/90 backdrop-blur border-2 border-mauve shadow-[0_8px_24px_rgba(64,18,104,0.15)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_14px_40px_rgba(64,18,104,0.22)]"
                         style={{ borderRadius: "16px" }}
                       >
                         {/* Subtle gradient glow */}
                         <div
-                          className="pointer-events-none absolute -top-24 -right-24 h-56 w-56 rounded-full blur-3xl opacity-70 transition-opacity duration-300 group-hover:opacity-100"
+                          className="pointer-events-none absolute -top-24 -right-24 h-72 w-56 rounded-full blur-3xl opacity-70 transition-opacity duration-300 group-hover:opacity-100"
                           style={{
                             background:
                               "radial-gradient(circle, rgba(197,163,255,0.55) 0%, rgba(197,163,255,0) 70%)",
@@ -143,7 +143,7 @@ export const FeaturedCarousel = () => {
                         />
 
                         {/* Image */}
-                        <div className="relative aspect-[16/10] w-full overflow-hidden">
+                        <div className="relative aspect-16/10 w-full overflow-hidden">
                           <div
                             className="absolute inset-0"
                             style={{
