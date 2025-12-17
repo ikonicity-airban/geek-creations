@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ShoppingCart,
   Heart,
@@ -12,16 +12,20 @@ import {
   ChevronLeft,
   ChevronRight,
   Check,
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import Link from 'next/link';
-import Image from 'next/image';
-import { useCart } from '@/lib/cart-context';
-import { Product, Variant } from '@/types';
-import { toast } from 'sonner';
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
+import Image from "next/image";
+import { useCart } from "@/lib/cart-context";
+import { Product, Variant } from "@/types";
+import { toast } from "sonner";
 
-export default function ProductPage({ params }: { params: { handle: string } }) {
+export default function ProductPage({
+  params,
+}: {
+  params: { handle: string };
+}) {
   const [product, setProduct] = useState<Product | null>(null);
   const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
   const [quantity, setQuantity] = useState(1);
@@ -41,7 +45,7 @@ export default function ProductPage({ params }: { params: { handle: string } }) 
       setProduct(data.product);
       setSelectedVariant(data.product.variants[0] || null);
     } catch (error) {
-      console.error('Error fetching product:', error);
+      console.error("Error fetching product:", error);
     } finally {
       setLoading(false);
     }
@@ -57,14 +61,16 @@ export default function ProductPage({ params }: { params: { handle: string } }) 
         product_title: product.title,
         variant_title: selectedVariant.title,
         price: selectedVariant.price,
-        image: product.images[currentImageIndex]?.src || '',
+        image: product.images[currentImageIndex]?.src || "",
         sku: selectedVariant.sku,
         max_quantity: selectedVariant.inventory_quantity,
       },
-      quantity,
+      quantity
     );
 
-    toast.success(`Added ${quantity} ${quantity === 1 ? 'item' : 'items'} to cart!`);
+    toast.success(
+      `Added ${quantity} ${quantity === 1 ? "item" : "items"} to cart!`
+    );
   };
 
   const nextImage = () => {
@@ -75,7 +81,9 @@ export default function ProductPage({ params }: { params: { handle: string } }) 
 
   const prevImage = () => {
     if (product && product.images) {
-      setCurrentImageIndex((prev) => (prev - 1 + product.images.length) % product.images.length);
+      setCurrentImageIndex(
+        (prev) => (prev - 1 + product.images.length) % product.images.length
+      );
     }
   };
 
@@ -84,7 +92,7 @@ export default function ProductPage({ params }: { params: { handle: string } }) 
       <div className="min-h-screen flex items-center justify-center">
         <motion.div
           animate={{ rotate: 360 }}
-          transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+          transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
           className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full"
         />
       </div>
@@ -107,7 +115,9 @@ export default function ProductPage({ params }: { params: { handle: string } }) 
   // Group variants by option (e.g., Size, Color)
   const variantOptions = {
     sizes: [...new Set(product.variants.map((v) => v.option1).filter(Boolean))],
-    colors: [...new Set(product.variants.map((v) => v.option2).filter(Boolean))],
+    colors: [
+      ...new Set(product.variants.map((v) => v.option2).filter(Boolean)),
+    ],
   };
 
   return (
@@ -164,12 +174,17 @@ export default function ProductPage({ params }: { params: { handle: string } }) 
                     onClick={() => setCurrentImageIndex(idx)}
                     className={`relative w-20 h-20 rounded-xl overflow-hidden border ${
                       idx === currentImageIndex
-                        ? 'border-indigo-600'
-                        : 'border-gray-200 dark:border-gray-800'
+                        ? "border-indigo-600"
+                        : "border-gray-200 dark:border-gray-800"
                     }`}
                     aria-label={`Select image ${idx + 1}`}
                   >
-                    <Image src={img.src} alt={product.title} fill className="object-cover" />
+                    <Image
+                      src={img.src}
+                      alt={product.title}
+                      fill
+                      className="object-cover"
+                    />
                   </button>
                 ))}
               </div>
@@ -196,7 +211,7 @@ export default function ProductPage({ params }: { params: { handle: string } }) 
             </div>
 
             <p className="mt-4 text-gray-600 dark:text-gray-300 leading-relaxed">
-              {product.body_html ? product.body_html.replace(/<[^>]*>/g, '') : ' '}
+              {product.description || " "}
             </p>
 
             {/* Price */}
@@ -223,13 +238,15 @@ export default function ProductPage({ params }: { params: { handle: string } }) 
                       <button
                         key={String(size)}
                         onClick={() => {
-                          const found = product.variants.find((v) => v.option1 === size);
+                          const found = product.variants.find(
+                            (v) => v.option1 === size
+                          );
                           if (found) setSelectedVariant(found);
                         }}
                         className={`px-4 py-2 rounded-lg border text-sm font-semibold ${
                           selectedVariant?.option1 === size
-                            ? 'border-indigo-600 bg-indigo-600 text-white'
-                            : 'border-gray-200 dark:border-gray-800 bg-white/70 dark:bg-gray-900/50 backdrop-blur text-gray-900 dark:text-white'
+                            ? "border-indigo-600 bg-indigo-600 text-white"
+                            : "border-gray-200 dark:border-gray-800 bg-white/70 dark:bg-gray-900/50 backdrop-blur text-gray-900 dark:text-white"
                         }`}
                       >
                         {String(size)}
@@ -274,7 +291,7 @@ export default function ProductPage({ params }: { params: { handle: string } }) 
                 onClick={handleAddToCart}
               >
                 <ShoppingCart className="w-5 h-5 mr-2" />
-                {isInCart(selectedVariant?.id) ? 'In Cart' : 'Add to Cart'}
+                {isInCart(selectedVariant?.id) ? "In Cart" : "Add to Cart"}
               </Button>
               <AnimatePresence>
                 {!!selectedVariant?.available && (
@@ -293,17 +310,33 @@ export default function ProductPage({ params }: { params: { handle: string } }) 
             {/* Trust indicators */}
             <div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-4">
               {[
-                { icon: Truck, title: 'Fast Delivery', desc: 'Nationwide shipping' },
-                { icon: Shield, title: 'Secure Checkout', desc: 'SSL protected' },
-                { icon: Package, title: 'Quality Print', desc: 'Premium materials' },
+                {
+                  icon: Truck,
+                  title: "Fast Delivery",
+                  desc: "Nationwide shipping",
+                },
+                {
+                  icon: Shield,
+                  title: "Secure Checkout",
+                  desc: "SSL protected",
+                },
+                {
+                  icon: Package,
+                  title: "Quality Print",
+                  desc: "Premium materials",
+                },
               ].map((item) => (
                 <div
                   key={item.title}
                   className="rounded-xl border border-gray-200/70 dark:border-gray-800 bg-white/70 dark:bg-gray-900/50 backdrop-blur p-4"
                 >
                   <item.icon className="w-5 h-5 text-indigo-600 mb-2" />
-                  <p className="font-bold text-gray-900 dark:text-white">{item.title}</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{item.desc}</p>
+                  <p className="font-bold text-gray-900 dark:text-white">
+                    {item.title}
+                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {item.desc}
+                  </p>
                 </div>
               ))}
             </div>
@@ -313,5 +346,3 @@ export default function ProductPage({ params }: { params: { handle: string } }) 
     </div>
   );
 }
-
-
