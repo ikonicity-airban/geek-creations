@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Shirt, Coffee, Smartphone, ShoppingBag, Package, Image as ImageIcon } from "lucide-react";
 import Link from "next/link";
+import { PageLayout } from "@/components/page-layout";
 
 interface Category {
   id: string;
@@ -93,7 +94,7 @@ export const CategoryGrid = () => {
 
   return (
     <section className="py-16" style={{ backgroundColor: '#ffffff' }}>
-      <div className="max-w-[1024px] mx-auto px-8 md:px-12">
+      <PageLayout>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -156,7 +157,7 @@ export const CategoryGrid = () => {
             </motion.div>
           ))}
         </div>
-      </div>
+      </PageLayout>
     </section>
   );
 };

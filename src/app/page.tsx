@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Moon, Sun } from "lucide-react";
+import { Navbar } from "@/components/navbar";
 import { Hero } from "@/components/home/hero";
 import { FeaturedCarousel } from "@/components/home/featured-carousel";
 import { CategoryGrid } from "@/components/home/category-grid";
@@ -22,6 +23,9 @@ export default function HomePage() {
 
   return (
     <div className="relative min-h-screen" style={{ backgroundColor: '#f8f6f0' }}>
+      {/* Navbar */}
+      <Navbar darkMode={darkMode} />
+
       {/* Dark Mode Toggle */}
       <motion.button
         initial={{ scale: 0 }}
