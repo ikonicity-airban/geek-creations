@@ -1,14 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Users, Package, TrendingUp, Globe } from "lucide-react";
+import { Users, Package, ShieldCheck, Globe } from "lucide-react";
 
 export const StatsSection = () => {
   const stats = [
-    { icon: Users, value: "10K+", label: "Active Creators" },
-    { icon: Package, value: "50K+", label: "Products Sold" },
-    { icon: TrendingUp, value: "98%", label: "Satisfaction Rate" },
-    { icon: Globe, value: "36", label: "States Covered" },
+    { icon: Users, value: "10M+", label: "Sellers trust POD" },
+    { icon: Package, value: "59M+", label: "Orders delivered" },
+    { icon: ShieldCheck, value: "4.8★", label: "Avg. marketplace rating" },
+    { icon: Globe, value: "209", label: "Countries & territories" },
   ];
 
   return (

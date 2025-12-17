@@ -9,21 +9,24 @@ import {
 } from "lucide-react";
 
 export const HeroSection = ({ darkMode }: { darkMode: boolean }) => {
-  console.log("🚀 ~ HeroSection ~ darkMode:", darkMode);
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 500], [0, 150]);
   const opacity = useTransform(scrollY, [0, 300], [1, 0]);
 
   return (
-    <section 
+    <section
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
       style={{
-        background: darkMode 
-          ? 'linear-gradient(90deg, #401268 0%, #c5a3ff 25%, #f8f6f0 50%, #e2ae3d 75%, #e21b35 100%)'
-          : 'linear-gradient(90deg, #401268 0%, #c5a3ff 25%, #f8f6f0 50%, #e2ae3d 75%, #e21b35 100%)'
+        background:
+          "linear-gradient(90deg, #401268 0%, #c5a3ff 25%, #f8f6f0 50%, #e2ae3d 75%, #e21b35 100%)",
       }}
     >
-      <div className="absolute inset-0" style={{ backgroundColor: darkMode ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.2)' }} />
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundColor: darkMode ? "rgba(64,18,104,0.4)" : "rgba(64,18,104,0.25)",
+        }}
+      />
 
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
@@ -33,7 +36,8 @@ export const HeroSection = ({ darkMode }: { darkMode: boolean }) => {
             rotate: [0, 90, 0],
           }}
           transition={{ duration: 20, repeat: Infinity }}
-          className="absolute -top-40 -right-40 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl"
+          className="absolute -top-40 -right-40 w-96 h-96 rounded-full blur-3xl"
+          style={{ backgroundColor: "rgba(197,163,255,0.22)" }}
         />
         <motion.div
           animate={{
@@ -41,7 +45,8 @@ export const HeroSection = ({ darkMode }: { darkMode: boolean }) => {
             rotate: [90, 0, 90],
           }}
           transition={{ duration: 15, repeat: Infinity }}
-          className="absolute -bottom-40 -left-40 w-96 h-96 bg-pink-500/20 rounded-full blur-3xl"
+          className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full blur-3xl"
+          style={{ backgroundColor: "rgba(226,174,61,0.2)" }}
         />
       </div>
 
@@ -64,13 +69,9 @@ export const HeroSection = ({ darkMode }: { darkMode: boolean }) => {
           className="text-6xl md:text-8xl font-black tracking-tighter mb-6"
           style={{ color: darkMode ? '#f8f6f0' : '#ffffff' }}
         >
-          <span style={{ color: '#f8f6f0' }}>
-            GEEKS
-          </span>
+          <span style={{ color: '#f8f6f0' }}>GEEKS</span>
           <br />
-          <span style={{ color: '#c5a3ff' }}>
-            CREATION
-          </span>
+          <span style={{ color: '#c5a3ff' }}>CREATION</span>
         </motion.h1>
 
         <motion.p
@@ -80,11 +81,8 @@ export const HeroSection = ({ darkMode }: { darkMode: boolean }) => {
           className="text-2xl md:text-3xl font-light max-w-3xl mx-auto mb-12"
           style={{ color: darkMode ? 'rgba(248, 246, 240, 0.9)' : 'rgba(255, 255, 255, 0.9)' }}
         >
-          Nigeria's Premier Print-on-Demand Platform
-          <br />
-          <span className="text-xl" style={{ color: '#c5a3ff' }}>
-            Where Artists, Nerds & Dreamers Build Legendary Brands
-          </span>
+          Create and sell custom products with zero risk. 100% free to start,
+          powered by local production and global delivery.
         </motion.p>
 
         <motion.div
@@ -93,7 +91,7 @@ export const HeroSection = ({ darkMode }: { darkMode: boolean }) => {
           transition={{ delay: 0.9 }}
           className="flex flex-col sm:flex-row gap-4 justify-center mb-16"
         >
-          <button 
+          <button
             className="group relative px-10 py-5 rounded-full font-bold text-lg shadow-2xl transition-all hover:scale-105"
             style={{
               backgroundColor: '#401268',
@@ -104,10 +102,10 @@ export const HeroSection = ({ darkMode }: { darkMode: boolean }) => {
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#401268'}
           >
             <ShoppingBag className="inline-block w-6 h-6 mr-2" />
-            Start Selling Now
+            Start for Free
             <ArrowRight className="inline-block w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
           </button>
-          <button 
+          <button
             className="px-10 py-5 border-2 backdrop-blur-sm rounded-full font-bold text-lg transition-all hover:scale-105"
             style={{
               borderColor: 'rgba(255, 255, 255, 0.3)',
@@ -118,7 +116,7 @@ export const HeroSection = ({ darkMode }: { darkMode: boolean }) => {
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           >
             <Play className="inline-block w-6 h-6 mr-2" />
-            Watch Demo
+            See How It Works
           </button>
         </motion.div>
 

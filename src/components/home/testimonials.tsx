@@ -32,7 +32,7 @@ export const Testimonials = () => {
   ];
 
   return (
-    <section className="py-32" style={{ backgroundColor: '#401268' }}>
+    <section className="py-32" style={{ backgroundColor: '#f8f6f0' }}>
       <div className="max-w-7xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0 }}
@@ -40,13 +40,13 @@ export const Testimonials = () => {
           viewport={{ once: true }}
           className="text-center mb-20"
         >
-          <span 
+          <span
             className="inline-block px-4 py-2 rounded-full font-semibold text-sm mb-4"
-            style={{ backgroundColor: 'rgba(226, 174, 61, 0.2)', color: '#e2ae3d' }}
+            style={{ backgroundColor: 'rgba(197, 163, 255, 0.2)', color: '#401268' }}
           >
             SUCCESS STORIES
           </span>
-          <h2 className="text-5xl md:text-6xl font-black mb-6" style={{ color: '#f8f6f0' }}>
+          <h2 className="text-5xl md:text-6xl font-black mb-6" style={{ color: '#401268' }}>
             Loved by Creators
           </h2>
         </motion.div>
@@ -61,15 +61,18 @@ export const Testimonials = () => {
               viewport={{ once: true }}
               className="rounded-2xl p-8 transition-all"
               style={{
-                backgroundColor: 'rgba(197, 163, 255, 0.1)',
+                backgroundColor: '#ffffff',
                 borderRadius: '16px',
-                border: '1px solid rgba(197, 163, 255, 0.2)'
+                border: '1px solid #e0e0e0',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(197, 163, 255, 0.2)';
+                e.currentTarget.style.boxShadow = '0 8px 24px rgba(64,18,104,0.15)';
+                e.currentTarget.style.borderColor = '#c5a3ff';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(197, 163, 255, 0.1)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.05)';
+                e.currentTarget.style.borderColor = '#e0e0e0';
               }}
             >
               <div className="flex gap-1 mb-4">
@@ -81,19 +84,19 @@ export const Testimonials = () => {
                   />
                 ))}
               </div>
-              <p className="mb-6 text-lg leading-relaxed" style={{ color: '#c5a3ff' }}>
+              <p className="mb-6 text-lg leading-relaxed" style={{ color: 'rgba(64, 18, 104, 0.8)' }}>
                 "{testimonial.content}"
               </p>
               <div className="flex items-center gap-4">
-                <div 
+                <div
                   className="w-12 h-12 rounded-full flex items-center justify-center font-bold"
                   style={{ backgroundColor: '#c5a3ff', color: '#401268' }}
                 >
                   {testimonial.avatar}
                 </div>
                 <div>
-                  <h4 className="font-bold" style={{ color: '#f8f6f0' }}>{testimonial.name}</h4>
-                  <p className="text-sm" style={{ color: 'rgba(248, 246, 240, 0.6)' }}>{testimonial.role}</p>
+                  <h4 className="font-bold" style={{ color: '#401268' }}>{testimonial.name}</h4>
+                  <p className="text-sm" style={{ color: 'rgba(64, 18, 104, 0.6)' }}>{testimonial.role}</p>
                 </div>
               </div>
             </motion.div>

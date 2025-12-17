@@ -3,17 +3,16 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Moon, Sun } from "lucide-react";
-import { HeroSection } from "@/components/hero-section";
-import { StatsSection } from "@/components/stats-section";
-import { FeaturesSection } from "@/components/features-section";
-import { ProductsShowcase } from "@/components/products-showcase";
-import { HowItWorks } from "@/components/how-it-works";
-import { Testimonials } from "@/components/testimonials";
-import { CTASection } from "@/components/cta-section";
+import { Hero } from "@/components/home/hero";
+import { FeaturedCarousel } from "@/components/home/featured-carousel";
+import { CategoryGrid } from "@/components/home/category-grid";
+import { DesignGallery } from "@/components/home/design-gallery";
+import { ProductionDemo } from "@/components/home/production-demo";
+import { FeaturesSection } from "@/components/home/features-section";
 import { Footer } from "@/components/footer";
 
-// Main App Component - Community Website Structure
-export default function GeeksCreationLanding() {
+// Main App Component - Homepage Structure
+export default function HomePage() {
   const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
@@ -41,29 +40,26 @@ export default function GeeksCreationLanding() {
         )}
       </motion.button>
 
-      {/* Community Website Structure */}
-      {/* 1. Hero Section - Community-focused messaging */}
-      <HeroSection darkMode={darkMode} />
+      {/* Homepage Structure (Top → Bottom Flow) */}
+      {/* 1. Hero Banner - Instant brand impact + CTA */}
+      <Hero darkMode={darkMode} />
       
-      {/* 2. Stats Section - Community metrics */}
-      <StatsSection />
+      {/* 2. Featured Designs Carousel - Hook visitors with best sellers */}
+      <FeaturedCarousel />
       
-      {/* 3. Features Section - Community benefits */}
+      {/* 3. Category Grid - Easy navigation to product types (Bento Grid) */}
+      <CategoryGrid />
+      
+      {/* 4. All Designs Gallery - Core browsing experience */}
+      <DesignGallery />
+      
+      {/* 5. Production Demo - UI demonstration with animation */}
+      <ProductionDemo />
+      
+      {/* 6. Why Choose Us / Features - Build trust */}
       <FeaturesSection />
       
-      {/* 4. Products Showcase - Community gallery */}
-      <ProductsShowcase />
-      
-      {/* 5. How It Works - Community process */}
-      <HowItWorks />
-      
-      {/* 6. Testimonials - Community stories */}
-      <Testimonials />
-      
-      {/* 7. CTA Section - Join community */}
-      <CTASection />
-      
-      {/* 8. Footer */}
+      {/* 7. Footer - Navigation + Legal */}
       <Footer />
     </div>
   );

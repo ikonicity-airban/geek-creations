@@ -7,30 +7,30 @@ export const HowItWorks = () => {
   const steps = [
     {
       number: "01",
-      title: "Create Your Design",
+      title: "Pick a Product",
       description:
-        "Use our intuitive design studio or upload your artwork. AI suggestions included.",
+        "Choose from 1000+ products and set your retail price and margins.",
       icon: Palette,
     },
     {
       number: "02",
-      title: "Choose Products",
+      title: "Design & Preview",
       description:
-        "Select from 200+ premium products. Set your prices and profit margins.",
+        "Upload art or design in the studio. Generate polished mockups instantly.",
       icon: Package,
     },
     {
       number: "03",
-      title: "Start Selling",
+      title: "Publish & Sell",
       description:
-        "Share your store link. We handle production, shipping, and customer service.",
+        "Share your store link or connect your channel. Orders flow automatically.",
       icon: Rocket,
     },
     {
       number: "04",
-      title: "Get Paid",
+      title: "We Fulfill",
       description:
-        "Receive payouts weekly. Track everything in real-time analytics.",
+        "We print, pack, and ship worldwide. You keep the profit—no inventory.",
       icon: TrendingUp,
     },
   ];

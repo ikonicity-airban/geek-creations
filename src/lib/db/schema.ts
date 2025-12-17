@@ -117,6 +117,57 @@ export const analyticsEvents = pgTable('analytics_events', {
   createdAtIdx: index('idx_analytics_events_created_at').on(table.createdAt),
 }));
 
+// Designs table (marketing/merch catalog)
+export const designs = pgTable('designs', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  title: varchar('title', { length: 255 }).notNull(),
+  description: text('description'),
+  imageUrl: text('image_url').notNull(),
+  thumbnailUrl: text('thumbnail_url'),
+  category: varchar('category', { length: 100 }),
+  tags: text('tags').array(),
+  isActive: boolean('is_active').default(true),
+  sortOrder: integer('sort_order').default(0),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+}, (table) => ({
+  categoryIdx: index('idx_designs_category').on(table.category),
+  activeIdx: index('idx_designs_active').on(table.isActive),
+  sortIdx: index('idx_designs_sort_order').on(table.sortOrder),
+}));
+
+// Design-to-Product mapping for POD sync
+export const designProducts = pgTable('design_products', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  designId: uuid('design_id').references(() => designs.id, { onDelete: 'cascade' }),
+  productId: uuid('product_id').references(() => products.id, { onDelete: 'cascade' }),
+  mockupUrl: text('mockup_url'),
+  printfulSyncVariantId: bigint('printful_sync_variant_id', { mode: 'number' }),
+  printifyBlueprintId: varchar('printify_blueprint_id', { length: 255 }),
+  ikonshopProductId: varchar('ikonshop_product_id', { length: 255 }),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+}, (table) => ({
+  pk: primaryKey({ columns: [table.designId, table.productId] }),
+}));
+
+// Payment transactions per order/payment provider
+export const paymentTransactions = pgTable('payment_transactions', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  orderId: bigint('order_id', { mode: 'number' }).references(() => ordersLog.id, { onDelete: 'cascade' }),
+  paymentMethod: varchar('payment_method', { length: 50 }).notNull(), // paystack, solana
+  paymentProvider: varchar('payment_provider', { length: 50 }),
+  transactionReference: varchar('transaction_reference', { length: 255 }).notNull(),
+  amount: decimal('amount', { precision: 10, scale: 2 }).notNull(),
+  currency: varchar('currency', { length: 10 }).notNull(), // NGN, USDC, SOL
+  status: varchar('status', { length: 50 }).notNull(), // pending, success, failed
+  metadata: jsonb('metadata'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+}, (table) => ({
+  referenceIdx: index('idx_payment_transactions_reference').on(table.transactionReference),
+  statusIdx: index('idx_payment_transactions_status').on(table.status),
+}));
+
 // Relations
 export const productsRelations = relations(products, ({ many }) => ({
   variants: many(variants),
@@ -142,5 +193,31 @@ export const collectionProductsRelations = relations(collectionProducts, ({ one 
   product: one(products, {
     fields: [collectionProducts.productId],
     references: [products.id],
+  }),
+}));
+
+export const designsRelations = relations(designs, ({ many }) => ({
+  designProducts: many(designProducts),
+}));
+
+export const designProductsRelations = relations(designProducts, ({ one }) => ({
+  design: one(designs, {
+    fields: [designProducts.designId],
+    references: [designs.id],
+  }),
+  product: one(products, {
+    fields: [designProducts.productId],
+    references: [products.id],
+  }),
+}));
+
+export const ordersRelations = relations(ordersLog, ({ many }) => ({
+  paymentTransactions: many(paymentTransactions),
+}));
+
+export const paymentTransactionsRelations = relations(paymentTransactions, ({ one }) => ({
+  order: one(ordersLog, {
+    fields: [paymentTransactions.orderId],
+    references: [ordersLog.id],
   }),
 }));

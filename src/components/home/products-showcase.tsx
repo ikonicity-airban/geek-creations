@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Shirt, Coffee, Smartphone } from "lucide-react";
+import { Shirt, Coffee, Smartphone, PenTool } from "lucide-react";
 
 export const ProductsShowcase = () => {
   const products = [
@@ -24,6 +24,11 @@ export const ProductsShowcase = () => {
       name: "Phone Cases",
       icon: Smartphone,
       count: "100+ models",
+    },
+    {
+      name: "Accessories",
+      icon: PenTool,
+      count: "Stickers, pins & more",
     },
   ];
 
@@ -52,7 +57,7 @@ export const ProductsShowcase = () => {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {products.map((product, i) => {
-            const colors = ['#401268', '#c5a3ff', '#e2ae3d', '#e21b35'];
+            const colors = ['#401268', '#c5a3ff', '#e2ae3d', '#401268'];
             const cardColor = colors[i % colors.length];
             return (
               <motion.div
