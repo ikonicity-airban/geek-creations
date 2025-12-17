@@ -9,6 +9,7 @@ interface Category {
   id: string;
   name: string;
   icon: any;
+  image?: string;
   count: string;
   handle: string;
   size: "small" | "medium" | "large";
@@ -20,6 +21,7 @@ export const CategoryGrid = () => {
       id: "1",
       name: "T-Shirts",
       icon: Shirt,
+      image: "/img/tshirt.jpg",
       count: "150+ designs",
       handle: "t-shirts",
       size: "large"
@@ -28,6 +30,7 @@ export const CategoryGrid = () => {
       id: "2",
       name: "Hoodies",
       icon: Shirt,
+      image: "/img/hoodie.jpg",
       count: "80+ designs",
       handle: "hoodies",
       size: "medium"
@@ -36,6 +39,7 @@ export const CategoryGrid = () => {
       id: "3",
       name: "Mugs",
       icon: Coffee,
+      image: "/img/mug.jpg",
       count: "60+ designs",
       handle: "mugs",
       size: "medium"
@@ -44,6 +48,7 @@ export const CategoryGrid = () => {
       id: "4",
       name: "Phone Cases",
       icon: Smartphone,
+      image: "/img/phone-case.jpg",
       count: "120+ designs",
       handle: "phone-cases",
       size: "small"
@@ -122,7 +127,7 @@ export const CategoryGrid = () => {
             >
               <Link href={`/collections/${category.handle}`}>
                 <div
-                  className="h-full rounded-2xl p-4 md:p-6 cursor-pointer transition-all flex flex-col items-center justify-center"
+                  className="h-full rounded-2xl overflow-hidden cursor-pointer transition-all flex flex-col"
                   style={{
                     backgroundColor: index % 2 === 0 ? '#f8f6f0' : '#ffffff',
                     borderRadius: '16px',
@@ -140,18 +145,31 @@ export const CategoryGrid = () => {
                     e.currentTarget.style.borderWidth = '1px';
                   }}
                 >
-                  <div
-                    className={`${getIconSize(category.size)} mb-3 rounded-xl flex items-center justify-center`}
-                    style={{ backgroundColor: '#401268' }}
-                  >
-                    <category.icon className={getIconSize(category.size)} style={{ color: '#ffffff' }} />
+                  {category.image ? (
+                    <div className="relative w-full flex-1 min-h-[120px] md:min-h-[160px] overflow-hidden">
+                      <img
+                        src={category.image}
+                        alt={category.name}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                    </div>
+                  ) : (
+                    <div
+                      className={`${getIconSize(category.size)} mb-3 mt-4 mx-auto rounded-xl flex items-center justify-center`}
+                      style={{ backgroundColor: '#401268' }}
+                    >
+                      <category.icon className={getIconSize(category.size)} style={{ color: '#ffffff' }} />
+                    </div>
+                  )}
+                  <div className="p-4 md:p-6 flex flex-col items-center justify-center">
+                    <h3 className="text-lg md:text-xl font-bold mb-2 text-center" style={{ color: '#401268' }}>
+                      {category.name}
+                    </h3>
+                    <p className="text-xs md:text-sm text-center" style={{ color: 'rgba(64, 18, 104, 0.6)' }}>
+                      {category.count}
+                    </p>
                   </div>
-                  <h3 className="text-lg md:text-xl font-bold mb-2 text-center" style={{ color: '#401268' }}>
-                    {category.name}
-                  </h3>
-                  <p className="text-xs md:text-sm text-center" style={{ color: 'rgba(64, 18, 104, 0.6)' }}>
-                    {category.count}
-                  </p>
                 </div>
               </Link>
             </motion.div>
