@@ -146,6 +146,6 @@
   h5,
   h6,
   button {
-    font-family: var(--font-display);
+    font-family: var(--font-sans);
   }
 }

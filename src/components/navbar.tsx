@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Moon, ShoppingCart, Sun } from "lucide-react";
+import { Moon, ShoppingCart, Sun, User, Search, ChevronDown } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 import { useTheme } from "@/lib/theme-context";
 import {
@@ -17,17 +17,27 @@ import {
 
 export const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isShopOpen, setIsShopOpen] = useState(false);
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
   const { cart } = useCart();
   const theme = useTheme();
 
   const resolvedDarkMode = theme.darkMode;
   const resolvedToggle = theme.toggleDarkMode;
 
-  const navItems = [
-    { name: "Shop", link: "/collections/all" },
+  const shopItems = [
+    { name: "All Designs", link: "/designs" },
     { name: "T-Shirts", link: "/collections/t-shirts" },
     { name: "Hoodies", link: "/collections/hoodies" },
     { name: "Mugs", link: "/collections/mugs" },
+    { name: "Phone Cases", link: "/collections/phone-cases" },
+  ];
+
+  const accountItems = [
+    { name: "My Orders", link: "/account/orders" },
+    { name: "Addresses", link: "/account/addresses" },
+    { name: "Login / Register", link: "/account" },
+    { name: "Logout", link: "/account/logout" },
   ];
 
   return (
@@ -46,9 +56,56 @@ export const Navbar = () => {
           </span>
         </Link>
 
-        <NavItems items={navItems} />
+        <div className="hidden md:flex items-center gap-4">
+          {/* Shop Dropdown */}
+          <div
+            className="relative group"
+            onMouseEnter={() => setIsShopOpen(true)}
+            onMouseLeave={() => setIsShopOpen(false)}
+          >
+            <button className="inline-flex items-center gap-1 text-sm font-semibold text-neutral-700 dark:text-neutral-200">
+              Shop <ChevronDown className="w-4 h-4" />
+            </button>
+            {isShopOpen && (
+              <div className="absolute left-0 mt-2 w-56 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-xl p-2">
+                {shopItems.map((item) => (
+                  <Link
+                    key={item.link}
+                    href={item.link}
+                    className="block rounded-md px-3 py-2 text-sm text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                  >
+                    {item.name}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* About */}
+          <Link
+            href="/pages/about"
+            className="text-sm font-semibold text-neutral-700 dark:text-neutral-200 hover:text-[#401268] dark:hover:text-[#c5a3ff]"
+          >
+            About
+          </Link>
+        </div>
 
         <div className="flex items-center gap-3">
+          {/* Search placeholder */}
+          <button
+            type="button"
+            className="relative z-20 p-2 rounded-full backdrop-blur-lg border transition-all"
+            style={{
+              backgroundColor: resolvedDarkMode
+                ? "rgba(197, 163, 255, 0.1)"
+                : "rgba(64, 18, 104, 0.1)",
+              borderColor: resolvedDarkMode ? "#c5a3ff" : "#401268",
+            }}
+            aria-label="Search (coming soon)"
+          >
+            <Search className="w-5 h-5" />
+          </button>
+
           <button
             type="button"
             className="relative z-20 p-2 rounded-full backdrop-blur-lg border transition-all"
@@ -88,6 +145,40 @@ export const Navbar = () => {
               )}
             </button>
           </Link>
+
+          {/* Account dropdown */}
+          <div
+            className="relative"
+            onMouseEnter={() => setIsAccountOpen(true)}
+            onMouseLeave={() => setIsAccountOpen(false)}
+          >
+            <button
+              type="button"
+              className="relative z-20 p-2 rounded-full backdrop-blur-lg border transition-all"
+              style={{
+                backgroundColor: resolvedDarkMode
+                  ? "rgba(197, 163, 255, 0.1)"
+                  : "rgba(64, 18, 104, 0.1)",
+                borderColor: resolvedDarkMode ? "#c5a3ff" : "#401268",
+              }}
+              aria-label="Account menu"
+            >
+              <User className="w-5 h-5" />
+            </button>
+            {isAccountOpen && (
+              <div className="absolute right-0 mt-2 w-52 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-xl p-2">
+                {accountItems.map((item) => (
+                  <Link
+                    key={item.link}
+                    href={item.link}
+                    className="block rounded-md px-3 py-2 text-sm text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                  >
+                    {item.name}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </NavBody>
 
@@ -126,6 +217,20 @@ export const Navbar = () => {
               </button>
             </Link>
 
+            <button
+              type="button"
+              className="relative p-2 rounded-full backdrop-blur-lg border transition-all"
+              style={{
+                backgroundColor: resolvedDarkMode
+                  ? "rgba(197, 163, 255, 0.1)"
+                  : "rgba(64, 18, 104, 0.1)",
+                borderColor: resolvedDarkMode ? "#c5a3ff" : "#401268",
+              }}
+              aria-label="Search (coming soon)"
+            >
+              <Search className="w-5 h-5" />
+            </button>
+
             <MobileNavToggle
               isOpen={isMobileMenuOpen}
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -138,16 +243,48 @@ export const Navbar = () => {
           onClose={() => setIsMobileMenuOpen(false)}
         >
           <div className="flex w-full flex-col gap-2">
-            {navItems.map((item, idx) => (
+            {/* Shop dropdown links (flattened for mobile) */}
+            <a
+              href="/collections/all"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="relative rounded-md px-2 py-2 text-neutral-700 dark:text-neutral-200"
+            >
+              Shop
+            </a>
+            {shopItems.map((item, idx) => (
               <a
-                key={`mobile-link-${idx}`}
+                key={`mobile-shop-${idx}`}
                 href={item.link}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="relative rounded-md px-2 py-2 text-neutral-700 dark:text-neutral-200"
+                className="relative rounded-md px-2 py-2 text-neutral-600 dark:text-neutral-300 text-sm"
               >
-                <span className="block">{item.name}</span>
+                {item.name}
               </a>
             ))}
+
+            <a
+              href="/pages/about"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="relative rounded-md px-2 py-2 text-neutral-700 dark:text-neutral-200"
+            >
+              About
+            </a>
+
+            <a
+              href="/cart"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="relative rounded-md px-2 py-2 text-neutral-700 dark:text-neutral-200"
+            >
+              Cart
+            </a>
+
+            <a
+              href="/account"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="relative rounded-md px-2 py-2 text-neutral-700 dark:text-neutral-200"
+            >
+              Account
+            </a>
           </div>
 
           <button

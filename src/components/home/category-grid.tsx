@@ -62,14 +62,14 @@ export const CategoryGrid = () => {
       handle: "tote-bags",
       size: "small"
     },
-    {
-      id: "6",
-      name: "Posters",
-      icon: ImageIcon,
-      count: "90+ designs",
-      handle: "posters",
-      size: "small"
-    },
+    // {
+    //   id: "6",
+    //   name: "Posters",
+    //   icon: ImageIcon,
+    //   count: "90+ designs",
+    //   handle: "posters",
+    //   size: "small"
+    // },
   ];
 
   const getSizeClasses = (size: string) => {
@@ -77,7 +77,7 @@ export const CategoryGrid = () => {
       case "large":
         return "md:col-span-2 md:row-span-2";
       case "medium":
-        return "md:col-span-1 md:row-span-1";
+        return "md:col-span-2 md:row-span-1";
       case "small":
         return "md:col-span-1 md:row-span-1";
       default:
@@ -115,7 +115,7 @@ export const CategoryGrid = () => {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 auto-rows-fr">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 auto-rows-fr grid-flow-row-dense">
           {categories.map((category, index) => (
             <motion.div
               key={category.id}
@@ -124,7 +124,7 @@ export const CategoryGrid = () => {
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
               whileHover={{ scale: 1.01, y: -5 }}
-              className={getSizeClasses(category.size)}
+              className={/* getSizeClasses(category.size) */"h-auto"}
             >
               <Link href={`/collections/${category.handle}`}>
                 <div
