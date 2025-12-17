@@ -1,16 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { Shield, LogOut, Instagram, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 export default function AdminLayout({
   children,
@@ -21,35 +16,69 @@ export default function AdminLayout({
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState('');
   const router = useRouter();
+  const supabase = createClient();
 
   useEffect(() => {
     checkAuth();
-  }, []);
+
+    // Listen for auth state changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        checkAuth();
+      } else {
+        setLoading(false);
+        setIsAuthenticated(false);
+        router.push('/admin/login');
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [router]);
 
   const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
+    try {
+      setLoading(true);
+      const { data: { session }, error } = await supabase.auth.getSession();
 
-    if (!session) {
+      if (error) {
+        console.error('Error getting session:', error);
+        setLoading(false);
+        router.push('/admin/login');
+        return;
+      }
+
+      if (!session) {
+        setLoading(false);
+        router.push('/admin/login');
+        return;
+      }
+
+      // Check if user is admin (geekcreations.com or codeoven.tech email)
+      const userEmail = session.user.email || '';
+      const isAdmin = 
+        userEmail.endsWith('@geekcreations.com') ||
+        userEmail.endsWith('@codeoven.tech') ||
+        userEmail === 'admin@geekscreation.com';
+
+      if (!isAdmin) {
+        await supabase.auth.signOut();
+        setLoading(false);
+        router.push('/admin/login');
+        return;
+      }
+
+      setEmail(userEmail);
+      setIsAuthenticated(true);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error in checkAuth:', error);
+      setLoading(false);
       router.push('/admin/login');
-      return;
     }
-
-    // Check if user is admin (geekcreations.com or codeoven.tech email)
-    const userEmail = session.user.email || '';
-    const isAdmin = 
-      userEmail.endsWith('@geekcreations.com') ||
-      userEmail.endsWith('@codeoven.tech') ||
-      userEmail === 'admin@geekscreation.com';
-
-    if (!isAdmin) {
-      await supabase.auth.signOut();
-      router.push('/admin/login');
-      return;
-    }
-
-    setEmail(userEmail);
-    setIsAuthenticated(true);
-    setLoading(false);
   };
 
   const handleSignOut = async () => {

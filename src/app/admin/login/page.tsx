@@ -1,16 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Shield, AlertCircle } from 'lucide-react';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('');
@@ -18,6 +13,7 @@ export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
+  const supabase = createClient();
 
   const handleLogin = async () => {
     setLoading(true);
@@ -46,7 +42,13 @@ export default function AdminLoginPage() {
     }
 
     if (data.session) {
+      // Wait a moment for session to be fully established, then redirect
+      await new Promise(resolve => setTimeout(resolve, 100));
       router.push('/admin/orders');
+      router.refresh(); // Refresh to ensure session is available
+    } else {
+      setError('Failed to create session. Please try again.');
+      setLoading(false);
     }
   };
 
