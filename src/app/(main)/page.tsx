@@ -17,22 +17,21 @@ export default function HomePage() {
       {/* Homepage Structure (Top → Bottom Flow) */}
       {/* 1. Hero Banner - Instant brand impact + CTA */}
       <Hero darkMode={darkMode} />
-      
+
       {/* 2. Featured Designs Carousel - Hook visitors with best sellers */}
       <FeaturedCarousel />
-      
+
       {/* 3. Category Grid - Easy navigation to product types (Bento Grid) */}
       <CategoryGrid />
-      
+
       {/* 4. All Designs Gallery - Core browsing experience */}
       <DesignGallery />
-      
+
       {/* 5. Production Demo - UI demonstration with animation */}
       <ProductionDemo />
-      
+
       {/* 6. Why Choose Us / Features - Build trust */}
       <FeaturesSection />
-      
     </>
   );
 }
