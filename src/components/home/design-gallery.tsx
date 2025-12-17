@@ -26,27 +26,27 @@ export const DesignGallery = () => {
   const visibleDesigns = designs.slice(0, visibleCount);
 
   return (
-    <section className="py-20" style={{ backgroundColor: '#f8f6f0' }}>
-      <div className="max-w-7xl mx-auto px-6">
+    <section className="py-16" style={{ backgroundColor: '#f8f6f0' }}>
+      <div className="max-w-[1024px] mx-auto px-8 md:px-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-12"
+          className="text-center mb-10"
         >
-          <h2 className="text-4xl md:text-5xl font-black mb-4" style={{ color: '#401268' }}>
+          <h2 className="text-3xl md:text-4xl font-black mb-3" style={{ color: '#401268' }}>
             All Designs
           </h2>
-          <p className="text-xl mb-8" style={{ color: 'rgba(64, 18, 104, 0.8)' }}>
+          <p className="text-base md:text-lg mb-6" style={{ color: 'rgba(64, 18, 104, 0.8)' }}>
             Browse our complete collection
           </p>
           
           {/* Filters Bar */}
-          <div className="flex flex-wrap gap-4 justify-center mb-12">
+          <div className="flex flex-wrap gap-3 justify-center mb-10">
             {['All', 'Category', 'Price', 'Newest'].map((filter) => (
               <button
                 key={filter}
-                className="px-6 py-2 rounded-full font-semibold transition-all"
+                className="px-4 py-1.5 rounded-full text-sm font-semibold transition-all"
                 style={{
                   backgroundColor: filter === 'All' ? '#401268' : '#ffffff',
                   color: filter === 'All' ? '#ffffff' : '#401268',
@@ -73,7 +73,7 @@ export const DesignGallery = () => {
         </motion.div>
 
         {/* Masonry/Grid Layout */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
           {visibleDesigns.map((design, index) => (
             <motion.div
               key={design.id}
@@ -135,11 +135,11 @@ export const DesignGallery = () => {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="text-center mt-12"
+            className="text-center mt-10"
           >
             <button
               onClick={() => setVisibleCount(prev => Math.min(prev + 12, designs.length))}
-              className="px-8 py-4 rounded-xl font-bold transition-all"
+              className="px-6 py-3 rounded-xl text-base font-bold transition-all"
               style={{
                 backgroundColor: '#401268',
                 color: '#ffffff',

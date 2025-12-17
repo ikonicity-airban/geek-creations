@@ -74,18 +74,18 @@ export const FeaturedCarousel = () => {
   };
 
   return (
-    <section className="py-20" style={{ backgroundColor: '#f8f6f0' }}>
-      <div className="max-w-7xl mx-auto px-6">
+    <section className="py-16" style={{ backgroundColor: '#f8f6f0' }}>
+      <div className="max-w-[1024px] mx-auto px-8 md:px-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-12"
+          className="text-center mb-10"
         >
-          <h2 className="text-4xl md:text-5xl font-black mb-4" style={{ color: '#401268' }}>
+          <h2 className="text-3xl md:text-4xl font-black mb-3" style={{ color: '#401268' }}>
             Featured Designs
           </h2>
-          <p className="text-xl" style={{ color: 'rgba(64, 18, 104, 0.8)' }}>
+          <p className="text-base md:text-lg" style={{ color: 'rgba(64, 18, 104, 0.8)' }}>
             Our best sellers and trending designs
           </p>
         </motion.div>
@@ -112,7 +112,7 @@ export const FeaturedCarousel = () => {
                 >
                   <Link href={`/products/${design.handle}`}>
                     <div
-                      className="rounded-2xl p-6 cursor-pointer transition-all"
+                      className="rounded-2xl p-4 cursor-pointer transition-all"
                       style={{
                         backgroundColor: '#ffffff',
                         borderRadius: '16px',
@@ -132,7 +132,7 @@ export const FeaturedCarousel = () => {
                     >
                       {/* Design Image Placeholder */}
                       <div
-                        className="w-full h-64 rounded-xl mb-4 flex items-center justify-center"
+                        className="w-full h-48 rounded-xl mb-3 flex items-center justify-center"
                         style={{
                           backgroundColor: 'rgba(197, 163, 255, 0.1)',
                           border: '1px dashed rgba(197, 163, 255, 0.3)'
@@ -141,10 +141,10 @@ export const FeaturedCarousel = () => {
                         <span style={{ color: '#c5a3ff' }}>Design Image</span>
                       </div>
                       
-                      <h3 className="text-xl font-bold mb-2" style={{ color: '#401268' }}>
+                      <h3 className="text-lg font-bold mb-2" style={{ color: '#401268' }}>
                         {design.name}
                       </h3>
-                      <p className="mb-4" style={{ color: 'rgba(64, 18, 104, 0.6)' }}>
+                      <p className="mb-3" style={{ color: 'rgba(64, 18, 104, 0.6)' }}>
                         {design.priceRange}
                       </p>
                       <div className="flex items-center" style={{ color: '#c5a3ff' }}>
@@ -163,7 +163,7 @@ export const FeaturedCarousel = () => {
             <>
               <button
                 onClick={prevSlide}
-                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-12 h-12 rounded-full flex items-center justify-center"
+                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-10 h-10 rounded-full flex items-center justify-center"
                 style={{
                   backgroundColor: '#401268',
                   color: '#ffffff',
@@ -172,11 +172,11 @@ export const FeaturedCarousel = () => {
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2d0d4a'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#401268'}
               >
-                <ChevronLeft className="w-6 h-6" />
+                <ChevronLeft className="w-5 h-5" />
               </button>
               <button
                 onClick={nextSlide}
-                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 w-12 h-12 rounded-full flex items-center justify-center"
+                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 w-10 h-10 rounded-full flex items-center justify-center"
                 style={{
                   backgroundColor: '#401268',
                   color: '#ffffff',
@@ -185,7 +185,7 @@ export const FeaturedCarousel = () => {
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2d0d4a'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#401268'}
               >
-                <ChevronRight className="w-6 h-6" />
+                <ChevronRight className="w-5 h-5" />
               </button>
             </>
           )}

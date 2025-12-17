@@ -81,34 +81,34 @@ export const CategoryGrid = () => {
   const getIconSize = (size: string) => {
     switch (size) {
       case "large":
-        return "w-20 h-20";
-      case "medium":
         return "w-16 h-16";
+      case "medium":
+        return "w-12 h-12";
       case "small":
-        return "w-12 h-12";
+        return "w-10 h-10";
       default:
-        return "w-12 h-12";
+        return "w-10 h-10";
     }
   };
 
   return (
-    <section className="py-20" style={{ backgroundColor: '#ffffff' }}>
-      <div className="max-w-7xl mx-auto px-6">
+    <section className="py-16" style={{ backgroundColor: '#ffffff' }}>
+      <div className="max-w-[1024px] mx-auto px-8 md:px-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-12"
+          className="text-center mb-10"
         >
-          <h2 className="text-4xl md:text-5xl font-black mb-4" style={{ color: '#401268' }}>
+          <h2 className="text-3xl md:text-4xl font-black mb-3" style={{ color: '#401268' }}>
             Shop by Category
           </h2>
-          <p className="text-xl" style={{ color: 'rgba(64, 18, 104, 0.8)' }}>
+          <p className="text-base md:text-lg" style={{ color: 'rgba(64, 18, 104, 0.8)' }}>
             Find your perfect product type
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 auto-rows-fr">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 auto-rows-fr">
           {categories.map((category, index) => (
             <motion.div
               key={category.id}
@@ -121,7 +121,7 @@ export const CategoryGrid = () => {
             >
               <Link href={`/collections/${category.handle}`}>
                 <div
-                  className="h-full rounded-2xl p-6 md:p-8 cursor-pointer transition-all flex flex-col items-center justify-center"
+                  className="h-full rounded-2xl p-4 md:p-6 cursor-pointer transition-all flex flex-col items-center justify-center"
                   style={{
                     backgroundColor: index % 2 === 0 ? '#f8f6f0' : '#ffffff',
                     borderRadius: '16px',
@@ -140,15 +140,15 @@ export const CategoryGrid = () => {
                   }}
                 >
                   <div
-                    className={`${getIconSize(category.size)} mb-4 rounded-xl flex items-center justify-center`}
+                    className={`${getIconSize(category.size)} mb-3 rounded-xl flex items-center justify-center`}
                     style={{ backgroundColor: '#401268' }}
                   >
                     <category.icon className={getIconSize(category.size)} style={{ color: '#ffffff' }} />
                   </div>
-                  <h3 className="text-xl md:text-2xl font-bold mb-2 text-center" style={{ color: '#401268' }}>
+                  <h3 className="text-lg md:text-xl font-bold mb-2 text-center" style={{ color: '#401268' }}>
                     {category.name}
                   </h3>
-                  <p className="text-sm md:text-base text-center" style={{ color: 'rgba(64, 18, 104, 0.6)' }}>
+                  <p className="text-xs md:text-sm text-center" style={{ color: 'rgba(64, 18, 104, 0.6)' }}>
                     {category.count}
                   </p>
                 </div>

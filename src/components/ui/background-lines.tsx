@@ -7,19 +7,24 @@ export const BackgroundLines = ({
   children,
   className,
   svgOptions,
+  darkMode,
 }: {
   children: React.ReactNode;
   className?: string;
   svgOptions?: {
     duration?: number;
   };
+  darkMode?: boolean;
 }) => {
   return (
     <div
       className={cn(
-        "h-[20rem] md:h-screen w-full bg-white dark:bg-black",
+        "h-[20rem] md:h-screen w-full relative",
         className
       )}
+      style={{
+        backgroundColor: darkMode ? "#0f172a" : "#efefef"
+      }}
     >
       <SVG svgOptions={svgOptions} />
       {children}
