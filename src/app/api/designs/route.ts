@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db, designs } from "@/lib/db";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 
 export async function GET(request: Request) {
   try {
@@ -11,15 +11,15 @@ export async function GET(request: Request) {
     const category = searchParams.get("category");
     const q = searchParams.get("q");
 
-    const baseQuery = db
+    const conditions = [eq(designs.isActive, true)];
+    if (category) {
+      conditions.push(eq(designs.category, category));
+    }
+
+    const data = await db
       .select()
       .from(designs)
-      .where(eq(designs.isActive, true));
-
-    const data = await (category
-      ? baseQuery.where(eq(designs.category, category))
-      : baseQuery
-    )
+      .where(and(...conditions))
       .orderBy(desc(designs.sortOrder), desc(designs.createdAt))
       .limit(limit)
       .offset(offset);
@@ -44,4 +44,3 @@ export async function GET(request: Request) {
     );
   }
 }
-

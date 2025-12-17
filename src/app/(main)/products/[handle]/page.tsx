@@ -291,7 +291,7 @@ export default function ProductPage({
                 onClick={handleAddToCart}
               >
                 <ShoppingCart className="w-5 h-5 mr-2" />
-                {isInCart(selectedVariant?.id) ? "In Cart" : "Add to Cart"}
+                {selectedVariant?.id && isInCart(selectedVariant.id) ? "In Cart" : "Add to Cart"}
               </Button>
               <AnimatePresence>
                 {!!selectedVariant?.available && (

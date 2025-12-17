@@ -12,9 +12,12 @@ type Design = {
 
 async function getDesign(id: string): Promise<Design | null> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL ?? ""}/api/designs/${id}`, {
-      cache: "no-store",
-    });
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_SITE_URL ?? ""}/api/designs/${id}`,
+      {
+        cache: "no-store",
+      }
+    );
     if (!res.ok) return null;
     const json = await res.json();
     return json.data as Design;
@@ -24,8 +27,13 @@ async function getDesign(id: string): Promise<Design | null> {
   }
 }
 
-export default async function DesignDetailPage({ params }: { params: { id: string } }) {
-  const design = await getDesign(params.id);
+export default async function DesignDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const design = await getDesign(id);
   const palette = {
     primary: "#401268",
     secondary: "#c5a3ff",
@@ -35,7 +43,10 @@ export default async function DesignDetailPage({ params }: { params: { id: strin
 
   if (!design) {
     return (
-      <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: palette.background }}>
+      <main
+        className="min-h-screen flex items-center justify-center"
+        style={{ backgroundColor: palette.background }}
+      >
         <p style={{ color: palette.primary }}>Design not found.</p>
       </main>
     );
@@ -48,7 +59,10 @@ export default async function DesignDetailPage({ params }: { params: { id: strin
   ];
 
   return (
-    <main className="min-h-screen" style={{ backgroundColor: palette.background }}>
+    <main
+      className="min-h-screen"
+      style={{ backgroundColor: palette.background }}
+    >
       <section className="max-w-6xl mx-auto px-6 py-16 grid lg:grid-cols-2 gap-10 items-start">
         <div
           className="rounded-2xl overflow-hidden shadow-lg border"
@@ -65,15 +79,22 @@ export default async function DesignDetailPage({ params }: { params: { id: strin
           <div className="space-y-3">
             <span
               className="px-3 py-1 rounded-full text-sm font-semibold"
-              style={{ backgroundColor: "rgba(197,163,255,0.2)", color: palette.primary }}
+              style={{
+                backgroundColor: "rgba(197,163,255,0.2)",
+                color: palette.primary,
+              }}
             >
               {design.category || "General"}
             </span>
-            <h1 className="text-4xl font-black" style={{ color: palette.primary }}>
+            <h1
+              className="text-4xl font-black"
+              style={{ color: palette.primary }}
+            >
               {design.title}
             </h1>
             <p className="text-lg" style={{ color: "rgba(64, 18, 104, 0.75)" }}>
-              {design.description || "Premium print-ready artwork for tees, hoodies, and mugs."}
+              {design.description ||
+                "Premium print-ready artwork for tees, hoodies, and mugs."}
             </p>
             {design.tags && (
               <div className="flex flex-wrap gap-2">
@@ -81,7 +102,10 @@ export default async function DesignDetailPage({ params }: { params: { id: strin
                   <span
                     key={tag}
                     className="px-3 py-1 rounded-full text-xs font-semibold"
-                    style={{ backgroundColor: "rgba(226,174,61,0.15)", color: palette.primary }}
+                    style={{
+                      backgroundColor: "rgba(226,174,61,0.15)",
+                      color: palette.primary,
+                    }}
                   >
                     #{tag}
                   </span>
@@ -91,7 +115,10 @@ export default async function DesignDetailPage({ params }: { params: { id: strin
           </div>
 
           <div className="space-y-3">
-            <h3 className="text-xl font-bold" style={{ color: palette.primary }}>
+            <h3
+              className="text-xl font-bold"
+              style={{ color: palette.primary }}
+            >
               Choose a product
             </h3>
             <div className="grid sm:grid-cols-3 gap-3">
@@ -106,13 +133,22 @@ export default async function DesignDetailPage({ params }: { params: { id: strin
                     boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
                   }}
                 >
-                  <div className="text-sm font-semibold" style={{ color: palette.primary }}>
+                  <div
+                    className="text-sm font-semibold"
+                    style={{ color: palette.primary }}
+                  >
                     {p.label}
                   </div>
-                  <div className="text-lg font-bold" style={{ color: palette.primary }}>
+                  <div
+                    className="text-lg font-bold"
+                    style={{ color: palette.primary }}
+                  >
                     {p.price}
                   </div>
-                  <p className="text-xs" style={{ color: "rgba(64, 18, 104, 0.6)" }}>
+                  <p
+                    className="text-xs"
+                    style={{ color: "rgba(64, 18, 104, 0.6)" }}
+                  >
                     Printful/Printify fulfillment
                   </p>
                 </Link>
@@ -124,4 +160,3 @@ export default async function DesignDetailPage({ params }: { params: { id: strin
     </main>
   );
 }
-
