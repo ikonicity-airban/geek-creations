@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
+import { FollowerPointerCard } from "@/components/ui/following-pointer";
 
 interface Design {
   id: string;
@@ -84,46 +85,33 @@ export const DesignGallery = () => {
               whileHover={{ y: -5, scale: 1.02 }}
             >
               <Link href={`/designs/${design.slug}`}>
-                <div
-                  className="rounded-2xl overflow-hidden cursor-pointer transition-all"
-                  style={{
-                    backgroundColor: '#ffffff',
-                    borderRadius: '16px',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-                    border: '1px solid #e0e0e0'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.boxShadow = '0 8px 24px rgba(64,18,104,0.15)';
-                    e.currentTarget.style.borderColor = '#c5a3ff';
-                    e.currentTarget.style.borderWidth = '2px';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.05)';
-                    e.currentTarget.style.borderColor = '#e0e0e0';
-                    e.currentTarget.style.borderWidth = '1px';
-                  }}
-                >
-                  {/* Design Image Placeholder */}
+                <FollowerPointerCard title={design.name}>
                   <div
-                    className="w-full aspect-square flex items-center justify-center"
-                    style={{
-                      backgroundColor: 'rgba(197, 163, 255, 0.1)',
-                      borderBottom: '1px solid #e0e0e0'
-                    }}
+                    className="rounded-2xl overflow-hidden cursor-pointer transition-all bg-white border-2 border-[#c5a3ff] shadow-[0_8px_24px_rgba(64,18,104,0.15)]"
+                    style={{ borderRadius: "16px" }}
                   >
-                    <span style={{ color: '#c5a3ff' }}>Design Preview</span>
-                  </div>
-                  
-                  <div className="p-4">
-                    <h3 className="font-bold mb-2" style={{ color: '#401268' }}>
-                      {design.name}
-                    </h3>
-                    <div className="flex items-center" style={{ color: '#c5a3ff' }}>
-                      <span className="text-sm font-semibold mr-2">View Products</span>
-                      <ArrowRight className="w-4 h-4" />
+                    {/* Design Image Placeholder */}
+                    <div
+                      className="w-full aspect-square flex items-center justify-center"
+                      style={{
+                        backgroundColor: "rgba(197, 163, 255, 0.1)",
+                        borderBottom: "1px solid #e0e0e0",
+                      }}
+                    >
+                      <span style={{ color: "#c5a3ff" }}>Design Preview</span>
+                    </div>
+
+                    <div className="p-4">
+                      <h3 className="font-bold mb-2" style={{ color: "#401268" }}>
+                        {design.name}
+                      </h3>
+                      <div className="flex items-center" style={{ color: "#c5a3ff" }}>
+                        <span className="text-sm font-semibold mr-2">View Products</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </div>
                     </div>
                   </div>
-                </div>
+                </FollowerPointerCard>
               </Link>
             </motion.div>
           ))}

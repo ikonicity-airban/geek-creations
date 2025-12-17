@@ -1,21 +1,31 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { ShoppingCart, Heart, Filter, SlidersHorizontal, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import Link from 'next/link';
-import Image from 'next/image';
-import { useCart } from '@/lib/cart-context';
-import { Product, Collection } from '@/types';
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import {
+  ShoppingCart,
+  Heart,
+  Filter,
+  SlidersHorizontal,
+  X,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
+import Image from "next/image";
+import { useCart } from "@/lib/cart-context";
+import { Product, Collection } from "@/types";
 
-export default function CollectionPage({ params }: { params: { handle: string } }) {
+export default function CollectionPage({
+  params,
+}: {
+  params: { handle: string };
+}) {
   const [collection, setCollection] = useState<Collection | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
-  const [sortBy, setSortBy] = useState('featured');
+  const [sortBy, setSortBy] = useState("featured");
   const { addToCart, isInCart } = useCart();
 
   useEffect(() => {
@@ -29,14 +39,14 @@ export default function CollectionPage({ params }: { params: { handle: string } 
       setCollection(data.collection);
       setProducts(data.products || []);
     } catch (error) {
-      console.error('Error fetching collection:', error);
+      console.error("Error fetching collection:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const handleAddToCart = (product: Product, variantId: string) => {
-    const variant = product.variants.find(v => v.id === variantId);
+    const variant = product.variants.find((v) => v.id === variantId);
     if (!variant) return;
 
     addToCart({
@@ -45,7 +55,7 @@ export default function CollectionPage({ params }: { params: { handle: string } 
       product_title: product.title,
       variant_title: variant.title,
       price: variant.price,
-      image: product.images[0]?.src || '',
+      image: product.images[0]?.src || "",
       sku: variant.sku,
       max_quantity: variant.inventory_quantity,
     });
@@ -56,7 +66,7 @@ export default function CollectionPage({ params }: { params: { handle: string } 
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900">
         <motion.div
           animate={{ rotate: 360 }}
-          transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+          transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
           className="w-16 h-16 border-4 border-white border-t-transparent rounded-full"
         />
       </div>
@@ -64,25 +74,8 @@ export default function CollectionPage({ params }: { params: { handle: string } 
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-800">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/">
-            <h1 className="text-2xl font-black text-gray-900 dark:text-white">
-              GEEKS CREATION
-            </h1>
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link href="/cart">
-              <Button variant="ghost" size="icon">
-                <ShoppingCart className="w-5 h-5" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </header>
-
+    <div className="min-h-screen">
+      <div className="pt-10" />
       {/* Collection Header */}
       <section className="relative py-20 px-6 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 overflow-hidden">
         <div className="absolute inset-0 bg-black/30" />
@@ -96,13 +89,13 @@ export default function CollectionPage({ params }: { params: { handle: string } 
               Collection
             </Badge>
             <h1 className="text-5xl md:text-7xl font-black text-white mb-6">
-              {collection?.title || 'Collection'}
+              {collection?.title || "Collection"}
             </h1>
             <p className="text-xl text-white/90 max-w-2xl mx-auto">
-              {collection?.description || 'Explore our latest designs'}
+              {collection?.description || "Explore our latest designs"}
             </p>
             <p className="mt-4 text-white/70">
-              {products.length} {products.length === 1 ? 'product' : 'products'}
+              {products.length} {products.length === 1 ? "product" : "products"}
             </p>
           </motion.div>
         </div>
@@ -188,7 +181,8 @@ export default function CollectionPage({ params }: { params: { handle: string } 
                         </p>
                         {product.variants[0]?.compare_at_price && (
                           <p className="text-sm text-gray-500 line-through">
-                            ₦{product.variants[0].compare_at_price.toLocaleString()}
+                            ₦
+                            {product.variants[0].compare_at_price.toLocaleString()}
                           </p>
                         )}
                       </div>
@@ -198,10 +192,14 @@ export default function CollectionPage({ params }: { params: { handle: string } 
                       <Button
                         size="sm"
                         className="flex-1"
-                        onClick={() => handleAddToCart(product, product.variants[0]?.id)}
+                        onClick={() =>
+                          handleAddToCart(product, product.variants[0]?.id)
+                        }
                       >
                         <ShoppingCart className="w-4 h-4 mr-2" />
-                        {isInCart(product.variants[0]?.id) ? 'In Cart' : 'Add to Cart'}
+                        {isInCart(product.variants[0]?.id)
+                          ? "In Cart"
+                          : "Add to Cart"}
                       </Button>
                       <Button size="sm" variant="outline">
                         <Heart className="w-4 h-4" />
