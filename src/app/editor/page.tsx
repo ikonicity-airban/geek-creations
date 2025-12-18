@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   Type,
@@ -63,7 +63,7 @@ const PRESET_COLORS = [
   "#BB8FCE",
 ];
 
-export default function ProductCustomizer() {
+function ProductCustomizerContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { addToCart } = useCart();
@@ -792,5 +792,25 @@ export default function ProductCustomizer() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ProductCustomizer() {
+  return (
+    <Suspense
+      fallback={
+        <div
+          className="min-h-screen flex items-center justify-center"
+          style={{ backgroundColor: COLORS.background }}
+        >
+          <Loader2
+            className="w-8 h-8 animate-spin"
+            style={{ color: COLORS.primary }}
+          />
+        </div>
+      }
+    >
+      <ProductCustomizerContent />
+    </Suspense>
   );
 }
