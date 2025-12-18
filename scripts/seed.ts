@@ -169,7 +169,7 @@ async function seed() {
     ];
 
     for (const design of sampleDesigns) {
-      const [inserted] = await db.insert(designs).values(design).returning();
+      await db.insert(designs).values(design).returning();
       console.log(`  ✓ ${design.title}`);
     }
 

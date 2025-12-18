@@ -12,12 +12,12 @@ const COLORS = {
 
 // Shimmer effect component
 const Shimmer = () => (
-  <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+  <div className="absolute inset-0 -translate-x-full animate-shimmer bg-linear-to-r from-transparent via-white/20 to-transparent" />
 );
 
 // Skeleton components
 const ImageSkeleton = () => (
-  <div className="relative aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-gray-200 to-gray-300">
+  <div className="relative aspect-square rounded-2xl overflow-hidden bg-linear-to-br from-gray-200 to-gray-300">
     <Shimmer />
   </div>
 );
@@ -167,7 +167,7 @@ export default function ProductLoadingSkeleton() {
                 className="relative rounded-2xl overflow-hidden bg-white border"
                 style={{ borderColor: `${COLORS.primary}20` }}
               >
-                <div className="relative aspect-[3/4] bg-gray-200 overflow-hidden">
+                <div className="relative aspect-3/4 bg-gray-200 overflow-hidden">
                   <Shimmer />
                 </div>
                 <div className="p-4 space-y-2">
