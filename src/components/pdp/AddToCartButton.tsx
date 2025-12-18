@@ -19,6 +19,7 @@ interface AddToCartButtonProps {
   selectedVariant: Variant | null;
   quantity?: number;
   className?: string;
+  onAddToCart?: () => void; // NEW: callback to open mini-cart
 }
 
 export default function AddToCartButton({
@@ -26,6 +27,7 @@ export default function AddToCartButton({
   selectedVariant,
   quantity = 1,
   className = "",
+  onAddToCart,
 }: AddToCartButtonProps) {
   const { addToCart, isInCart } = useCart();
   const [isAdding, setIsAdding] = useState(false);
@@ -39,7 +41,6 @@ export default function AddToCartButton({
     setIsAdding(true);
 
     try {
-      // Find the image for this variant or use the first product image
       const variantImage = selectedVariant.image_id
         ? product.images.find((img) => img.id === selectedVariant.image_id)
         : product.images[0];
@@ -60,6 +61,11 @@ export default function AddToCartButton({
 
       setIsSuccess(true);
       setTimeout(() => setIsSuccess(false), 2000);
+
+      // Trigger mini-cart open
+      if (onAddToCart) {
+        setTimeout(() => onAddToCart(), 300);
+      }
     } catch (error) {
       console.error("Error adding to cart:", error);
     } finally {
@@ -74,7 +80,9 @@ export default function AddToCartButton({
     (selectedVariant.inventory_quantity > 0 &&
       quantity > selectedVariant.inventory_quantity);
 
-  const isInCartAlready = selectedVariant ? isInCart(selectedVariant.id) : false;
+  const isInCartAlready = selectedVariant
+    ? isInCart(selectedVariant.id)
+    : false;
 
   return (
     <motion.button
@@ -116,4 +124,3 @@ export default function AddToCartButton({
     </motion.button>
   );
 }
-
