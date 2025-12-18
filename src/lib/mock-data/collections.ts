@@ -1,19 +1,23 @@
 // Mock collection data for development and styling
+// lib/mock-data/collections.ts - FIXED WITH GLOBAL UNIQUE VARIANT IDs
 import { Collection, Product, Variant, ProductImage } from "@/types";
 
 const now = new Date().toISOString();
 
-// Helper to create product images
+// === GLOBAL VARIANT ID COUNTER (BigInt for safety) ===
+let globalVariantId = BigInt(9000000000); // Starts high, increments forever
+
+// Helper to create product images (unchanged)
 const createImages = (src: string, alt?: string): ProductImage[] => [
   {
-    id: `img-${Math.random().toString(36).substr(2, 9)}`,
+    id: `img-${Math.random().toString(36).slice(2, 9)}`,
     src,
     alt: alt || "Product image",
     position: 0,
   },
 ];
 
-// Helper to create variants
+// Helper to create variants – now uses GLOBAL counter
 const createVariants = (
   productId: string,
   basePrice: number,
@@ -21,22 +25,23 @@ const createVariants = (
   colors: string[] = ["Black", "White"]
 ): Variant[] => {
   const variants: Variant[] = [];
-  let variantIndex = 0;
 
-  sizes.forEach((size, sizeIdx) => {
-    colors.forEach((color, colorIdx) => {
-      const price = basePrice + sizeIdx * 500 + colorIdx * 300;
-      const compareAtPrice = variantIndex % 3 === 0 ? price * 1.3 : undefined; // Some on sale
+  sizes.forEach((size) => {
+    colors.forEach((color) => {
+      const priceAdjustment =
+        sizes.indexOf(size) * 500 + colors.indexOf(color) * 300;
+      const price = basePrice + priceAdjustment;
+      const compareAtPrice =
+        Math.random() > 0.7 ? Math.round(price * 1.3) : undefined;
 
       variants.push({
-        id: `var-${productId}-${variantIndex}`,
+        id: `var-${productId}-${globalVariantId}`,
         product_id: productId,
-        shopify_variant_id: 1000 + variantIndex,
+        // ← GLOBAL UNIQUE ID
+        shopify_variant_id: Number(globalVariantId++),
         title: `${size} / ${color}`,
         price: Math.round(price),
-        compare_at_price: compareAtPrice
-          ? Math.round(compareAtPrice)
-          : undefined,
+        compare_at_price: compareAtPrice,
         sku: `SKU-${productId}-${size}-${color}`,
         inventory_quantity: Math.floor(Math.random() * 50) + 10,
         weight: 0.3,
@@ -47,7 +52,6 @@ const createVariants = (
         created_at: now,
         updated_at: now,
       });
-      variantIndex++;
     });
   });
 
@@ -282,19 +286,27 @@ export const mockCollections: Collection[] = [
 
 // Collection to Products mapping
 export const collectionProductMap: Record<string, string[]> = {
-  anime: ["prod-1", "prod-3"],
-  "tech-gaming": ["prod-2", "prod-3", "prod-7"],
-  "nigerian-pride": ["prod-4", "prod-5"],
-  accessories: ["prod-4", "prod-5", "prod-6"],
+  anime: ["anime-hero-classic-tee", "gaming-legend-tee"],
+  "tech-gaming": [
+    "tech-geek-premium-hoodie",
+    "gaming-legend-tee",
+    "cyberpunk-street-hoodie",
+  ],
+  "nigerian-pride": ["nigerian-pride-phone-case", "afro-futurism-mug"],
+  accessories: [
+    "nigerian-pride-phone-case",
+    "afro-futurism-mug",
+    "designer-tote-bag",
+  ],
   all: [
-    "prod-1",
-    "prod-2",
-    "prod-3",
-    "prod-4",
-    "prod-5",
-    "prod-6",
-    "prod-7",
-    "prod-8",
+    "anime-hero-classic-tee",
+    "tech-geek-premium-hoodie",
+    "gaming-legend-tee",
+    "nigerian-pride-phone-case",
+    "afro-futurism-mug",
+    "designer-tote-bag",
+    "cyberpunk-street-hoodie",
+    "minimalist-classic-tee",
   ],
 };
 

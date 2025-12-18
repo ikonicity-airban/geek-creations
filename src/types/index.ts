@@ -12,6 +12,7 @@ export interface Product {
   status: "active" | "draft" | "archived";
   fulfillment_provider: "printful" | "printify" | "ikonshop";
   images: ProductImage[];
+  featuredImage?: string;
   variants: Variant[];
   created_at: string;
   updated_at: string;
