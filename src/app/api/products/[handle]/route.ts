@@ -15,10 +15,10 @@ import { mockProducts } from "@/lib/mock-data/collections";
  */
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { handle: string } }
+  { params }: { params: Promise<{ handle: string }> }
 ) {
   try {
-    const { handle } = params;
+    const { handle } = await params;
 
     // Try to fetch from database first
     let productRow;
