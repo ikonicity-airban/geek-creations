@@ -16,11 +16,15 @@ const COLORS = {
 interface MockupCarouselProps {
   images: ProductImage[];
   productTitle: string;
+  designImage?: string; // Optional design image to overlay on product mockup
+  mockupUrl?: string; // Optional pre-generated POD mockup URL (takes precedence over designImage)
 }
 
 export default function MockupCarousel({
   images,
   productTitle,
+  designImage,
+  mockupUrl,
 }: MockupCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isZoomed, setIsZoomed] = useState(false);
@@ -50,17 +54,46 @@ export default function MockupCarousel({
       {/* Main Image */}
       <div className="relative aspect-square rounded-2xl overflow-hidden bg-gray-100 group">
         <AnimatePresence mode="wait">
-          <motion.img
-            key={currentIndex}
-            src={images[currentIndex].src}
-            alt={images[currentIndex].alt || `${productTitle} - Image ${currentIndex + 1}`}
+          <motion.div
+            key={`${currentIndex}-${designImage || "no-design"}`}
             initial={{ opacity: 0, scale: 1.1 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{ duration: 0.3 }}
-            className="w-full h-full object-cover cursor-zoom-in"
+            className="relative w-full h-full cursor-zoom-in"
             onClick={() => setIsZoomed(true)}
-          />
+          >
+            {/* Use pre-generated mockup if available, otherwise overlay design */}
+            {mockupUrl ? (
+              <img
+                src={mockupUrl}
+                alt={`${productTitle} with design`}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <>
+                {/* Product Mockup Base */}
+                <img
+                  src={images[currentIndex].src}
+                  alt={images[currentIndex].alt || `${productTitle} - Image ${currentIndex + 1}`}
+                  className="w-full h-full object-cover"
+                />
+                {/* Design Overlay (if designImage provided) */}
+                {designImage && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <img
+                      src={designImage}
+                      alt="Design overlay"
+                      className="max-w-[80%] max-h-[80%] object-contain opacity-90 mix-blend-multiply"
+                      style={{
+                        filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.2))",
+                      }}
+                    />
+                  </div>
+                )}
+              </>
+            )}
+          </motion.div>
         </AnimatePresence>
 
         {/* Navigation Arrows */}
@@ -135,15 +168,44 @@ export default function MockupCarousel({
             className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4"
             onClick={() => setIsZoomed(false)}
           >
-            <motion.img
+            <motion.div
               initial={{ scale: 0.9 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.9 }}
-              src={images[currentIndex].src}
-              alt={images[currentIndex].alt || productTitle}
-              className="max-w-full max-h-full object-contain"
+              className="relative max-w-full max-h-full"
               onClick={(e) => e.stopPropagation()}
-            />
+            >
+              {/* Use pre-generated mockup if available, otherwise overlay design */}
+              {mockupUrl ? (
+                <img
+                  src={mockupUrl}
+                  alt={`${productTitle} with design`}
+                  className="max-w-full max-h-full object-contain"
+                />
+              ) : (
+                <>
+                  {/* Product Mockup Base */}
+                  <img
+                    src={images[currentIndex].src}
+                    alt={images[currentIndex].alt || productTitle}
+                    className="max-w-full max-h-full object-contain"
+                  />
+                  {/* Design Overlay (if designImage provided) */}
+                  {designImage && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <img
+                        src={designImage}
+                        alt="Design overlay"
+                        className="max-w-[80%] max-h-[80%] object-contain opacity-90 mix-blend-multiply"
+                        style={{
+                          filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.2))",
+                        }}
+                      />
+                    </div>
+                  )}
+                </>
+              )}
+            </motion.div>
             <button
               onClick={() => setIsZoomed(false)}
               className="absolute top-4 right-4 p-2 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white transition"

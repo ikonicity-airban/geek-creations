@@ -37,12 +37,13 @@ async function testConnection() {
 
     await sql.end();
     process.exit(0);
-  } catch (error: any) {
+  } catch (error) {
+    const err = error as { message?: string; code?: string };
     console.error("❌ Connection failed:");
-    console.error("   Error:", error.message);
-    console.error("   Code:", error.code);
+    console.error("   Error:", err.message || String(error));
+    console.error("   Code:", err.code);
 
-    if (error.code === "ENOTFOUND") {
+    if (err.code === "ENOTFOUND") {
       console.error("\n💡 DNS resolution failed. Possible issues:");
       console.error(
         "   1. The hostname in your connection string is incorrect"

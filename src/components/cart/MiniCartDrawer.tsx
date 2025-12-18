@@ -111,7 +111,7 @@ export default function MiniCartDrawer({
                       style={{ backgroundColor: `${COLORS.secondary}10` }}
                     >
                       {/* Image */}
-                      <div className="relative w-20 h-20 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                      <div className="relative w-20 h-20 rounded-lg overflow-hidden bg-gray-100 shrink-0">
                         {item.image ? (
                           <Image
                             src={item.image}

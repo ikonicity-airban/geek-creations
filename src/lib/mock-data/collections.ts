@@ -73,7 +73,7 @@ export const mockProducts: Product[] = [
     status: "active",
     fulfillment_provider: "printful",
     images: createImages(
-      "/img/blank_isolated_white_and_black_t_shirt_front_view.jpg",
+      "/img/blank_isolated_white_and_black_t_shirt_front_view.png",
       "Anime Hero Classic Tee"
     ),
     variants: createVariants("prod-1", 5500),
@@ -224,7 +224,7 @@ export const mockCollections: Collection[] = [
     handle: "anime",
     description:
       "Celebrate your favorite anime characters and moments with our exclusive anime-themed collection. From classic heroes to modern legends, find the perfect design to express your passion.",
-    image_url: "/img/blank_isolated_white_and_black_t_shirt_front_view.jpg",
+    image_url: "/img/blank_isolated_white_and_black_t_shirt_front_view.png",
     product_count: 2,
     published: true,
     created_at: now,

@@ -70,7 +70,7 @@ export const Hero = ({ darkMode }: { darkMode: boolean }) => {
                 <ArrowRight className="inline-block w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
               </button>
             </Link>
-            <Link href="#featured">
+            <Link href="/collections/all">
               <button
                 className="px-6 py-3 border-2 rounded-xl font-bold text-base transition-all flex items-center justify-center"
                 style={{
@@ -89,7 +89,7 @@ export const Hero = ({ darkMode }: { darkMode: boolean }) => {
                 }}
               >
                 <ShoppingBag className="inline-block w-5 h-5 mr-2" />
-                Browse featured
+                Shop Now
               </button>
             </Link>
           </motion.div>

@@ -156,7 +156,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${poppins.variable} ${spaceMono.variable} antialiased`}
+        className={`${poppins.variable} ${orbitron.variable} ${spaceMono.variable} antialiased`}
       >
         <CartProvider>
           {children}

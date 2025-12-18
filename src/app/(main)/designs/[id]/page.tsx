@@ -10,20 +10,58 @@ type Design = {
   tags: string[] | null;
 };
 
+type ProductOption = {
+  label: string;
+  handle: string;
+  price: string;
+};
+
 async function getDesign(id: string): Promise<Design | null> {
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_SITE_URL ?? ""}/api/designs/${id}`,
-      {
-        cache: "no-store",
-      }
-    );
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+    const res = await fetch(`${baseUrl}/api/designs/${id}`, {
+      cache: "no-store",
+    });
     if (!res.ok) return null;
     const json = await res.json();
     return json.data as Design;
   } catch (error) {
     console.error("design detail fetch failed", error);
     return null;
+  }
+}
+
+async function getProducts(): Promise<ProductOption[]> {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+    const res = await fetch(`${baseUrl}/api/products?limit=20`, {
+      cache: "no-store",
+    });
+    if (!res.ok) return [];
+    const json = await res.json();
+    const products = json.products || [];
+
+    // Get unique product types from available products
+    const productTypeMap = new Map<string, ProductOption>();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    products.forEach((product: any) => {
+      if (
+        product.handle &&
+        product.product_type &&
+        !productTypeMap.has(product.product_type)
+      ) {
+        productTypeMap.set(product.product_type, {
+          label: product.product_type,
+          handle: product.handle,
+          price: `₦${product.variants?.[0]?.price?.toLocaleString() || "0"}`,
+        });
+      }
+    });
+
+    return Array.from(productTypeMap.values()).slice(0, 6);
+  } catch (error) {
+    console.error("products fetch failed", error);
+    return [];
   }
 }
 
@@ -34,6 +72,7 @@ export default async function DesignDetailPage({
 }) {
   const { id } = await params;
   const design = await getDesign(id);
+  const productOptions = await getProducts();
   const palette = {
     primary: "#401268",
     secondary: "#c5a3ff",
@@ -52,11 +91,15 @@ export default async function DesignDetailPage({
     );
   }
 
-  const productTypes = [
+  // Fallback to default product types if no products found
+  const defaultProductTypes: ProductOption[] = [
     { label: "T-Shirt", handle: "t-shirt", price: "₦8,000" },
     { label: "Hoodie", handle: "hoodie", price: "₦18,000" },
     { label: "Mug", handle: "mug", price: "₦5,000" },
   ];
+
+  const displayProducts =
+    productOptions.length > 0 ? productOptions : defaultProductTypes;
 
   return (
     <main
@@ -122,9 +165,9 @@ export default async function DesignDetailPage({
               Choose a product
             </h3>
             <div className="grid sm:grid-cols-3 gap-3">
-              {productTypes.map((p) => (
+              {displayProducts.map((p: ProductOption) => (
                 <Link
-                  key={p.label}
+                  key={p.handle}
                   href={`/products/${p.handle}?design=${design.id}`}
                   className="rounded-2xl border p-4 transition hover:-translate-y-1"
                   style={{

@@ -200,7 +200,7 @@ export default function SizeChartModal({
                 <div className="mt-6 p-4 rounded-lg" style={{ backgroundColor: `${COLORS.secondary}20` }}>
                   <p className="text-sm" style={{ color: COLORS.primary }}>
                     <strong>Note:</strong> All measurements are in inches. Please refer to
-                    this chart to find your perfect fit. If you're between sizes, we
+                    this chart to find your perfect fit. If you&apos;re between sizes, we
                     recommend sizing up.
                   </p>
                 </div>

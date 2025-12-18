@@ -71,6 +71,9 @@ export interface CartItem {
   image: string;
   sku: string;
   max_quantity: number;
+  design_id?: string; // ID of selected design from design library
+  uploaded_design_url?: string; // URL of user-uploaded design image
+  mockup_url?: string; // Generated POD mockup preview URL
 }
 
 export interface Cart {
@@ -96,6 +99,20 @@ export interface Order {
   shipped_at?: string;
   created_at: string;
   updated_at: string;
+}
+
+export interface Design {
+  id: string;
+  title: string;
+  description: string | null;
+  imageUrl: string;
+  thumbnailUrl: string | null;
+  category: string | null;
+  tags: string[] | null;
+  isActive?: boolean;
+  sortOrder?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface CustomDesign {

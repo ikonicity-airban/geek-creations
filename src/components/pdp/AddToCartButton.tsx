@@ -19,6 +19,9 @@ interface AddToCartButtonProps {
   selectedVariant: Variant | null;
   quantity?: number;
   className?: string;
+  designId?: string; // ID of selected design from design library
+  uploadedDesignUrl?: string; // URL of user-uploaded design
+  mockupUrl?: string; // Generated POD mockup URL
   onAddToCart?: () => void; // NEW: callback to open mini-cart
 }
 
@@ -27,6 +30,9 @@ export default function AddToCartButton({
   selectedVariant,
   quantity = 1,
   className = "",
+  designId,
+  uploadedDesignUrl,
+  mockupUrl,
   onAddToCart,
 }: AddToCartButtonProps) {
   const { addToCart, isInCart } = useCart();
@@ -55,6 +61,9 @@ export default function AddToCartButton({
           image: variantImage?.src || product.images[0]?.src || "",
           sku: selectedVariant.sku,
           max_quantity: selectedVariant.inventory_quantity,
+          design_id: designId,
+          uploaded_design_url: uploadedDesignUrl,
+          mockup_url: mockupUrl,
         },
         quantity
       );

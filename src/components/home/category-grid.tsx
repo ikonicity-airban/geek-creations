@@ -6,8 +6,6 @@ import {
   Coffee,
   Smartphone,
   ShoppingBag,
-  Package,
-  Image as ImageIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { PageLayout } from "@/components/page-layout";

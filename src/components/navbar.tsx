@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { Fragment, useState } from "react";
 import {
   Home,
@@ -247,7 +246,7 @@ const DesktopNavbarContent = () => {
         {/* Theme Toggle */}
         <button
           onClick={toggleDarkMode}
-          className="p-2 rounded-full shadow-md"
+          className="p-2 rounded-full shadow-md cursor-pointer hover:shadow-lg hover:shadow-mauve transition-shadow"
           style={{ backgroundColor: darkMode ? COLORS.darkBg : COLORS.lightBg }}
           aria-label={darkMode ? "Light mode" : "Dark mode"}
         >
@@ -259,9 +258,9 @@ const DesktopNavbarContent = () => {
         </button>
 
         {/* Cart */}
-        <Link href="/cart" className="relative">
+        <Link href="/cart" className="relative cursor-pointer">
           <button
-            className="p-2 rounded-full shadow-md"
+            className="p-2 rounded-full shadow-md hover:shadow-lg hover:shadow-mauve transition-shadow"
             style={{ color: darkMode ? COLORS.light : COLORS.primary }}
             aria-label="Cart"
           >
@@ -279,12 +278,12 @@ const DesktopNavbarContent = () => {
 
         {/* Account Dropdown */}
         <div
-          className="relative"
+          className="relative cursor-pointer"
           onMouseEnter={() => setIsAccountOpen(true)}
           onMouseLeave={() => setIsAccountOpen(false)}
         >
           <button
-            className="p-2 rounded-full shadow-md"
+            className="p-2 rounded-full shadow-md hover:shadow-lg hover:shadow-mauve transition-shadow"
             style={{
               backgroundColor: darkMode ? COLORS.darkBg : COLORS.lightBg,
             }}
@@ -330,7 +329,9 @@ const MobileNavbarContent = () => {
     const main = document.getElementById("main-content");
     if (!main) return;
     main.style.transition = "transform 0.3s ease, filter 0.3s ease";
-    main.style.transform = open ? "translateX(-75%) scale(0.95)" : "translateX(0) scale(1)";
+    main.style.transform = open
+      ? "translateX(-75%) scale(0.95)"
+      : "translateX(0) scale(1)";
     main.style.filter = open ? "brightness(0.95)" : "brightness(1)";
     main.style.transformOrigin = "top right";
     main.style.borderEndStartRadius = open ? "2rem" : "0";
@@ -356,7 +357,7 @@ const MobileNavbarContent = () => {
         </Link>
 
         <div className="flex items-center gap-3">
-          <Link href="/cart" className="relative">
+          <Link href="/cart" className="relative cursor-pointer">
             <button
               className="p-2 rounded-full shadow-md"
               style={{ color: darkMode ? COLORS.light : COLORS.primary }}
