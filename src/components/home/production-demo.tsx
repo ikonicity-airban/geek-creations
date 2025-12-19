@@ -1,12 +1,13 @@
 "use client";
 
 import { motion, useAnimation } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Package, Zap, Truck } from "lucide-react";
 
 export const ProductionDemo = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const controls = useAnimation();
+  const isMountedRef = useRef(false);
 
   const steps = [
     { name: "Design", icon: "🎨", color: "#c5a3ff" },
@@ -16,21 +17,37 @@ export const ProductionDemo = () => {
   ];
 
   useEffect(() => {
-    const sequence = async () => {
-      for (let i = 0; i < steps.length; i++) {
-        setCurrentStep(i);
-        await controls.start({
-          scale: [1, 1.2, 1],
-          rotate: [0, 10, -10, 0],
-          transition: { duration: 1 }
-        });
-        await new Promise(resolve => setTimeout(resolve, 1500));
-      }
-      // Reset and loop
-      setCurrentStep(0);
-      setTimeout(() => sequence(), 1000);
+    // Mark component as mounted
+    isMountedRef.current = true;
+
+    // Small delay to ensure component is fully mounted
+    const timeoutId = setTimeout(() => {
+      const sequence = async () => {
+        if (!isMountedRef.current) return;
+        
+        for (let i = 0; i < steps.length; i++) {
+          if (!isMountedRef.current) return;
+          setCurrentStep(i);
+          await controls.start({
+            scale: [1, 1.2, 1],
+            rotate: [0, 10, -10, 0],
+            transition: { duration: 1 }
+          });
+          await new Promise(resolve => setTimeout(resolve, 1500));
+        }
+        // Reset and loop
+        if (isMountedRef.current) {
+          setCurrentStep(0);
+          setTimeout(() => sequence(), 1000);
+        }
+      };
+      sequence();
+    }, 100);
+
+    return () => {
+      isMountedRef.current = false;
+      clearTimeout(timeoutId);
     };
-    sequence();
   }, [controls, steps.length]);
 
   // Particle positions for zaps (deterministic for React purity)

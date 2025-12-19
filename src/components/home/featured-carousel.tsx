@@ -336,7 +336,7 @@ export const FeaturedCarousel = () => {
             <motion.button
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.98 }}
-              className="px-8 py-4 rounded-xl font-bold text-lg shadow-xl transition-all flex items-center gap-2 mx-auto"
+              className="px-8 py-2 rounded-xl font-bold text-lg shadow-xl transition-all flex items-center gap-2 mx-auto"
               style={{
                 backgroundColor: COLORS.primary,
                 color: "#fff",

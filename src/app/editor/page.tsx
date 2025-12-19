@@ -3,22 +3,33 @@
 import React, { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
-  Type,
-  Circle,
-  Square,
   Trash2,
   Download,
   RotateCw,
-  Palette,
-  Upload,
   ShoppingCart,
   ArrowLeft,
   Loader2,
+  ChevronDown,
+  Save,
+  ChevronRight,
+  ChevronLeft,
+  Circle,
+  Square,
 } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 import { Product } from "@/types";
 import Image from "next/image";
 import Link from "next/link";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { Toolbar } from "@/components/editor/Toolbar";
+import { IconSidebar } from "@/components/editor/IconSidebar";
+import { BottomNav } from "@/components/editor/BottomNav";
+import { BottomSheet } from "@/components/editor/BottomSheet";
+import { ZoomControls } from "@/components/editor/ZoomControls";
+import { CanvasArea } from "@/components/editor/CanvasArea";
+import { ProductPreview } from "@/components/editor/ProductPreview";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 const COLORS = {
   primary: "#401268",
@@ -67,11 +78,14 @@ function ProductCustomizerContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { addToCart } = useCart();
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const fabricCanvasRef = useRef<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const productGuideRef = useRef<any>(null);
 
   // Get product handle from URL if coming from PDP
   const productHandle = searchParams.get("product");
@@ -87,6 +101,21 @@ function ProductCustomizerContent() {
   const [selectedColor, setSelectedColor] = useState("#000000");
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+
+  // New state for redesigned editor
+  const [showGridlines, setShowGridlines] = useState(true);
+  const [editMode, setEditMode] = useState<"edit" | "preview">("edit");
+  const [zoomLevel, setZoomLevel] = useState(100);
+  const [activeTool, setActiveTool] = useState<string | null>(null);
+  const [showBottomSheet, setShowBottomSheet] = useState(false);
+  const [bottomSheetContent, setBottomSheetContent] = useState<
+    "colors" | "fonts" | "shapes" | "text" | "products" | null
+  >(null);
+  const [canvasDataUrl, setCanvasDataUrl] = useState<string>("");
+  const [history, setHistory] = useState<string[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+  const [isProductSidebarCollapsed, setIsProductSidebarCollapsed] =
+    useState(false);
 
   // Fetch products
   useEffect(() => {
@@ -136,6 +165,71 @@ function ProductCustomizerContent() {
     loadProducts();
   }, [productHandle]);
 
+  // Load product guide image when product/variant changes
+  useEffect(() => {
+    if (!fabricCanvasRef.current || !selectedProduct) return;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const fabric = (window as any).fabric as any;
+    if (!fabric) return;
+
+    const productImageUrl =
+      selectedVariant?.image_id &&
+      selectedProduct.images.find((img) => img.id === selectedVariant.image_id)
+        ? selectedProduct.images.find(
+            (img) => img.id === selectedVariant.image_id
+          )?.src
+        : selectedProduct.images[0]?.src;
+
+    if (!productImageUrl) return;
+
+    // Remove old guide if exists
+    if (productGuideRef.current) {
+      fabricCanvasRef.current.remove(productGuideRef.current);
+      productGuideRef.current = null;
+    }
+
+    // Load and add product guide as locked background
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    fabric.Image.fromURL(productImageUrl, (img: any) => {
+      img.set({
+        selectable: false,
+        evented: false,
+        lockMovementX: true,
+        lockMovementY: true,
+        lockRotation: true,
+        lockScalingX: true,
+        lockScalingY: true,
+        opacity: 0.3, // Make it subtle
+        originX: "center",
+        originY: "center",
+      });
+
+      // Center the image
+      const canvas = fabricCanvasRef.current;
+      img.set({
+        left: canvas.width / 2,
+        top: canvas.height / 2,
+      });
+
+      // Scale to fit canvas
+      const scale = Math.min(
+        (canvas.width * 0.8) / img.width,
+        (canvas.height * 0.8) / img.height
+      );
+      img.scale(scale);
+
+      // Add to canvas at the bottom (background layer)
+      // Ensure guide is always at the bottom
+      canvas.insertAt(img, 0, false);
+      productGuideRef.current = img;
+
+      // Move guide to bottom if other objects exist
+      canvas.sendToBack(img);
+      canvas.renderAll();
+    });
+  }, [selectedProduct, selectedVariant]);
+
   // Initialize Fabric.js canvas
   useEffect(() => {
     if (isLoading) return;
@@ -158,6 +252,10 @@ function ProductCustomizerContent() {
 
         fabricCanvasRef.current = canvas;
 
+        // Debug: Log canvas setup
+        console.log("Canvas initialized:", canvas.width, "x", canvas.height);
+        console.log("Canvas objects:", canvas.getObjects().length);
+
         // Listen for object selection
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         canvas.on("selection:created", (e: any) =>
@@ -168,6 +266,71 @@ function ProductCustomizerContent() {
           setActiveObject(e.selected[0])
         );
         canvas.on("selection:cleared", () => setActiveObject(null));
+
+        // Save canvas state for history
+        let currentHistoryIndex = historyIndex;
+        const saveState = () => {
+          const json = JSON.stringify(canvas.toJSON());
+          setHistory((prev) => {
+            const newHistory = prev.slice(0, currentHistoryIndex + 1);
+            newHistory.push(json);
+            currentHistoryIndex = newHistory.length - 1;
+            setHistoryIndex(currentHistoryIndex);
+            return newHistory;
+          });
+        };
+        canvas.on("object:added", saveState);
+        canvas.on("object:modified", saveState);
+        canvas.on("object:removed", saveState);
+
+        // Update preview data URL - debounced to avoid infinite loops
+        let previewTimeout: NodeJS.Timeout | null = null;
+        const updatePreview = () => {
+          if (previewTimeout) {
+            clearTimeout(previewTimeout);
+          }
+          previewTimeout = setTimeout(() => {
+            try {
+              // Use requestAnimationFrame to ensure canvas is ready
+              requestAnimationFrame(() => {
+                if (fabricCanvasRef.current) {
+                  const dataUrl = fabricCanvasRef.current.toDataURL({
+                    format: "png",
+                    quality: 0.9,
+                  });
+                  setCanvasDataUrl(dataUrl);
+                }
+              });
+            } catch (error) {
+              // Silently fail if canvas is not ready
+              console.error("Failed to update preview:", error);
+            }
+          }, 500); // Debounce by 500ms
+        };
+
+        // Only update preview on object changes, not on every render
+        // Remove after:render listener to prevent infinite loops
+        canvas.on("object:added", () => {
+          canvas.renderAll();
+          updatePreview();
+        });
+        canvas.on("object:modified", () => {
+          canvas.renderAll();
+          updatePreview();
+        });
+        canvas.on("object:removed", () => {
+          canvas.renderAll();
+          updatePreview();
+        });
+        canvas.on("object:moved", () => {
+          canvas.renderAll();
+          updatePreview();
+        });
+
+        // Initial render
+        canvas.renderAll();
+        // Initial preview after a delay
+        setTimeout(() => updatePreview(), 1000);
       }
     };
     document.body.appendChild(script);
@@ -180,29 +343,73 @@ function ProductCustomizerContent() {
         script.parentNode.removeChild(script);
       }
     };
-  }, [isLoading]);
+  }, [isLoading, historyIndex]);
+
+  const handleUndo = () => {
+    if (historyIndex > 0 && fabricCanvasRef.current) {
+      const newIndex = historyIndex - 1;
+      fabricCanvasRef.current.loadFromJSON(history[newIndex], () => {
+        fabricCanvasRef.current.renderAll();
+        setHistoryIndex(newIndex);
+      });
+    }
+  };
+
+  const handleRedo = () => {
+    if (historyIndex < history.length - 1 && fabricCanvasRef.current) {
+      const newIndex = historyIndex + 1;
+      fabricCanvasRef.current.loadFromJSON(history[newIndex], () => {
+        fabricCanvasRef.current.renderAll();
+        setHistoryIndex(newIndex);
+      });
+    }
+  };
 
   const addText = () => {
     if (!fabricCanvasRef.current || !textInput.trim()) return;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const fabric = (window as any).fabric;
+    if (!fabric) {
+      console.error("Fabric.js not loaded");
+      return;
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const text: any = new fabric.IText(textInput, {
-      left: 100,
-      top: 100,
+      left: 200,
+      top: 250,
       fontFamily: selectedFont,
-      fill: selectedColor,
+      fill: selectedColor || "#000000", // Ensure color is set
       fontSize: 40,
+      stroke: null,
+      strokeWidth: 0,
+      originX: "center",
+      originY: "center",
     });
+
+    // Ensure color is visible
+    if (!selectedColor || selectedColor === "#FFFFFF") {
+      text.set("fill", "#000000");
+    }
 
     fabricCanvasRef.current.add(text);
     fabricCanvasRef.current.setActiveObject(text);
+    // Ensure text is above product guide
+    if (productGuideRef.current) {
+      fabricCanvasRef.current.bringToFront(text);
+    }
+    // Force render
     fabricCanvasRef.current.renderAll();
+    console.log("Text added:", textInput, "Color:", text.fill);
     setTextInput("");
+    if (isMobile) {
+      setShowBottomSheet(false);
+      setActiveTool(null);
+    }
   };
 
-  const addShape = (type: string) => {
+  const addShape = (type: "circle" | "rectangle") => {
     if (!fabricCanvasRef.current) return;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -213,23 +420,53 @@ function ProductCustomizerContent() {
       shape = new fabric.Circle({
         radius: 50,
         fill: selectedColor,
-        left: 150,
-        top: 150,
+        left: 200,
+        top: 250,
+        stroke: "#000000",
+        strokeWidth: 0,
       });
     } else if (type === "rectangle") {
       shape = new fabric.Rect({
         width: 100,
         height: 80,
         fill: selectedColor,
-        left: 150,
-        top: 150,
+        left: 200,
+        top: 250,
+        stroke: "#000000",
+        strokeWidth: 0,
       });
     }
 
     if (shape) {
+      // Ensure color is set - default to black if white or empty
+      const fillColor =
+        selectedColor && selectedColor !== "#FFFFFF"
+          ? selectedColor
+          : "#000000";
+      shape.set("fill", fillColor);
+
       fabricCanvasRef.current.add(shape);
       fabricCanvasRef.current.setActiveObject(shape);
+      // Ensure shape is above product guide
+      if (productGuideRef.current) {
+        fabricCanvasRef.current.bringToFront(shape);
+      }
+      // Force render
       fabricCanvasRef.current.renderAll();
+      console.log(
+        "Shape added:",
+        type,
+        "Color:",
+        fillColor,
+        "Objects on canvas:",
+        fabricCanvasRef.current.getObjects().length
+      );
+      if (isMobile) {
+        setShowBottomSheet(false);
+        setActiveTool(null);
+      }
+    } else {
+      console.error("Failed to create shape:", type);
     }
   };
 
@@ -247,12 +484,24 @@ function ProductCustomizerContent() {
       fabric.Image.fromURL(event.target?.result as string, (img: any) => {
         img.scaleToWidth(200);
         img.set({
-          left: 100,
-          top: 100,
+          left: 200,
+          top: 250,
+          originX: "center",
+          originY: "center",
         });
         fabricCanvasRef.current.add(img);
         fabricCanvasRef.current.setActiveObject(img);
+        // Ensure image is above product guide
+        if (productGuideRef.current) {
+          fabricCanvasRef.current.bringToFront(img);
+        }
+        // Force render
         fabricCanvasRef.current.renderAll();
+        console.log("Image uploaded and added to canvas");
+        if (isMobile) {
+          setShowBottomSheet(false);
+          setActiveTool(null);
+        }
       });
     };
     reader.readAsDataURL(file);
@@ -268,9 +517,17 @@ function ProductCustomizerContent() {
 
   const changeColor = (color: string) => {
     setSelectedColor(color);
-    if (!fabricCanvasRef.current || !activeObject) return;
+    if (!fabricCanvasRef.current || !activeObject) {
+      // If no active object, just update the selected color for next object
+      return;
+    }
 
-    activeObject.set("fill", color);
+    // Update the active object's color
+    if (activeObject.type === "i-text" || activeObject.type === "text") {
+      activeObject.set("fill", color);
+    } else {
+      activeObject.set("fill", color);
+    }
     fabricCanvasRef.current.renderAll();
   };
 
@@ -395,6 +652,36 @@ function ProductCustomizerContent() {
     }
   };
 
+  const handleToolSelect = (tool: string) => {
+    setActiveTool(tool);
+    if (isMobile) {
+      if (tool === "colors") {
+        setBottomSheetContent("colors");
+        setShowBottomSheet(true);
+      } else if (tool === "fonts") {
+        setBottomSheetContent("fonts");
+        setShowBottomSheet(true);
+      } else if (tool === "shapes") {
+        setBottomSheetContent("shapes");
+        setShowBottomSheet(true);
+      } else if (tool === "upload") {
+        fileInputRef.current?.click();
+      } else if (tool === "text") {
+        setBottomSheetContent("text");
+        setShowBottomSheet(true);
+      }
+    } else {
+      // Desktop: handle text input inline
+      if (tool === "text") {
+        // Text input is shown inline on desktop
+      }
+    }
+  };
+
+  const handleZoomChange = (zoom: number) => {
+    setZoomLevel(Math.max(25, Math.min(200, zoom)));
+  };
+
   if (isLoading) {
     return (
       <div
@@ -411,386 +698,458 @@ function ProductCustomizerContent() {
 
   return (
     <div
-      className="min-h-screen"
+      className="flex flex-col h-screen overflow-hidden"
       style={{ backgroundColor: COLORS.background }}
     >
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 mb-4 text-sm font-semibold hover:opacity-80 transition"
-            style={{ color: COLORS.primary }}
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Shop
-          </Link>
+      {/* Header */}
+      <div className="bg-white border-b border-primary/20 px-4 py-3 flex items-center gap-3">
+        <Link
+          href="/"
+          className="p-2 rounded-lg hover:bg-primary/10 transition-colors"
+        >
+          <ArrowLeft className="w-5 h-5 text-primary" />
+        </Link>
+        {isMobile ? (
           <h1
-            className="text-4xl md:text-5xl font-black mb-2"
-            style={{
-              color: COLORS.primary,
-              fontFamily: "Orbitron, sans-serif",
-            }}
+            className="text-lg font-bold flex-1"
+            style={{ color: COLORS.primary }}
           >
             Product Customizer
           </h1>
-          <p className="text-lg" style={{ color: "rgba(64, 18, 104, 0.75)" }}>
-            Design your perfect product with our easy-to-use editor
-          </p>
-        </div>
-
-        <div className="grid lg:grid-cols-12 gap-6">
-          {/* Left Sidebar - Tools */}
-          <div className="lg:col-span-3">
-            <div
-              className="bg-white rounded-2xl p-6 shadow-lg"
-              style={{ border: `1px solid ${COLORS.primary}20` }}
+        ) : (
+          <div className="flex-1">
+            <h1
+              className="text-2xl font-black"
+              style={{
+                color: COLORS.primary,
+                fontFamily: "Orbitron, sans-serif",
+              }}
             >
-              <h3
-                className="text-xl font-bold mb-6"
-                style={{ color: COLORS.primary }}
-              >
-                Add Elements
-              </h3>
+              Product Customizer
+            </h1>
+            <p className="text-sm" style={{ color: "rgba(64, 18, 104, 0.75)" }}>
+              Design your perfect product
+            </p>
+          </div>
+        )}
+      </div>
 
-              {/* Add Text */}
-              <div className="mb-6">
-                <label
-                  className="block text-sm font-semibold mb-2"
-                  style={{ color: COLORS.primary }}
+      {/* Top Toolbar */}
+      <Toolbar
+        editMode={editMode}
+        onEditModeChange={setEditMode}
+        showGridlines={showGridlines}
+        onToggleGridlines={() => setShowGridlines(!showGridlines)}
+        zoomLevel={zoomLevel}
+        onZoomIn={() => handleZoomChange(zoomLevel + 10)}
+        onZoomOut={() => handleZoomChange(zoomLevel - 10)}
+        onUndo={handleUndo}
+        onRedo={handleRedo}
+        canUndo={historyIndex > 0}
+        canRedo={historyIndex < history.length - 1}
+        isMobile={isMobile}
+      />
+
+      {/* Main Content Area */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Left Icon Sidebar - Desktop only */}
+        {!isMobile && (
+          <IconSidebar
+            activeTool={activeTool}
+            onToolSelect={handleToolSelect}
+            onTextClick={() => {
+              // Show text input in a modal or inline
+              const input = prompt("Enter text:");
+              if (input) {
+                setTextInput(input);
+                addText();
+              }
+            }}
+            onUploadClick={() => fileInputRef.current?.click()}
+            onShapeClick={addShape}
+            onColorClick={() => {
+              setActiveTool("colors");
+            }}
+          />
+        )}
+
+        {/* Canvas Area */}
+        <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
+          <div className="flex-1 flex flex-col">
+            <CanvasArea
+              canvasRef={canvasRef}
+              fabricCanvasRef={fabricCanvasRef}
+              showGridlines={showGridlines}
+              zoomLevel={zoomLevel}
+              isMobile={isMobile}
+            />
+
+            {/* Canvas Object Controls */}
+            {activeObject && editMode === "edit" && (
+              <div className="bg-white border-t border-primary/20 px-4 py-2 flex items-center justify-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={rotateObject}
+                  className="gap-2"
                 >
-                  Add Text
-                </label>
-                <input
-                  type="text"
-                  value={textInput}
-                  onChange={(e) => setTextInput(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && addText()}
-                  placeholder="Enter your text..."
-                  className="w-full px-4 py-2 rounded-lg border-2 mb-2 text-sm"
-                  style={{
-                    borderColor: `${COLORS.primary}20`,
-                  }}
-                />
-                <button
-                  onClick={addText}
-                  className="w-full py-2.5 rounded-lg font-semibold text-white flex items-center justify-center gap-2 transition hover:opacity-90"
-                  style={{ backgroundColor: COLORS.primary }}
+                  <RotateCw className="w-4 h-4" />
+                  Rotate
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={deleteSelected}
+                  className="gap-2"
                 >
-                  <Type className="w-4 h-4" />
-                  Add Text
-                </button>
+                  <Trash2 className="w-4 h-4" />
+                  Delete
+                </Button>
               </div>
+            )}
 
-              {/* Upload Image */}
-              <div className="mb-6">
-                <label
-                  className="block text-sm font-semibold mb-2"
-                  style={{ color: COLORS.primary }}
-                >
-                  Upload Image
-                </label>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={uploadImage}
-                  className="hidden"
-                />
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="w-full py-2.5 rounded-lg font-semibold flex items-center justify-center gap-2 transition hover:opacity-90"
-                  style={{
-                    backgroundColor: `${COLORS.secondary}40`,
-                    color: COLORS.primary,
-                  }}
-                >
-                  <Upload className="w-4 h-4" />
-                  Upload Image
-                </button>
-              </div>
-
-              {/* Add Shapes */}
-              <div className="mb-6">
-                <label
-                  className="block text-sm font-semibold mb-2"
-                  style={{ color: COLORS.primary }}
-                >
-                  Add Shapes
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    onClick={() => addShape("circle")}
-                    className="py-2.5 rounded-lg font-semibold border-2 flex items-center justify-center gap-2 transition hover:opacity-80"
-                    style={{
-                      borderColor: COLORS.primary,
-                      color: COLORS.primary,
-                    }}
-                  >
-                    <Circle className="w-4 h-4" />
-                    Circle
-                  </button>
-                  <button
-                    onClick={() => addShape("rectangle")}
-                    className="py-2.5 rounded-lg font-semibold border-2 flex items-center justify-center gap-2 transition hover:opacity-80"
-                    style={{
-                      borderColor: COLORS.primary,
-                      color: COLORS.primary,
-                    }}
-                  >
-                    <Square className="w-4 h-4" />
-                    Square
-                  </button>
+            {/* Text Input - Desktop inline */}
+            {!isMobile && activeTool === "text" && (
+              <div className="bg-white border-t border-primary/20 px-4 py-3">
+                <div className="space-y-3">
+                  <div className="flex gap-2">
+                    <Input
+                      type="text"
+                      value={textInput}
+                      onChange={(e) => setTextInput(e.target.value)}
+                      onKeyPress={(e) => e.key === "Enter" && addText()}
+                      placeholder="Enter your text..."
+                      className="flex-1"
+                    />
+                    <Button onClick={addText}>Add</Button>
+                  </div>
+                  {activeObject?.type === "i-text" && (
+                    <div className="flex gap-2">
+                      <select
+                        value={selectedFont}
+                        onChange={(e) => changeFont(e.target.value)}
+                        className="flex-1 px-3 py-2 rounded-lg border-2 border-primary/20 text-sm"
+                        style={{ fontFamily: selectedFont }}
+                      >
+                        {FONTS.map((font) => (
+                          <option
+                            key={font}
+                            value={font}
+                            style={{ fontFamily: font }}
+                          >
+                            {font}
+                          </option>
+                        ))}
+                      </select>
+                      <div className="grid grid-cols-6 gap-1">
+                        {PRESET_COLORS.slice(0, 6).map((color) => (
+                          <button
+                            key={color}
+                            onClick={() => changeColor(color)}
+                            className={`w-8 h-8 rounded border-2 ${
+                              selectedColor === color
+                                ? "border-primary border-4"
+                                : "border-gray-300"
+                            }`}
+                            style={{ backgroundColor: color }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
+            )}
 
-              {/* Color Picker */}
-              <div className="mb-6">
-                <label
-                  className="flex items-center gap-2 text-sm font-semibold mb-2"
+            {/* Color Picker - Desktop inline */}
+            {!isMobile && activeTool === "colors" && (
+              <div className="bg-white border-t border-primary/20 px-4 py-3">
+                <div className="space-y-3">
+                  <h4 className="text-sm font-semibold text-primary">
+                    Select Color
+                  </h4>
+                  <div className="grid grid-cols-8 gap-2">
+                    {PRESET_COLORS.map((color) => (
+                      <button
+                        key={color}
+                        onClick={() => changeColor(color)}
+                        className={`aspect-square rounded-lg border-2 transition-all hover:scale-110 ${
+                          selectedColor === color
+                            ? "border-primary border-4"
+                            : "border-gray-300"
+                        }`}
+                        style={{ backgroundColor: color }}
+                        title={color}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Shapes Panel - Desktop inline */}
+            {!isMobile && activeTool === "shapes" && (
+              <div className="bg-white border-t border-primary/20 px-4 py-3">
+                <div className="space-y-3">
+                  <h4 className="text-sm font-semibold text-primary">
+                    Add Shape
+                  </h4>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Button
+                      variant="outline"
+                      onClick={() => addShape("circle")}
+                      className="h-24 flex-col gap-2"
+                    >
+                      <Circle className="w-8 h-8" />
+                      <span>Circle</span>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => addShape("rectangle")}
+                      className="h-24 flex-col gap-2"
+                    >
+                      <Square className="w-8 h-8" />
+                      <span>Rectangle</span>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Product Preview - Desktop only */}
+          {!isMobile && (
+            <div className="w-80 border-l border-primary/20 bg-white p-4 overflow-y-auto">
+              <ProductPreview
+                product={selectedProduct}
+                variant={selectedVariant}
+                canvasDataUrl={canvasDataUrl}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Right Sidebar - Product Selection - Desktop only */}
+        {!isMobile && (
+          <div
+            className={`border-l border-primary/20 bg-white transition-all duration-300 ${
+              isProductSidebarCollapsed ? "w-12" : "w-80"
+            } flex flex-col`}
+          >
+            <div className="p-4 border-b border-primary/20 flex items-center justify-between">
+              {!isProductSidebarCollapsed && (
+                <h3
+                  className="text-xl font-bold"
                   style={{ color: COLORS.primary }}
                 >
-                  <Palette className="w-4 h-4" />
-                  Colors
-                </label>
-                <div className="grid grid-cols-6 gap-2">
-                  {PRESET_COLORS.map((color) => (
+                  Select Product
+                </h3>
+              )}
+              <button
+                onClick={() =>
+                  setIsProductSidebarCollapsed(!isProductSidebarCollapsed)
+                }
+                className="p-2 rounded-lg hover:bg-primary/10 transition-colors"
+              >
+                {isProductSidebarCollapsed ? (
+                  <ChevronLeft className="w-5 h-5 text-primary" />
+                ) : (
+                  <ChevronRight className="w-5 h-5 text-primary" />
+                )}
+              </button>
+            </div>
+            {!isProductSidebarCollapsed && (
+              <div className="flex-1 overflow-y-auto p-4">
+                <div className="space-y-3 mb-6 max-h-96 overflow-y-auto">
+                  {products.map((product) => (
                     <button
-                      key={color}
-                      onClick={() => changeColor(color)}
-                      className="aspect-square rounded-lg border-2 transition hover:scale-110"
-                      style={{
-                        backgroundColor: color,
-                        borderColor:
-                          selectedColor === color ? COLORS.primary : "#ddd",
-                        borderWidth: selectedColor === color ? "3px" : "2px",
+                      key={product.id}
+                      onClick={() => {
+                        setSelectedProduct(product);
+                        setSelectedVariant(
+                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                          product.variants.find((v: any) => v.available) ||
+                            product.variants[0]
+                        );
                       }}
-                    />
+                      className={`w-full p-3 rounded-xl border-2 flex items-center gap-3 transition ${
+                        selectedProduct?.id === product.id
+                          ? "shadow-md"
+                          : "hover:shadow-sm"
+                      }`}
+                      style={{
+                        backgroundColor:
+                          selectedProduct?.id === product.id
+                            ? `${COLORS.secondary}20`
+                            : "white",
+                        borderColor:
+                          selectedProduct?.id === product.id
+                            ? COLORS.primary
+                            : "#ddd",
+                      }}
+                    >
+                      {product.images[0] && (
+                        <div className="relative w-16 h-16 shrink-0 rounded-lg overflow-hidden">
+                          <Image
+                            src={product.images[0].src}
+                            alt={product.title}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                      )}
+                      <div className="text-left flex-1 min-w-0">
+                        <div
+                          className="font-bold text-sm truncate"
+                          style={{ color: COLORS.primary }}
+                        >
+                          {product.title}
+                        </div>
+                        <div
+                          className="text-xs truncate"
+                          style={{ color: "rgba(64, 18, 104, 0.6)" }}
+                        >
+                          {product.product_type}
+                        </div>
+                      </div>
+                    </button>
                   ))}
                 </div>
-              </div>
 
-              {/* Font Selector */}
-              {activeObject?.type === "i-text" && (
-                <div className="mb-6">
-                  <label
-                    className="block text-sm font-semibold mb-2"
-                    style={{ color: COLORS.primary }}
-                  >
-                    Font Family
-                  </label>
-                  <select
-                    value={selectedFont}
-                    onChange={(e) => changeFont(e.target.value)}
-                    className="w-full px-4 py-2 rounded-lg border-2 text-sm cursor-pointer"
-                    style={{
-                      borderColor: `${COLORS.primary}20`,
-                    }}
-                  >
-                    {FONTS.map((font) => (
-                      <option
-                        key={font}
-                        value={font}
-                        style={{ fontFamily: font }}
-                      >
-                        {font}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Center - Canvas */}
-          <div className="lg:col-span-6">
-            <div
-              className="bg-white rounded-2xl p-6 shadow-lg flex flex-col items-center"
-              style={{ border: `1px solid ${COLORS.primary}20` }}
-            >
-              <canvas ref={canvasRef} className="rounded-lg" />
-
-              {/* Canvas Controls */}
-              {activeObject && (
-                <div className="mt-4 flex gap-2">
-                  <button
-                    onClick={rotateObject}
-                    className="px-4 py-2 rounded-lg font-semibold text-white flex items-center gap-2 transition hover:opacity-90"
-                    style={{ backgroundColor: COLORS.accentWarm }}
-                  >
-                    <RotateCw className="w-4 h-4" />
-                    Rotate
-                  </button>
-                  <button
-                    onClick={deleteSelected}
-                    className="px-4 py-2 rounded-lg font-semibold text-white flex items-center gap-2 transition hover:opacity-90"
-                    style={{ backgroundColor: COLORS.accentBold }}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                    Delete
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Right Sidebar - Product Selection & Actions */}
-          <div className="lg:col-span-3">
-            <div
-              className="bg-white rounded-2xl p-6 shadow-lg"
-              style={{ border: `1px solid ${COLORS.primary}20` }}
-            >
-              <h3
-                className="text-xl font-bold mb-6"
-                style={{ color: COLORS.primary }}
-              >
-                Select Product
-              </h3>
-
-              <div className="space-y-3 mb-6 max-h-96 overflow-y-auto">
-                {products.map((product) => (
-                  <button
-                    key={product.id}
-                    onClick={() => {
-                      setSelectedProduct(product);
-                      setSelectedVariant(
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        product.variants.find((v: any) => v.available) ||
-                          product.variants[0]
-                      );
-                    }}
-                    className={`w-full p-3 rounded-xl border-2 flex items-center gap-3 transition ${
-                      selectedProduct?.id === product.id
-                        ? "shadow-md"
-                        : "hover:shadow-sm"
-                    }`}
-                    style={{
-                      backgroundColor:
-                        selectedProduct?.id === product.id
-                          ? `${COLORS.secondary}20`
-                          : "white",
-                      borderColor:
-                        selectedProduct?.id === product.id
-                          ? COLORS.primary
-                          : "#ddd",
-                    }}
-                  >
-                    {product.images[0] && (
-                      <div className="relative w-16 h-16 shrink-0 rounded-lg overflow-hidden">
-                        <Image
-                          src={product.images[0].src}
-                          alt={product.title}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                    )}
-                    <div className="text-left flex-1 min-w-0">
+                {selectedProduct && selectedVariant && (
+                  <>
+                    <div
+                      className="p-4 rounded-xl mb-4"
+                      style={{
+                        backgroundColor: `${COLORS.secondary}20`,
+                      }}
+                    >
                       <div
-                        className="font-bold text-sm truncate"
+                        className="font-semibold mb-1 text-sm"
                         style={{ color: COLORS.primary }}
                       >
-                        {product.title}
+                        Selected: {selectedProduct.title}
                       </div>
                       <div
-                        className="text-xs truncate"
-                        style={{ color: "rgba(64, 18, 104, 0.6)" }}
+                        className="text-2xl font-black"
+                        style={{ color: COLORS.primary }}
                       >
-                        {product.product_type}
+                        ₦{selectedVariant.price.toLocaleString()}
                       </div>
                     </div>
-                  </button>
-                ))}
-                {products.length === 0 && (
-                  <p
-                    className="text-sm text-center py-4"
-                    style={{ color: "rgba(64, 18, 104, 0.6)" }}
-                  >
-                    No products available
-                  </p>
+
+                    <div className="space-y-3">
+                      <Button
+                        variant="accent"
+                        onClick={downloadDesign}
+                        className="w-full gap-2"
+                      >
+                        <Download className="w-5 h-5" />
+                        Download Design
+                      </Button>
+
+                      <Button
+                        onClick={handleAddToCart}
+                        disabled={isSaving}
+                        className="w-full gap-2"
+                      >
+                        {isSaving ? (
+                          <>
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                            Adding...
+                          </>
+                        ) : (
+                          <>
+                            <ShoppingCart className="w-5 h-5" />
+                            Add to Cart - ₦
+                            {selectedVariant.price.toLocaleString()}
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </>
                 )}
               </div>
-
-              {selectedProduct && selectedVariant && (
-                <>
-                  <div
-                    className="p-4 rounded-xl mb-4"
-                    style={{
-                      backgroundColor: `${COLORS.secondary}20`,
-                    }}
-                  >
-                    <div
-                      className="font-semibold mb-1 text-sm"
-                      style={{ color: COLORS.primary }}
-                    >
-                      Selected: {selectedProduct.title}
-                    </div>
-                    <div
-                      className="text-2xl font-black"
-                      style={{ color: COLORS.primary }}
-                    >
-                      ₦{selectedVariant.price.toLocaleString()}
-                    </div>
-                    {selectedVariant.compare_at_price && (
-                      <div className="text-sm line-through opacity-60">
-                        ₦{selectedVariant.compare_at_price.toLocaleString()}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="space-y-3">
-                    <button
-                      onClick={downloadDesign}
-                      className="w-full py-3 rounded-xl font-bold text-white flex items-center justify-center gap-2 transition hover:opacity-90"
-                      style={{ backgroundColor: COLORS.accentWarm }}
-                    >
-                      <Download className="w-5 h-5" />
-                      Download Design
-                    </button>
-
-                    <button
-                      onClick={handleAddToCart}
-                      disabled={isSaving}
-                      className="w-full py-3 rounded-xl font-bold text-white flex items-center justify-center gap-2 transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-                      style={{ backgroundColor: COLORS.primary }}
-                    >
-                      {isSaving ? (
-                        <>
-                          <Loader2 className="w-5 h-5 animate-spin" />
-                          Adding...
-                        </>
-                      ) : (
-                        <>
-                          <ShoppingCart className="w-5 h-5" />
-                          Add to Cart - ₦
-                          {selectedVariant.price.toLocaleString()}
-                        </>
-                      )}
-                    </button>
-                  </div>
-
-                  {/* Tips */}
-                  <div
-                    className="mt-6 p-4 rounded-xl text-sm"
-                    style={{
-                      backgroundColor: COLORS.background,
-                      color: "rgba(64, 18, 104, 0.7)",
-                    }}
-                  >
-                    <strong style={{ color: COLORS.primary }}>💡 Tips:</strong>
-                    <ul className="mt-2 ml-4 list-disc space-y-1">
-                      <li>Click elements to select and edit</li>
-                      <li>Drag to move, use corners to resize</li>
-                      <li>Double-click text to edit directly</li>
-                    </ul>
-                  </div>
-                </>
-              )}
-            </div>
+            )}
           </div>
+        )}
+      </div>
+
+      {/* Bottom Controls */}
+      <div className="bg-white border-t border-primary/20 flex items-center justify-between px-4 py-2">
+        {isMobile && (
+          <ZoomControls
+            zoomLevel={zoomLevel}
+            onZoomIn={() => handleZoomChange(zoomLevel + 10)}
+            onZoomOut={() => handleZoomChange(zoomLevel - 10)}
+            onZoomChange={handleZoomChange}
+            isMobile={true}
+          />
+        )}
+        <div className="flex items-center gap-2 ml-auto">
+          <Button variant="outline" size="sm" className="gap-2">
+            <ChevronDown className="w-4 h-4" />
+            3D Preview
+          </Button>
+          <Button size="sm" className="gap-2">
+            <Save className="w-4 h-4" />
+            Save
+          </Button>
         </div>
       </div>
+
+      {/* Mobile Bottom Navigation */}
+      {isMobile && (
+        <BottomNav
+          activeTool={activeTool}
+          onToolSelect={handleToolSelect}
+          onProductSelect={() => {
+            setBottomSheetContent("products");
+            setShowBottomSheet(true);
+          }}
+        />
+      )}
+
+      {/* Mobile Bottom Sheet */}
+      {isMobile && (
+        <BottomSheet
+          isOpen={showBottomSheet}
+          onClose={() => {
+            setShowBottomSheet(false);
+            setBottomSheetContent(null);
+          }}
+          content={bottomSheetContent}
+          selectedColor={selectedColor}
+          onColorSelect={changeColor}
+          selectedFont={selectedFont}
+          onFontSelect={changeFont}
+          onShapeSelect={addShape}
+          presetColors={PRESET_COLORS}
+          fonts={FONTS}
+          textInput={textInput}
+          onTextInputChange={setTextInput}
+          onTextAdd={addText}
+          products={products}
+          selectedProduct={selectedProduct}
+          onProductSelect={(product) => {
+            setSelectedProduct(product);
+            setSelectedVariant(
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              product.variants.find((v: any) => v.available) ||
+                product.variants[0]
+            );
+          }}
+        />
+      )}
+
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={uploadImage}
+        className="hidden"
+      />
     </div>
   );
 }
