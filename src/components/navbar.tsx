@@ -258,9 +258,9 @@ const DesktopNavbarContent = () => {
         </button>
 
         {/* Cart */}
-        <Link href="/cart" className="relative cursor-pointer">
+        <Link href="/cart" className="relative">
           <button
-            className="p-2 rounded-full shadow-md hover:shadow-lg hover:shadow-mauve transition-shadow"
+            className="p-2 rounded-full shadow-md hover:shadow-lg hover:shadow-mauve transition-shadow cursor-pointer"
             style={{ color: darkMode ? COLORS.light : COLORS.primary }}
             aria-label="Cart"
           >
@@ -283,7 +283,7 @@ const DesktopNavbarContent = () => {
           onMouseLeave={() => setIsAccountOpen(false)}
         >
           <button
-            className="p-2 rounded-full shadow-md hover:shadow-lg hover:shadow-mauve transition-shadow"
+            className="p-2 rounded-full shadow-md hover:shadow-lg hover:shadow-mauve transition-shadow  cursor-pointer"
             style={{
               backgroundColor: darkMode ? COLORS.darkBg : COLORS.lightBg,
             }}

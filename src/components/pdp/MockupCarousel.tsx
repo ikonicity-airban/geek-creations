@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, ZoomIn } from "lucide-react";
 import { ProductImage } from "@/types";
+import Image from "next/image";
 
 const COLORS = {
   primary: "#401268",
@@ -65,7 +66,9 @@ export default function MockupCarousel({
           >
             {/* Use pre-generated mockup if available, otherwise overlay design */}
             {mockupUrl ? (
-              <img
+              <Image
+                width={400}
+                height={300}
                 src={mockupUrl}
                 alt={`${productTitle} with design`}
                 className="w-full h-full object-cover"
@@ -73,15 +76,22 @@ export default function MockupCarousel({
             ) : (
               <>
                 {/* Product Mockup Base */}
-                <img
+                <Image
+                  width={400}
+                  height={300}
                   src={images[currentIndex].src}
-                  alt={images[currentIndex].alt || `${productTitle} - Image ${currentIndex + 1}`}
+                  alt={
+                    images[currentIndex].alt ||
+                    `${productTitle} - Image ${currentIndex + 1}`
+                  }
                   className="w-full h-full object-cover"
                 />
                 {/* Design Overlay (if designImage provided) */}
                 {designImage && (
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <img
+                    <Image
+                      width={400}
+                      height={300}
                       src={designImage}
                       alt="Design overlay"
                       className="max-w-[80%] max-h-[80%] object-contain opacity-90 mix-blend-multiply"
@@ -138,7 +148,7 @@ export default function MockupCarousel({
             <button
               key={image.id || index}
               onClick={() => goToImage(index)}
-              className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+              className={`shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
                 currentIndex === index
                   ? "border-opacity-100 scale-105"
                   : "border-transparent opacity-60 hover:opacity-100"
@@ -148,7 +158,9 @@ export default function MockupCarousel({
                   currentIndex === index ? COLORS.primary : "transparent",
               }}
             >
-              <img
+              <Image
+                width={400}
+                height={300}
                 src={image.src}
                 alt={image.alt || `Thumbnail ${index + 1}`}
                 className="w-full h-full object-cover"
@@ -177,7 +189,9 @@ export default function MockupCarousel({
             >
               {/* Use pre-generated mockup if available, otherwise overlay design */}
               {mockupUrl ? (
-                <img
+                <Image
+                  width={400}
+                  height={300}
                   src={mockupUrl}
                   alt={`${productTitle} with design`}
                   className="max-w-full max-h-full object-contain"
@@ -185,7 +199,9 @@ export default function MockupCarousel({
               ) : (
                 <>
                   {/* Product Mockup Base */}
-                  <img
+                  <Image
+                    width={400}
+                    height={300}
                     src={images[currentIndex].src}
                     alt={images[currentIndex].alt || productTitle}
                     className="max-w-full max-h-full object-contain"
@@ -193,7 +209,9 @@ export default function MockupCarousel({
                   {/* Design Overlay (if designImage provided) */}
                   {designImage && (
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <img
+                      <Image
+                        width={400}
+                        height={300}
                         src={designImage}
                         alt="Design overlay"
                         className="max-w-[80%] max-h-[80%] object-contain opacity-90 mix-blend-multiply"
@@ -218,4 +236,3 @@ export default function MockupCarousel({
     </div>
   );
 }
-

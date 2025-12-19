@@ -4,9 +4,9 @@ import Image from "next/image";
 export function Logo() {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.3 }}
+      initial={{ scale: 0.1, y: 20, opacity: 0 }}
+      animate={{ scale: 1, y: 0, opacity: 1 }}
+      transition={{ delay: 0.3, type: "spring", stiffness: 100, damping: 20 }}
       className="text-center"
     >
       <Image

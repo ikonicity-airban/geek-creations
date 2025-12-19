@@ -30,7 +30,10 @@ export const ProductsShowcase = () => {
   return (
     <section
       className="py-32 overflow-hidden"
-      style={{ backgroundColor: "#f8f6f0" }}
+      style={{
+        backgroundColor: "#f8f6f0",
+        borderBottom: "10rem solid transparent",
+      }}
     >
       <div className="max-w-7xl mx-auto px-6">
         <motion.div
@@ -134,12 +137,12 @@ export const ProductsShowcase = () => {
 
                         {/* Product Info */}
                         <div className="p-4">
-                          <h3
-                            className="font-bold text-lg mb-2 line-clamp-2"
+                          <h4
+                            className="font-bold text-sm mb-2 line-clamp-2"
                             style={{ color: "#401268" }}
                           >
                             {product.title}
-                          </h3>
+                          </h4>
                           {firstVariant && (
                             <div className="flex items-center gap-2">
                               <p

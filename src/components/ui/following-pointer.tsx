@@ -1,14 +1,11 @@
-// Core component that receives mouse positions and renders pointer and content
-
 "use client";
 
 import React, { useState } from "react";
-
 import {
   AnimatePresence,
+  MotionValue,
   motion,
   useMotionValue,
-  MotionValue,
 } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -23,17 +20,16 @@ export const FollowerPointerCard = ({
 }) => {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-  const [isInside, setIsInside] = useState<boolean>(false);
+  const [isInside, setIsInside] = useState(false);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    // Use viewport coordinates so it stays accurate even when the page scrolls
-    // or the element changes its position/size.
-    x.set(e.clientX);
-    y.set(e.clientY);
+    const rect = e.currentTarget.getBoundingClientRect();
+    x.set(e.clientX - rect.left);
+    y.set(e.clientY - rect.top);
   };
 
   return (
-    <div className="relative">
+    <div className="relative" style={{ cursor: "none" }}>
       <div
         onMouseLeave={() => setIsInside(false)}
         onMouseEnter={() => setIsInside(true)}
@@ -79,58 +75,38 @@ export const FollowPointer = ({
 
   return (
     <motion.div
-      className="fixed z-[9999] h-4 w-4 rounded-full"
+      className="pointer-events-none absolute z-50"
       style={{
-        top: y,
         left: x,
+        top: y,
+        translateX: "-15%",
+        translateY: "-25%",
         pointerEvents: "none",
       }}
-      initial={{
-        scale: 1,
-        opacity: 1,
-      }}
-      animate={{
-        scale: 1,
-        opacity: 1,
-      }}
-      exit={{
-        scale: 0,
-        opacity: 0,
-      }}
+      initial={{ opacity: 0, scale: 0 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0 }}
+      transition={{ type: "spring", damping: 30, stiffness: 500 }}
     >
       <svg
         stroke="currentColor"
         fill="currentColor"
         strokeWidth="1"
         viewBox="0 0 16 16"
-        className="h-6 w-6 -translate-x-[12px] -translate-y-[10px] -rotate-[70deg] transform stroke-sky-600 text-sky-500"
-        height="1em"
-        width="1em"
+        className="h-6 w-6 -rotate-70 text-sky-500"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <path d="M14.082 2.182a.5.5 0 0 1 .103.557L8.528 15.467a.5.5 0 0 1-.917-.007L5.57 10.694.803 8.652a.5.5 0 0 1-.006-.916l12.728-5.657a.5.5 0 0 1 .556.103z"></path>
+        <path d="M14.082 2.182a.5.5 0 0 1 .103.557L8.528 15.467a.5.5 0 0 1-.917-.007L5.57 10.694.803 8.652a.5.5 0 0 1-.006-.916l12.728-5.657a.5.5 0 0 1 .556.103z" />
       </svg>
+
       <motion.div
-        style={{
-          backgroundColor: colors[colorIndex],
-          translateX: 6,
-          translateY: 10,
-        }}
-        initial={{
-          scale: 0.5,
-          opacity: 0,
-        }}
-        animate={{
-          scale: 1,
-          opacity: 1,
-        }}
-        exit={{
-          scale: 0.5,
-          opacity: 0,
-        }}
-        className="min-w-max whitespace-nowrap rounded-full bg-neutral-200 px-2 py-2 text-xs text-white"
+        className="min-w-max whitespace-nowrap rounded-full px-2 py-1 text-xs text-white"
+        style={{ backgroundColor: colors[colorIndex] }}
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.8 }}
       >
-        {title || `William Shakespeare`}
+        {title || "William Shakespeare"}
       </motion.div>
     </motion.div>
   );

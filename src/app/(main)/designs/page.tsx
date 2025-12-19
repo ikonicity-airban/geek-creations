@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 type Design = {
   id: string;
@@ -61,7 +62,10 @@ export default function DesignsPage() {
         <div className="mb-10 text-center">
           <span
             className="inline-block px-4 py-2 rounded-full font-semibold text-sm mb-4"
-            style={{ backgroundColor: palette.secondary, color: palette.primary }}
+            style={{
+              backgroundColor: palette.secondary,
+              color: palette.primary,
+            }}
           >
             DESIGN GALLERY
           </span>
@@ -71,10 +75,7 @@ export default function DesignsPage() {
           >
             20 launch-ready designs
           </h1>
-          <p
-            className="text-lg"
-            style={{ color: "rgba(64, 18, 104, 0.75)" }}
-          >
+          <p className="text-lg" style={{ color: "rgba(64, 18, 104, 0.75)" }}>
             Pick a design, choose a product, and start selling instantly.
           </p>
         </div>
@@ -131,8 +132,10 @@ export default function DesignsPage() {
                   boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
                 }}
               >
-                <div className="aspect-[4/5] overflow-hidden">
-                  <img
+                <div className="aspect-4/5 overflow-hidden">
+                  <Image
+                    width={400}
+                    height={300}
                     src={design.thumbnailUrl || design.imageUrl}
                     alt={design.title}
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
@@ -183,4 +186,3 @@ export default function DesignsPage() {
     </main>
   );
 }
-

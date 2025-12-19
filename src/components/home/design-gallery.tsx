@@ -62,7 +62,7 @@ export const DesignGallery = () => {
           className="text-center mb-10"
         >
           <h2
-            className="text-3xl md:text-4xl font-black mb-3"
+            className="text-3xl md:text-5xl font-black mb-3"
             style={{ color: "#401268" }}
           >
             All Designs
@@ -106,69 +106,67 @@ export const DesignGallery = () => {
         </motion.div>
 
         {/* Masonry/Grid Layout */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-          {isLoading &&
-            Array.from({ length: 8 }).map((_, idx) => (
-              <div
-                key={idx}
-                className="rounded-2xl border-2 border-mauve/30 bg-white/80 p-4 animate-pulse h-56"
-              />
-            ))}
-
-          {!isLoading &&
-            visibleDesigns.map((design, index) => (
-              <motion.div
-                key={design.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: (index % 8) * 0.05 }}
-                whileHover={{ y: -5, scale: 1.01 }}
-              >
-                <Link href={`/designs/${design.id}`}>
-                  <FollowerPointerCard title={design.name}>
-                    <div
-                      className="rounded-2xl overflow-hidden cursor-pointer transition-all bg-white border-2 border-mauve shadow-[0_8px_24px_rgba(64,18,104,0.15)]"
-                      style={{ borderRadius: "16px" }}
-                    >
-                      {/* Design Image */}
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+          {isLoading
+            ? Array.from({ length: 8 }).map((_, idx) => (
+                <div
+                  key={idx}
+                  className="rounded-2xl border-2 border-mauve/10 bg-white/80 p-4 animate-pulse h-72"
+                />
+              ))
+            : visibleDesigns.map((design, index) => (
+                <motion.div
+                  key={design.id}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: (index % 8) * 0.05 }}
+                  whileHover={{ y: -5, scale: 1.01 }}
+                >
+                  <Link href={`/designs/${design.id}`}>
+                    <FollowerPointerCard title={design.name}>
                       <div
-                        className="w-full aspect-square overflow-hidden"
-                        style={{
-                          borderBottom: "1px solid #e0e0e0",
-                        }}
+                        className="rounded-2xl overflow-hidden cursor-pointer transition-all bg-white border-2 border-mauve shadow-[0_8px_24px_rgba(64,18,104,0.15)]"
+                        style={{ borderRadius: "16px" }}
                       >
-                        <Image
-                          src={design.image}
-                          alt={design.name}
-                          width={150}
-                          height={150}
-                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                        />
-                      </div>
-
-                      <div className="p-4">
-                        <h3
-                          className="font-bold mb-2"
-                          style={{ color: "#401268" }}
-                        >
-                          {design.name}
-                        </h3>
+                        {/* Design Image */}
                         <div
-                          className="flex items-center"
-                          style={{ color: "#c5a3ff" }}
+                          className="w-full aspect-square overflow-hidden"
+                          style={{
+                            borderBottom: "1px solid #e0e0e0",
+                          }}
                         >
-                          <span className="text-sm font-semibold mr-2">
-                            View Products
-                          </span>
-                          <ArrowRight className="w-4 h-4" />
+                          <Image
+                            src={design.image}
+                            alt={design.name}
+                            width={150}
+                            height={150}
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          />
+                        </div>
+
+                        <div className="p-4">
+                          <h4
+                            className="font-bold mb-2"
+                            style={{ color: "#401268" }}
+                          >
+                            {design.name}
+                          </h4>
+                          <div
+                            className="flex items-center"
+                            style={{ color: "#c5a3ff" }}
+                          >
+                            <span className="text-xs font-semibold mr-2">
+                              View Products
+                            </span>
+                            <ArrowRight className="w-4 h-4" />
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </FollowerPointerCard>
-                </Link>
-              </motion.div>
-            ))}
+                    </FollowerPointerCard>
+                  </Link>
+                </motion.div>
+              ))}
         </div>
 
         {/* Load More Button */}

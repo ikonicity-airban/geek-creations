@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 type Design = {
@@ -111,7 +112,9 @@ export default async function DesignDetailPage({
           className="rounded-2xl overflow-hidden shadow-lg border"
           style={{ borderColor: "#e0e0e0", backgroundColor: "#ffffff" }}
         >
-          <img
+          <Image
+            width={400}
+            height={300}
             src={design.imageUrl}
             alt={design.title}
             className="w-full h-full object-cover"

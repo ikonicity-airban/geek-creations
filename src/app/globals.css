@@ -42,7 +42,7 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  
+
   /* Geeks Creation Design System Colors */
   --color-indigo-ink: #401268;
   --color-mauve: #c5a3ff;
@@ -52,25 +52,28 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --font-display: var(--font-orbitron);
+  --font-sans: var(--font-poppins);
+  --font-mono: var(--font-space-mono);
+  --radius: 0.75rem; /* 12px - matches design system */
+  --background: #f8f6f0; /* porcelain */
+  --foreground: #401268; /* indigo-ink */
+  --card: #ffffff;
+  --card-foreground: #401268; /* indigo-ink */
+  --popover: #ffffff;
+  --popover-foreground: #401268; /* indigo-ink */
+  --primary: #401268; /* indigo-ink */
+  --primary-foreground: #ffffff;
+  --secondary: #c5a3ff; /* mauve */
+  --secondary-foreground: #401268; /* indigo-ink */
+  --muted: #f8f6f0; /* porcelain */
+  --muted-foreground: rgba(64, 18, 104, 0.6); /* indigo-ink at 60% opacity */
+  --accent: #c5a3ff; /* mauve */
+  --accent-foreground: #401268; /* indigo-ink */
+  --destructive: #e21b35; /* scarlet-rush */
+  --border: rgba(64, 18, 104, 0.2); /* indigo-ink at 20% opacity */
+  --input: rgba(64, 18, 104, 0.1); /* indigo-ink at 10% opacity */
+  --ring: #c5a3ff; /* mauve for focus rings */
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -87,24 +90,24 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --background: #401268; /* indigo-ink */
+  --foreground: #f8f6f0; /* porcelain */
+  --card: rgba(64, 18, 104, 0.8); /* indigo-ink at 80% opacity */
+  --card-foreground: #f8f6f0; /* porcelain */
+  --popover: rgba(64, 18, 104, 0.9); /* indigo-ink */
+  --popover-foreground: #f8f6f0; /* porcelain */
+  --primary: #c5a3ff; /* mauve */
+  --primary-foreground: #401268; /* indigo-ink */
+  --secondary: rgba(197, 163, 255, 0.2); /* mauve at 20% opacity */
+  --secondary-foreground: #c5a3ff; /* mauve */
+  --muted: rgba(64, 18, 104, 0.5); /* indigo-ink at 50% opacity */
+  --muted-foreground: rgba(248, 246, 240, 0.7); /* porcelain at 70% opacity */
+  --accent: #e2ae3d; /* honey-bronze */
+  --accent-foreground: #401268; /* indigo-ink */
+  --destructive: #e21b35; /* scarlet-rush */
+  --border: rgba(197, 163, 255, 0.3); /* mauve at 30% opacity */
+  --input: rgba(197, 163, 255, 0.15); /* mauve at 15% opacity */
+  --ring: #c5a3ff; /* mauve for focus rings */
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
@@ -130,10 +133,27 @@
 
   /* Dark mode: give main app a richer but still subtle gradient backdrop */
   .dark [data-main-bg="true"] {
-    background-image: radial-gradient(900px 500px at 15% 10%, rgba(197, 163, 255, 0.14), transparent 60%),
-      radial-gradient(800px 450px at 85% 15%, rgba(226, 174, 61, 0.10), transparent 55%),
-      radial-gradient(900px 520px at 75% 85%, rgba(64, 18, 104, 0.18), transparent 60%),
-      linear-gradient(180deg, rgba(10, 10, 12, 1) 0%, rgba(15, 23, 42, 0.92) 45%, rgba(10, 10, 12, 1) 100%);
+    background-image: radial-gradient(
+        900px 500px at 15% 10%,
+        rgba(197, 163, 255, 0.14),
+        transparent 60%
+      ),
+      radial-gradient(
+        800px 450px at 85% 15%,
+        rgba(226, 174, 61, 0.1),
+        transparent 55%
+      ),
+      radial-gradient(
+        900px 520px at 75% 85%,
+        rgba(64, 18, 104, 0.18),
+        transparent 60%
+      ),
+      linear-gradient(
+        180deg,
+        rgba(10, 10, 12, 1) 0%,
+        rgba(15, 23, 42, 0.92) 45%,
+        rgba(10, 10, 12, 1) 100%
+      );
   }
 
   /* Typography system:
@@ -141,11 +161,26 @@
      - Display/headings/buttons: Orbitron (via --font-display) */
   h1,
   h2,
-  h3,
+  h3 {
+    font-family: "Over the Rainbow", cursive;
+  }
+
   h4,
   h5,
-  h6,
-  button {
-    font-family: var(--font-sans);
+  h6 {
+    font-family: "Orbitron", sans-serif;
+  }
+
+  p,
+  button,
+  span {
+    font-family: "Roboto", sans-serif;
+    font-weight: 200;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-animation {
+    animation-play-state: paused !important;
   }
 }

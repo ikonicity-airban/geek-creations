@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ShoppingCart, Heart } from "lucide-react";
 import { Product } from "@/types";
 import { useCart } from "@/lib/cart-context";
+import Image from "next/image";
 
 const COLORS = {
   primary: "#401268",
@@ -92,9 +93,11 @@ export default function RelatedProducts({
                 }}
               >
                 {/* Image */}
-                <div className="relative aspect-[3/4] overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
+                <div className="relative aspect-3/4 overflow-hidden bg-linear-to-br from-gray-100 to-gray-200">
                   {mainImage && (
-                    <img
+                    <Image
+                      width={400}
+                      height={300}
                       src={mainImage.src}
                       alt={mainImage.alt || product.title}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
@@ -132,7 +135,10 @@ export default function RelatedProducts({
                   </h3>
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xl font-black" style={{ color: COLORS.primary }}>
+                      <p
+                        className="text-xl font-black"
+                        style={{ color: COLORS.primary }}
+                      >
                         ₦{firstVariant?.price.toLocaleString() || "0"}
                       </p>
                       {firstVariant?.compare_at_price && (
@@ -151,4 +157,3 @@ export default function RelatedProducts({
     </section>
   );
 }
-
