@@ -24,16 +24,16 @@ export const ProductionDemo = () => {
     const timeoutId = setTimeout(() => {
       const sequence = async () => {
         if (!isMountedRef.current) return;
-        
+
         for (let i = 0; i < steps.length; i++) {
           if (!isMountedRef.current) return;
           setCurrentStep(i);
           await controls.start({
             scale: [1, 1.2, 1],
             rotate: [0, 10, -10, 0],
-            transition: { duration: 1 }
+            transition: { duration: 1 },
           });
-          await new Promise(resolve => setTimeout(resolve, 1500));
+          await new Promise((resolve) => setTimeout(resolve, 1500));
         }
         // Reset and loop
         if (isMountedRef.current) {
@@ -58,7 +58,10 @@ export const ProductionDemo = () => {
   }));
 
   return (
-    <section className="py-20 relative overflow-hidden" style={{ backgroundColor: '#ffffff' }}>
+    <section
+      className="py-20 relative overflow-hidden"
+      style={{ backgroundColor: "#ffffff" }}
+    >
       <div className="max-w-[1024px] mx-auto px-8 md:px-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -66,10 +69,16 @@ export const ProductionDemo = () => {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-black mb-4" style={{ color: '#401268' }}>
+          <h2
+            className="text-3xl md:text-4xl lg:text-5xl font-black mb-4"
+            style={{ color: "#401268" }}
+          >
             See It Come to Life
           </h2>
-          <p className="text-base md:text-lg max-w-2xl mx-auto" style={{ color: 'rgba(64, 18, 104, 0.8)' }}>
+          <p
+            className="text-base md:text-lg max-w-2xl mx-auto"
+            style={{ color: "rgba(64, 18, 104, 0.8)" }}
+          >
             Watch your design transform from concept to shipped product
           </p>
         </motion.div>
@@ -80,26 +89,25 @@ export const ProductionDemo = () => {
           <div
             className="relative h-64 rounded-2xl flex items-center justify-center"
             style={{
-              backgroundColor: '#f8f6f0',
-              borderRadius: '16px',
-              border: '2px solid rgba(197, 163, 255, 0.2)'
+              backgroundColor: "#f8f6f0",
+              borderRadius: "16px",
+              border: "2px solid rgba(197, 163, 255, 0.2)",
             }}
           >
             {/* Central Product Display */}
-            <motion.div
-              animate={controls}
-              className="relative z-10"
-            >
+            <motion.div animate={controls} className="relative z-10">
               <div
                 className="w-36 h-36 rounded-xl flex flex-col items-center justify-center"
                 style={{
                   backgroundColor: steps[currentStep].color,
-                  borderRadius: '16px',
-                  boxShadow: '0 8px 24px rgba(64,18,104,0.2)'
+                  borderRadius: "16px",
+                  boxShadow: "0 8px 24px rgba(64,18,104,0.2)",
                 }}
               >
                 <div className="text-4xl mb-2">{steps[currentStep].icon}</div>
-                <div className="text-white font-bold text-base">{steps[currentStep].name}</div>
+                <div className="text-white font-bold text-base">
+                  {steps[currentStep].name}
+                </div>
               </div>
             </motion.div>
 
@@ -107,9 +115,13 @@ export const ProductionDemo = () => {
             {currentStep === 0 && (
               <div className="absolute inset-0">
                 {particles.map((particle) => {
-                  const x = Math.cos((particle.angle * Math.PI) / 180) * particle.distance;
-                  const y = Math.sin((particle.angle * Math.PI) / 180) * particle.distance;
-                  
+                  const x =
+                    Math.cos((particle.angle * Math.PI) / 180) *
+                    particle.distance;
+                  const y =
+                    Math.sin((particle.angle * Math.PI) / 180) *
+                    particle.distance;
+
                   return (
                     <motion.div
                       key={particle.id}
@@ -124,12 +136,12 @@ export const ProductionDemo = () => {
                         duration: 1.5,
                         repeat: Infinity,
                         delay: particle.id * 0.1,
-                        ease: "easeOut"
+                        ease: "easeOut",
                       }}
                       className="absolute top-1/2 left-1/2 w-2 h-2 rounded-full"
                       style={{
-                        backgroundColor: '#c5a3ff',
-                        boxShadow: '0 0 10px #c5a3ff'
+                        backgroundColor: "#c5a3ff",
+                        boxShadow: "0 0 10px #c5a3ff",
                       }}
                     />
                   );
@@ -144,10 +156,13 @@ export const ProductionDemo = () => {
                   key={index}
                   className="w-2.5 h-2.5 rounded-full"
                   style={{
-                    backgroundColor: index === currentStep ? step.color : 'rgba(64, 18, 104, 0.2)',
+                    backgroundColor:
+                      index === currentStep
+                        ? step.color
+                        : "rgba(64, 18, 104, 0.2)",
                   }}
                   animate={{
-                    scale: index === currentStep ? 1.5 : 1
+                    scale: index === currentStep ? 1.5 : 1,
                   }}
                   transition={{ duration: 0.3 }}
                 />
@@ -169,8 +184,11 @@ export const ProductionDemo = () => {
                 <div
                   className="w-12 h-12 rounded-xl mx-auto mb-2 flex items-center justify-center"
                   style={{
-                    backgroundColor: index === currentStep ? step.color : 'rgba(197, 163, 255, 0.1)',
-                    color: index === currentStep ? '#ffffff' : '#401268'
+                    backgroundColor:
+                      index === currentStep
+                        ? step.color
+                        : "rgba(197, 163, 255, 0.1)",
+                    color: index === currentStep ? "#ffffff" : "#401268",
                   }}
                 >
                   {index === 0 && <Package className="w-6 h-6" />}
@@ -178,7 +196,9 @@ export const ProductionDemo = () => {
                   {index === 2 && <Zap className="w-6 h-6" />}
                   {index === 3 && <Truck className="w-6 h-6" />}
                 </div>
-                <h3 className="text-sm font-bold" style={{ color: '#401268' }}>{step.name}</h3>
+                <h4 className="text-sm font-bold" style={{ color: "#401268" }}>
+                  {step.name}
+                </h4>
               </motion.div>
             ))}
           </div>
@@ -191,12 +211,12 @@ export const ProductionDemo = () => {
           viewport={{ once: true }}
           className="text-center mt-10"
         >
-          <p className="text-xs" style={{ color: 'rgba(64, 18, 104, 0.6)' }}>
-            * Enhanced animation with particle effects and production sequence coming soon
+          <p className="text-xs" style={{ color: "rgba(64, 18, 104, 0.6)" }}>
+            * Enhanced animation with particle effects and production sequence
+            coming soon
           </p>
         </motion.div>
       </div>
     </section>
   );
 };
-
