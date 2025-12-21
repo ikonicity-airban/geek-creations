@@ -1,4 +1,4 @@
-// types/index.ts - Global TypeScript types for Geeks Creation
+// types/index.ts - Global TypeScript types for Geek Creations
 
 export interface Product {
   id: string;

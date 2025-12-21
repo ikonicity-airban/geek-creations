@@ -1,6 +1,6 @@
 {
   "designSystem": {
-    "name": "Geeks Creation Brand Design System",
+    "name": "Geek Creations Brand Design System",
     "description": "Comprehensive visual design profile based on provided palette and branding screenshots. Strictly limited to the exact 5 colors: indigo-ink (#401268), mauve (#c5a3ff), porcelain (#f8f6f0), honey-bronze (#e2ae3d), scarlet-rush (#e21b35). All styling must use these colors only.",
     "colorPalette": {
       "primary": "#401268",

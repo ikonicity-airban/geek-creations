@@ -1,10 +1,13 @@
-# GEEKS CREATION POD STORE — 50+ ORDER TEST PLAN
+# GEEK CREATIONS POD STORE — 50+ ORDER TEST PLAN
+
 **Week 3 Final Testing | 10–13 Dec 2025**
 
 ## TEST COVERAGE REQUIREMENTS (Minimum 50 Orders)
 
 ### Payment Gateway Coverage (20 Orders)
+
 - [ ] **Paystack Card Payment** (5 test orders)
+
   - [ ] Naira card (successful)
   - [ ] Naira card (declined)
   - [ ] International card (if supported)
@@ -12,18 +15,21 @@
   - [ ] Logged-in checkout
 
 - [ ] **Paystack Bank Transfer** (5 test orders)
+
   - [ ] Generate account number
   - [ ] Complete payment
   - [ ] Webhook verification
   - [ ] Order fulfillment triggered
 
 - [ ] **Flutterwave** (5 test orders)
+
   - [ ] Card payment
   - [ ] USSD payment
   - [ ] Bank transfer
   - [ ] Mobile money
 
 - [ ] **Monnify** (3 test orders)
+
   - [ ] Card payment
   - [ ] Bank transfer
   - [ ] Virtual account
@@ -33,7 +39,9 @@
   - [ ] SOL payment
 
 ### Product Type Coverage (15 Orders)
+
 - [ ] **Printful Products** (5 orders)
+
   - [ ] Basic T-shirt (S, M, L, XL, XXL)
   - [ ] Premium T-shirt
   - [ ] Tank top
@@ -41,6 +49,7 @@
   - [ ] V-neck
 
 - [ ] **Printify Products** (5 orders)
+
   - [ ] Mug
   - [ ] Poster (A3)
   - [ ] Canvas print
@@ -53,6 +62,7 @@
   - [ ] Zip-up hoodie
 
 ### User Journey Coverage (10 Orders)
+
 - [ ] Guest checkout (no login)
 - [ ] Logged-in user checkout
 - [ ] First-time customer
@@ -65,6 +75,7 @@
 - [ ] Local (Nigeria) shipping
 
 ### Edge Cases & Error Handling (5 Orders)
+
 - [ ] Invalid card details
 - [ ] Expired payment session
 - [ ] Out of stock product
@@ -76,6 +87,7 @@
 ## RECORDING REQUIREMENTS
 
 ### For Each Test Order:
+
 1. **Screen recording** (full flow from product page → payment → confirmation)
 2. **Webhook log** (Supabase orders_log entry)
 3. **POD API response** (Printful/Printify/Ikonshop confirmation)
@@ -83,6 +95,7 @@
 5. **Admin dashboard** (order appears correctly)
 
 ### Video Proof Checklist:
+
 - [ ] Record full screen (browser + terminal)
 - [ ] Show timestamp in video
 - [ ] Demonstrate real payment flow (not sandbox test cards)
@@ -95,17 +108,20 @@
 ## PERFORMANCE & LIGHTHOUSE TESTS
 
 ### Desktop Testing:
+
 - [ ] Homepage Lighthouse score: 95+
 - [ ] Product page Lighthouse score: 95+
 - [ ] Checkout page Lighthouse score: 90+
 
 ### Mobile Testing:
+
 - [ ] Homepage mobile score: 90+
 - [ ] Product page mobile score: 90+
 - [ ] Checkout mobile score: 85+
 - [ ] PWA installable prompt works
 
 ### Load Testing:
+
 - [ ] 10 concurrent users
 - [ ] 50 concurrent users
 - [ ] 100 concurrent users
@@ -130,6 +146,7 @@
 ## FINAL PRE-LAUNCH CHECKLIST
 
 ### Environment Variables:
+
 - [ ] All production API keys added to Vercel
 - [ ] Supabase RLS policies tested
 - [ ] Webhook secrets verified
@@ -137,6 +154,7 @@
 - [ ] POD API keys active
 
 ### Domain & DNS:
+
 - [ ] Namecheap domain purchased
 - [ ] DNS pointed to Vercel
 - [ ] SSL certificate issued
@@ -144,6 +162,7 @@
 - [ ] Custom domain verified in Vercel
 
 ### Legal & Compliance:
+
 - [ ] Privacy Policy page live
 - [ ] Terms of Service page live
 - [ ] Refund Policy page live
@@ -151,6 +170,7 @@
 - [ ] Contact Us page live
 
 ### Marketing & Analytics:
+
 - [ ] Google Analytics 4 installed
 - [ ] Facebook Pixel installed
 - [ ] Instagram Shop integration
@@ -161,6 +181,7 @@
 ## HANDOVER DOCUMENTATION
 
 ### Files to Deliver:
+
 - [ ] GitHub repo (transferred to client)
 - [ ] Vercel project (transferred to client)
 - [ ] Supabase project (transferred to client)
@@ -174,12 +195,12 @@
 
 ## STATUS TRACKING
 
-| Date       | Orders Completed | Payment Methods Tested | POD Providers Tested | Issues Found |
-|------------|------------------|------------------------|----------------------|--------------|
-| 10 Dec     | 0/50             | 0/4                    | 0/3                  | 0            |
-| 11 Dec     | 15/50            | 2/4                    | 1/3                  | 2            |
-| 12 Dec     | 35/50            | 4/4                    | 3/3                  | 1            |
-| 13 Dec     | 50/50            | 4/4                    | 3/3                  | 0            |
+| Date   | Orders Completed | Payment Methods Tested | POD Providers Tested | Issues Found |
+| ------ | ---------------- | ---------------------- | -------------------- | ------------ |
+| 10 Dec | 0/50             | 0/4                    | 0/3                  | 0            |
+| 11 Dec | 15/50            | 2/4                    | 1/3                  | 2            |
+| 12 Dec | 35/50            | 4/4                    | 3/3                  | 1            |
+| 13 Dec | 50/50            | 4/4                    | 3/3                  | 0            |
 
 **Target Launch Date:** 14 December 2025 00:00 WAT
 

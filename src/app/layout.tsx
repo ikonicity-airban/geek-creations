@@ -49,8 +49,8 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://geekcreations.com"),
   title: {
     default:
-      "Geeks Creation - Nigerian Geek Culture Store | Anime, Tech & Afro-Geek Merch",
-    template: "%s | Geeks Creation",
+      "Geek Creations - Nigerian Geek Culture Store | Anime, Tech & Afro-Geek Merch",
+    template: "%s | Geek Creations",
   },
   description:
     "Premium Nigerian print-on-demand store for nerds, artists & dreamers. Shop exclusive anime, tech, and Afro-geek designs on T-shirts, hoodies, mugs & more. Pay with crypto (USDC/SOL) or Naira.",
@@ -66,9 +66,9 @@ export const metadata: Metadata = {
     "Solana payment",
     "geek culture Africa",
   ],
-  authors: [{ name: "Geeks Creation", url: "https://geekcreations.com" }],
+  authors: [{ name: "Geek Creations", url: "https://geekcreations.com" }],
   creator: "CodeOven Technologies",
-  publisher: "Geeks Creation",
+  publisher: "Geek Creations",
   formatDetection: {
     email: false,
     address: false,
@@ -78,8 +78,8 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_NG",
     url: "https://geekcreations.com",
-    siteName: "Geeks Creation",
-    title: "Geeks Creation - Nigerian Geek Culture Store",
+    siteName: "Geek Creations",
+    title: "Geek Creations - Nigerian Geek Culture Store",
     description:
       "Where Nigerian nerds, artists & dreamers turn wild ideas into wearable legends. Shop anime, tech & Afro-geek designs.",
     images: [
@@ -87,13 +87,13 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Geeks Creation - Nigerian Geek Store",
+        alt: "Geek Creations - Nigerian Geek Store",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Geeks Creation - Nigerian Geek Culture Store",
+    title: "Geek Creations - Nigerian Geek Culture Store",
     description:
       "Premium anime, tech & Afro-geek merch. Pay with crypto or Naira. Made in Nigeria.",
     images: ["/twitter-image.png"],
@@ -144,7 +144,7 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Store",
-              name: "Geeks Creation",
+              name: "Geek Creations",
               description:
                 "Premium Nigerian print-on-demand store for geek culture",
               url: "https://geekcreations.com",

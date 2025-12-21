@@ -1,4 +1,4 @@
-// seed.ts - Production-Ready Seed Script for Geeks Creation POD Store
+// seed.ts - Production-Ready Seed Script for Geek Creations POD Store
 import {
   db,
   products,
@@ -59,7 +59,7 @@ async function seed() {
           handle: mockProduct.handle,
           description: mockProduct.description || "",
           featuredImage: mockProduct.featuredImage || null,
-          vendor: mockProduct.vendor || "Geeks Creation",
+          vendor: mockProduct.vendor || "Geek Creations",
           productType: mockProduct.product_type || "Apparel",
           tags: mockProduct.tags || [],
           status: mockProduct.status || "active",

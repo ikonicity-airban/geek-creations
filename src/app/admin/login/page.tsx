@@ -66,11 +66,11 @@ export default function AdminLoginPage() {
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8">
           <div className="text-center mb-8">
             <Shield className="w-16 h-16 mx-auto mb-4 text-indigo-600" />
-            <h1 className="text-3xl font-black text-gray-900 dark:text-white mb-2">
+            <h4 className="text-3xl font-black text-gray-900 dark:text-white mb-2">
               ADMIN ACCESS
-            </h1>
+            </h4>
             <p className="text-gray-600 dark:text-gray-400 text-sm">
-              Geeks Creation POD Store
+              Geek Creations POD Store
             </p>
           </div>
 

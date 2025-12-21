@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# Geeks Creation POD Store — Production Deployment Script
+# Geek Creations POD Store — Production Deployment Script
 # Version: 1.0 | Date: 14 December 2025
 # Run this script to deploy to Vercel production
 
 set -e
 
-echo "🚀 GEEKS CREATION — PRODUCTION DEPLOYMENT"
+echo "🚀 GEEK CREATIONS — PRODUCTION DEPLOYMENT"
 echo "=========================================="
 
 # 1. Pre-flight checks

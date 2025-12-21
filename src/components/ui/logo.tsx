@@ -11,7 +11,7 @@ export function Logo() {
     >
       <Image
         src="/logo.png"
-        alt="Geeks Creation"
+        alt="Geek Creations"
         width={100}
         height={100}
         objectFit="contain"

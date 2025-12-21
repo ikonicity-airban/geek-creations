@@ -90,12 +90,12 @@ export default function AdminDesignsPage() {
     >
       <section className="max-w-6xl mx-auto px-6 py-12 space-y-10">
         <div>
-          <h1
+          <h4
             className="text-3xl font-black"
             style={{ color: palette.primary }}
           >
             Design Manager
-          </h1>
+          </h4>
           <p style={{ color: "rgba(64, 18, 104, 0.7)" }}>
             Upload, list, and manage launch designs.
           </p>

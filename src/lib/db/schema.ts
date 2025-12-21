@@ -1,4 +1,4 @@
-// lib/db/schema.ts - Optimized Drizzle Schema for Geeks Creation POD Store
+// lib/db/schema.ts - Optimized Drizzle Schema for Geek Creations POD Store
 import {
   pgTable,
   bigserial,
