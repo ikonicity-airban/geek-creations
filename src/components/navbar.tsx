@@ -207,7 +207,7 @@ const DesktopNavbarContent = () => {
           </NavItem>
 
           <NavItem
-            href="/pages/about"
+            href="/about"
             hoverKey="about"
             currentHover={hoveredKey}
             onMouseEnter={setHoveredKey}
@@ -321,7 +321,7 @@ const MobileNavbarContent = () => {
     { name: "Designs", href: "/designs" },
     { name: "Editor", href: "/editor" },
     { name: "Contact us", href: "/contact" },
-    { name: "About", href: "/pages/about" },
+    { name: "About", href: "/about" },
     { name: "Account", href: "/account" },
   ];
 

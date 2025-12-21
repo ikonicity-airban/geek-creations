@@ -1,25 +1,85 @@
+"use client";
+
+import CrudManager from "@/components/admin/CrudManager";
+import type { CrudConfig } from "@/types/crud";
+
+// Example Collection type - adjust based on your actual collection schema
+type Collection = {
+  id: string;
+  title: string;
+  description: string | null;
+  handle: string;
+  imageUrl: string | null;
+  published: boolean;
+  sortOrder: string;
+};
+
+const collectionsConfig: CrudConfig<Collection> = {
+  entityName: "Collection",
+  entityNamePlural: "Collections",
+  apiEndpoint: "/api/collections",
+  fields: [
+    {
+      name: "title",
+      label: "Title",
+      type: "text",
+      required: true,
+      placeholder: "Enter collection title",
+    },
+    {
+      name: "handle",
+      label: "Handle (URL slug)",
+      type: "text",
+      required: true,
+      placeholder: "collection-url-slug",
+    },
+    {
+      name: "description",
+      label: "Description",
+      type: "textarea",
+      placeholder: "Describe your collection...",
+      span: 2,
+    },
+    {
+      name: "imageUrl",
+      label: "Image URL",
+      type: "url",
+      placeholder: "https://...",
+    },
+    {
+      name: "sortOrder",
+      label: "Sort Order",
+      type: "select",
+      options: ["manual", "best-selling", "title-ascending", "title-descending", "price-ascending", "price-descending", "created-ascending", "created-descending"],
+      defaultValue: "manual",
+    },
+    {
+      name: "published",
+      label: "Published",
+      type: "checkbox",
+      defaultValue: true,
+    },
+  ],
+  displayFields: (collection) => ({
+    primary: collection.title,
+    secondary: `${collection.handle} · Sort: ${collection.sortOrder}`,
+    imageUrl: collection.imageUrl || undefined,
+    badge: collection.published
+      ? { text: "Published", color: "#10b981" }
+      : { text: "Draft", color: "#6b7280" },
+  }),
+  getItemId: (collection) => collection.id,
+  palette: {
+    primary: "#401268",
+    secondary: "#c5a3ff",
+    background: "#f8f6f0",
+  },
+  emptyState: {
+    title: "No collections yet",
+    description: "Create a collection to organize your products",
+  },
+};
+
 export default function AdminCollectionsPage() {
-  return (
-    <div className="flex flex-1 flex-col overflow-y-auto bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto w-full p-4 md:p-6">
-        <div className="mb-6 md:mb-8">
-          <h4 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white mb-2">
-            Collections Management
-          </h4>
-          <p className="text-gray-600 dark:text-gray-400">
-            Organize your product collections
-          </p>
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8">
-          <div className="text-center py-12">
-            <p className="text-gray-500 dark:text-gray-400">
-              Collections management page coming soon...
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  return <CrudManager config={collectionsConfig} />;
 }
-

@@ -74,15 +74,30 @@ export const Footer = () => {
   const footerSections = [
     {
       title: "Platform",
-      links: ["Start Selling", "Products", "Pricing", "Features"],
+      links: [
+        { name: "Start Selling", href: "#" },
+        { name: "Products", href: "/collections/all" },
+        { name: "Pricing", href: "#" },
+        { name: "Features", href: "#" },
+      ],
     },
     {
       title: "Resources",
-      links: ["Documentation", "Design Guide", "Blog", "Support"],
+      links: [
+        { name: "Documentation", href: "#" },
+        { name: "Design Guide", href: "#" },
+        { name: "Blog", href: "#" },
+        { name: "Support", href: "/contact" },
+      ],
     },
     {
       title: "Company",
-      links: ["About Us", "Contact", "Terms", "Privacy"],
+      links: [
+        { name: "About Us", href: "/about" },
+        { name: "Contact", href: "/contact" },
+        { name: "FAQ", href: "/faq" },
+        { name: "Privacy", href: "/privacy" },
+      ],
     },
   ];
 
@@ -243,27 +258,32 @@ export const Footer = () => {
                 {section.title}
               </h4>
               <ul className="space-y-2.5">
-                {section.links.map((link) => (
-                  <motion.li
-                    key={link}
-                    whileHover={{ x: 4 }}
-                    transition={{ type: "spring", stiffness: 300 }}
-                  >
-                    <a
-                      href="#"
-                      className="text-sm transition-colors inline-block"
-                      style={{ color: "rgba(64, 18, 104, 0.7)" }}
-                      onMouseEnter={(e) =>
-                        (e.currentTarget.style.color = "#e21b35")
-                      }
-                      onMouseLeave={(e) =>
-                        (e.currentTarget.style.color = "rgba(64, 18, 104, 0.7)")
-                      }
+                {section.links.map((link) => {
+                  const linkName = typeof link === "string" ? link : link.name;
+                  const linkHref = typeof link === "string" ? "#" : link.href;
+                  return (
+                    <motion.li
+                      key={linkName}
+                      whileHover={{ x: 4 }}
+                      transition={{ type: "spring", stiffness: 300 }}
                     >
-                      {link}
-                    </a>
-                  </motion.li>
-                ))}
+                      <a
+                        href={linkHref}
+                        className="text-sm transition-colors inline-block"
+                        style={{ color: "rgba(64, 18, 104, 0.7)" }}
+                        onMouseEnter={(e) =>
+                          (e.currentTarget.style.color = "#e21b35")
+                        }
+                        onMouseLeave={(e) =>
+                          (e.currentTarget.style.color =
+                            "rgba(64, 18, 104, 0.7)")
+                        }
+                      >
+                        {linkName}
+                      </a>
+                    </motion.li>
+                  );
+                })}
               </ul>
             </motion.div>
           ))}
@@ -362,6 +382,7 @@ export const Footer = () => {
                   style={{
                     background: "rgba(255, 255, 255, 0.4)",
                     border: "1px solid rgba(255, 255, 255, 0.6)",
+                    color: color,
                   }}
                 >
                   <Icon className="w-5 h-5" style={{ color: "#401268" }} />
@@ -415,13 +436,13 @@ export const Footer = () => {
                   >
                     <ul className="space-y-2">
                       {section.links.map((link) => (
-                        <li key={link}>
+                        <li key={link.name}>
                           <a
                             href="#"
                             className="text-sm block py-1"
                             style={{ color: "rgba(64, 18, 104, 0.7)" }}
                           >
-                            {link}
+                            {link.name}
                           </a>
                         </li>
                       ))}

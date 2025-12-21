@@ -1,25 +1,63 @@
+"use client";
+
+import CrudManager from "@/components/admin/CrudManager";
+import type { CrudConfig } from "@/types/crud";
+
+// Example User type - adjust based on your actual user schema
+type User = {
+  id: string;
+  email: string;
+  role: "admin" | "manager" | "viewer";
+  createdAt: string;
+  lastLogin: string | null;
+};
+
+const usersConfig: CrudConfig<User> = {
+  entityName: "User",
+  entityNamePlural: "Users",
+  apiEndpoint: "/api/admin/users",
+  fields: [
+    {
+      name: "email",
+      label: "Email",
+      type: "email",
+      required: true,
+      placeholder: "user@example.com",
+    },
+    {
+      name: "role",
+      label: "Role",
+      type: "select",
+      required: true,
+      options: ["admin", "manager", "viewer"],
+      defaultValue: "viewer",
+    },
+  ],
+  displayFields: (user) => ({
+    primary: user.email,
+    secondary: `Role: ${user.role} · Last login: ${user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : "Never"}`,
+    badge: {
+      text: user.role,
+      color:
+        user.role === "admin"
+          ? "#dc2626"
+          : user.role === "manager"
+          ? "#f59e0b"
+          : "#6b7280",
+    },
+  }),
+  getItemId: (user) => user.id,
+  palette: {
+    primary: "#401268",
+    secondary: "#c5a3ff",
+    background: "#f8f6f0",
+  },
+  emptyState: {
+    title: "No users yet",
+    description: "Add users to manage your store",
+  },
+};
+
 export default function AdminUsersPage() {
-  return (
-    <div className="flex flex-1 flex-col overflow-y-auto bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto w-full p-4 md:p-6">
-        <div className="mb-6 md:mb-8">
-          <h4 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white mb-2">
-            Users Management
-          </h4>
-          <p className="text-gray-600 dark:text-gray-400">
-            Manage admin users and permissions
-          </p>
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8">
-          <div className="text-center py-12">
-            <p className="text-gray-500 dark:text-gray-400">
-              Users management page coming soon...
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  return <CrudManager config={usersConfig} />;
 }
-

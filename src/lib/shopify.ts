@@ -271,6 +271,121 @@ export async function createCheckout(lineItems: Array<{ variantId: string; quant
   return data.checkoutCreate.checkout;
 }
 
+// Create order in Shopify
+interface CreateOrderInput {
+  email: string;
+  lineItems: Array<{
+    variantId: string;
+    quantity: number;
+  }>;
+  shippingAddress: {
+    firstName: string;
+    lastName: string;
+    address1: string;
+    address2?: string;
+    city: string;
+    province: string;
+    country: string;
+    zip: string;
+    phone: string;
+  };
+  billingAddress?: {
+    firstName: string;
+    lastName: string;
+    address1: string;
+    address2?: string;
+    city: string;
+    province: string;
+    country: string;
+    zip: string;
+    phone: string;
+  };
+  financialStatus?: "pending" | "paid" | "authorized";
+}
+
+interface CreateOrderResponse {
+  orderCreate: {
+    order: {
+      id: string;
+      name: string;
+      orderNumber: number;
+    } | null;
+    userErrors: Array<{
+      field: string[];
+      message: string;
+    }>;
+  };
+}
+
+export async function createOrder(input: CreateOrderInput) {
+  const mutation = `
+    mutation orderCreate($input: OrderInput!) {
+      orderCreate(input: $input) {
+        order {
+          id
+          name
+          orderNumber
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }
+  `;
+
+  const orderInput: any = {
+    email: input.email,
+    lineItems: input.lineItems.map(item => ({
+      variantId: item.variantId,
+      quantity: item.quantity,
+    })),
+    shippingAddress: {
+      firstName: input.shippingAddress.firstName,
+      lastName: input.shippingAddress.lastName,
+      address1: input.shippingAddress.address1,
+      address2: input.shippingAddress.address2 || "",
+      city: input.shippingAddress.city,
+      province: input.shippingAddress.province,
+      country: input.shippingAddress.country,
+      zip: input.shippingAddress.zip,
+      phone: input.shippingAddress.phone,
+    },
+    financialStatus: input.financialStatus || "pending",
+  };
+
+  if (input.billingAddress) {
+    orderInput.billingAddress = {
+      firstName: input.billingAddress.firstName,
+      lastName: input.billingAddress.lastName,
+      address1: input.billingAddress.address1,
+      address2: input.billingAddress.address2 || "",
+      city: input.billingAddress.city,
+      province: input.billingAddress.province,
+      country: input.billingAddress.country,
+      zip: input.billingAddress.zip,
+      phone: input.billingAddress.phone,
+    };
+  }
+
+  const data = await shopifyFetch<CreateOrderResponse>({
+    query: mutation,
+    variables: {
+      input: orderInput,
+    },
+  });
+
+  if (data.orderCreate.userErrors && data.orderCreate.userErrors.length > 0) {
+    throw new Error(data.orderCreate.userErrors[0].message);
+  }
+
+  if (!data.orderCreate.order) {
+    throw new Error("Failed to create order");
+  }
+
+  return data.orderCreate.order;
+}
+
 // Get product by handle
 interface GetProductByHandleResponse {
   product: ShopifyProduct | null;

@@ -1,25 +1,106 @@
+"use client";
+
+import CrudManager from "@/components/admin/CrudManager";
+import type { CrudConfig } from "@/types/crud";
+
+// Example Product type - adjust based on your actual product schema
+type Product = {
+  id: string;
+  title: string;
+  description: string | null;
+  price: number;
+  handle: string;
+  status: "active" | "draft" | "archived";
+  vendor: string | null;
+  productType: string | null;
+  featuredImage: string | null;
+};
+
+const productsConfig: CrudConfig<Product> = {
+  entityName: "Product",
+  entityNamePlural: "Products",
+  apiEndpoint: "/api/products",
+  fields: [
+    {
+      name: "title",
+      label: "Title",
+      type: "text",
+      required: true,
+      placeholder: "Enter product title",
+    },
+    {
+      name: "handle",
+      label: "Handle (URL slug)",
+      type: "text",
+      required: true,
+      placeholder: "product-url-slug",
+    },
+    {
+      name: "description",
+      label: "Description",
+      type: "textarea",
+      placeholder: "Describe your product...",
+      span: 2,
+    },
+    {
+      name: "price",
+      label: "Price",
+      type: "number",
+      required: true,
+      placeholder: "0.00",
+    },
+    {
+      name: "vendor",
+      label: "Vendor",
+      type: "text",
+      placeholder: "Product vendor",
+    },
+    {
+      name: "productType",
+      label: "Product Type",
+      type: "text",
+      placeholder: "e.g. T-Shirt, Hoodie",
+    },
+    {
+      name: "featuredImage",
+      label: "Featured Image URL",
+      type: "url",
+      placeholder: "https://...",
+    },
+    {
+      name: "status",
+      label: "Status",
+      type: "select",
+      options: ["active", "draft", "archived"],
+      defaultValue: "draft",
+    },
+  ],
+  displayFields: (product) => ({
+    primary: product.title,
+    secondary: `${product.vendor || "No vendor"} · ${product.productType || "General"} · ₦${product.price?.toLocaleString() || "0"}`,
+    imageUrl: product.featuredImage || undefined,
+    badge: {
+      text: product.status,
+      color:
+        product.status === "active"
+          ? "#10b981"
+          : product.status === "draft"
+          ? "#f59e0b"
+          : "#6b7280",
+    },
+  }),
+  getItemId: (product) => product.id,
+  palette: {
+    primary: "#401268",
+    secondary: "#c5a3ff",
+    background: "#f8f6f0",
+  },
+  emptyState: {
+    title: "No products yet",
+    description: "Get started by creating your first product",
+  },
+};
+
 export default function AdminProductsPage() {
-  return (
-    <div className="flex flex-1 flex-col overflow-y-auto bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto w-full p-4 md:p-6">
-        <div className="mb-6 md:mb-8">
-          <h4 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white mb-2">
-            Products Management
-          </h4>
-          <p className="text-gray-600 dark:text-gray-400">
-            Manage your product catalog
-          </p>
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8">
-          <div className="text-center py-12">
-            <p className="text-gray-500 dark:text-gray-400">
-              Products management page coming soon...
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  return <CrudManager config={productsConfig} />;
 }
-
