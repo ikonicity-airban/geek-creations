@@ -84,7 +84,7 @@ export default function AdminSettingsPage() {
   });
 
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">(
-    "idle",
+    "idle"
   );
 
   const handleSave = (settingType: string) => {
@@ -101,7 +101,7 @@ export default function AdminSettingsPage() {
       title: "Store",
       value: "store",
       content: (
-        <div className="w-full overflow-hidden relative h-full rounded-2xl p-6 sm:p-10 text-xl md:text-4xl font-bold text-white bg-gradient-to-br from-purple-700 to-violet-900">
+        <div className="w-full overflow-hidden relative h-full rounded-2xl p-6 sm:p-10 text-xl md:text-4xl font-bold text-white bg-linear-to-br from-purple-700 to-violet-900">
           <Store className="absolute top-4 right-4 w-8 h-8 sm:w-12 sm:h-12 opacity-20" />
           <div className="space-y-6">
             <div>
@@ -288,7 +288,7 @@ export default function AdminSettingsPage() {
       title: "Email",
       value: "email",
       content: (
-        <div className="w-full overflow-hidden relative h-full rounded-2xl p-6 sm:p-10 text-xl md:text-4xl font-bold text-white bg-gradient-to-br from-blue-600 to-cyan-600">
+        <div className="w-full overflow-hidden relative h-full rounded-2xl p-6 sm:p-10 text-xl md:text-4xl font-bold text-white bg-linear-to-br from-blue-600 to-cyan-600">
           <Mail className="absolute top-4 right-4 w-8 h-8 sm:w-12 sm:h-12 opacity-20" />
           <div className="space-y-6">
             <div>
@@ -494,7 +494,7 @@ export default function AdminSettingsPage() {
       title: "Payments",
       value: "payments",
       content: (
-        <div className="w-full overflow-hidden relative h-full rounded-2xl p-6 sm:p-10 text-xl md:text-4xl font-bold text-white bg-gradient-to-br from-green-600 to-emerald-600">
+        <div className="w-full overflow-hidden relative h-full rounded-2xl p-6 sm:p-10 text-xl md:text-4xl font-bold text-white bg-linear-to-br from-green-600 to-emerald-600">
           <CreditCard className="absolute top-4 right-4 w-8 h-8 sm:w-12 sm:h-12 opacity-20" />
           <div className="space-y-6">
             <div>
@@ -697,7 +697,7 @@ export default function AdminSettingsPage() {
       title: "Security",
       value: "security",
       content: (
-        <div className="w-full overflow-hidden relative h-full rounded-2xl p-6 sm:p-10 text-xl md:text-4xl font-bold text-white bg-gradient-to-br from-red-600 to-orange-600">
+        <div className="w-full overflow-hidden relative h-full rounded-2xl p-6 sm:p-10 text-xl md:text-4xl font-bold text-white bg-linear-to-br from-red-600 to-orange-600">
           <Shield className="absolute top-4 right-4 w-8 h-8 sm:w-12 sm:h-12 opacity-20" />
           <div className="space-y-6">
             <div>
