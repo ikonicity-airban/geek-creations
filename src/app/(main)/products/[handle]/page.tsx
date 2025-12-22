@@ -11,20 +11,18 @@ import {
   mockProducts,
   collectionProductMap,
 } from "@/lib/mock-data/collections";
-import MockupCarousel from "@/components/pdp/MockupCarousel";
+import {
+  MockupCarousel,
+  type MockupImage,
+} from "@/components/ui/mockup-carousel";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 import VariantSelector from "@/components/pdp/VariantSelector";
 import AddToCartButton from "@/components/pdp/AddToCartButton";
 import RelatedProducts from "@/components/pdp/RelatedProducts";
 import SizeChartModal from "@/components/pdp/SizeChartModal";
 import MiniCartDrawer from "@/components/cart/MiniCartDrawer";
-
-const COLORS = {
-  primary: "#401268",
-  secondary: "#c5a3ff",
-  background: "#f8f6f0",
-  accentWarm: "#e2ae3d",
-  accentBold: "#e21b35",
-};
+import { Button, buttonVariants } from "@/components/ui/button";
+import { IconBabyBottle, IconClothesRack } from "@tabler/icons-react";
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -184,33 +182,18 @@ export default function ProductDetailPage() {
       .slice(0, 4);
   };
 
-  if (isLoading) {
-    return null; // Next.js shows loading.tsx
-  }
-
   if (error || !product) {
     return (
-      <div
-        className="min-h-screen flex items-center justify-center"
-        style={{ backgroundColor: COLORS.background }}
-      >
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1
-            className="text-4xl font-black mb-4"
-            style={{ color: COLORS.primary }}
-          >
-            Product Not Found
-          </h1>
+          <IconBabyBottle className="w-30 h-30 my-4 mx-auto opacity-50" />
+          <h3 className="text-4xl font-black mb-4">Product Not Found</h3>
           <p className="mb-6 opacity-70">
             {error || "This product doesn't exist"}
           </p>
-          <button
-            onClick={() => router.push("/collections/all")}
-            className="px-6 py-3 rounded-lg font-bold text-white"
-            style={{ backgroundColor: COLORS.primary }}
-          >
+          <Button onClick={() => router.push("/collections/all")}>
             Browse Collections
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -222,41 +205,17 @@ export default function ProductDetailPage() {
 
   return (
     <>
-      <div
-        className="min-h-screen"
-        style={{
-          background: `linear-gradient(180deg, ${COLORS.background} 0%, #ffffff 100%)`,
-        }}
-      >
+      <div className="min-h-screen">
         <div className="max-w-7xl mx-auto px-6 py-12">
           {/* Breadcrumb */}
-          <nav className="mb-8 text-sm">
-            <ol className="flex items-center gap-2 opacity-70">
-              <li>
-                <button
-                  onClick={() => router.push("/")}
-                  className="hover:opacity-100 transition"
-                  style={{ color: COLORS.primary }}
-                >
-                  Home
-                </button>
-              </li>
-              <li>/</li>
-              <li>
-                <button
-                  onClick={() => router.push("/collections/all")}
-                  className="hover:opacity-100 transition"
-                  style={{ color: COLORS.primary }}
-                >
-                  Shop
-                </button>
-              </li>
-              <li>/</li>
-              <li className="font-semibold" style={{ color: COLORS.primary }}>
-                {product.title}
-              </li>
-            </ol>
-          </nav>
+          <Breadcrumb
+            className="py-10 md:px-10"
+            items={[
+              { label: "Home", href: "/" },
+              { label: "Products", href: "/collections/all" },
+              { label: product.title, href: `/products/${product.handle}` },
+            ]}
+          />
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -266,19 +225,46 @@ export default function ProductDetailPage() {
           >
             {/* Left: Image Gallery */}
             <div>
-              <MockupCarousel
-                images={product.images}
-                productTitle={product.title}
-                designImage={
-                  mockupUrl ||
-                  uploadedDesignUrl ||
-                  (selectedDesignId
-                    ? allDesigns.find((d) => d.id === selectedDesignId)
-                        ?.imageUrl
-                    : undefined)
+              {(() => {
+                // Build images array: start with product images
+                const carouselImages: MockupImage[] = product.images.map(
+                  (img) => ({
+                    id: img.id,
+                    src: img.src,
+                    alt: img.alt || product.title,
+                  })
+                );
+
+                // If there's a mockup URL, add it to the beginning
+                if (mockupUrl) {
+                  carouselImages.unshift({
+                    id: "mockup",
+                    src: mockupUrl,
+                    alt: `${product.title} with design`,
+                  });
                 }
-                mockupUrl={mockupUrl ?? undefined}
-              />
+
+                // If there's an uploaded design URL, add it as well
+                if (uploadedDesignUrl && !mockupUrl) {
+                  carouselImages.unshift({
+                    id: "uploaded-design",
+                    src: uploadedDesignUrl,
+                    alt: `${product.title} with uploaded design`,
+                  });
+                }
+
+                return (
+                  <MockupCarousel
+                    images={carouselImages}
+                    title={product.title}
+                    autoScroll={carouselImages.length > 1}
+                    autoScrollInterval={5000}
+                    showThumbnails={true}
+                    showZoom={true}
+                    aspectRatio="square"
+                  />
+                );
+              })()}
             </div>
 
             {/* Right: Product Info */}
@@ -289,11 +275,7 @@ export default function ProductDetailPage() {
                   {product.tags.slice(0, 3).map((tag) => (
                     <span
                       key={tag}
-                      className="px-3 py-1 rounded-full text-xs font-semibold"
-                      style={{
-                        backgroundColor: `${COLORS.secondary}20`,
-                        color: COLORS.primary,
-                      }}
+                      className="px-3 py-1 rounded-full text-xs font-semibold text-accent bg-accent/10"
                     >
                       #{tag}
                     </span>
@@ -302,48 +284,28 @@ export default function ProductDetailPage() {
               )}
 
               {/* Title */}
-              <h1
-                className="text-4xl md:text-5xl font-black"
-                style={{
-                  color: COLORS.primary,
-                  fontFamily: "Orbitron, sans-serif",
-                }}
-              >
+              <h3 className="text-2xl md:text-5xl font-black truncate">
                 {product.title}
-              </h1>
+              </h3>
 
               {/* Vendor & Type */}
               <div className="flex items-center gap-4 text-sm opacity-70">
-                {product.vendor && (
-                  <span style={{ color: COLORS.primary }}>
-                    By {product.vendor}
-                  </span>
-                )}
-                {product.product_type && (
-                  <span style={{ color: COLORS.primary }}>
-                    • {product.product_type}
-                  </span>
-                )}
+                {product.vendor && <span>By {product.vendor}</span>}
+                {product.product_type && <span>• {product.product_type}</span>}
               </div>
 
               {/* Price */}
               {selectedVariant && (
                 <div className="flex items-center gap-4">
-                  <p
-                    className="text-4xl font-black"
-                    style={{ color: COLORS.primary }}
-                  >
+                  <p className="text-3xl md:text-4xl font-black text-accent">
                     ₦{selectedVariant.price.toLocaleString()}
                   </p>
                   {selectedVariant.compare_at_price && (
                     <>
-                      <p className="text-2xl line-through opacity-60">
+                      <p className="text-xl line-through opacity-60">
                         ₦{selectedVariant.compare_at_price.toLocaleString()}
                       </p>
-                      <span
-                        className="px-3 py-1 rounded-full text-sm font-bold text-white"
-                        style={{ backgroundColor: COLORS.accentBold }}
-                      >
+                      <span className="px-3 py-1 rounded-full text-xs md:text-sm font-bold bg-destructive text-white">
                         SALE
                       </span>
                     </>
@@ -352,39 +314,31 @@ export default function ProductDetailPage() {
               )}
 
               {/* Geek Score Badge */}
-              <div
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full"
-                style={{
-                  backgroundColor: `${COLORS.secondary}20`,
-                  color: COLORS.primary,
-                }}
-              >
-                <Zap className="w-5 h-5" />
-                <span className="font-bold">Geek Score: 9000+</span>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary">
+                <Zap className="w-4 h-4" />
+                <span className="font-bold text-xs">Geek Score: 9000+</span>
               </div>
 
               {/* Description */}
               {product.description && (
                 <div
-                  className="prose max-w-none"
-                  style={{ color: COLORS.primary }}
+                  className="prose max-w-none italic"
                   dangerouslySetInnerHTML={{ __html: product.description }}
                 />
               )}
 
               {/* Design Selector Carousel */}
-              <div className="mb-8">
+              <div className="mb-8 max-w-[90dvw]">
                 <div className="flex items-center justify-between mb-6">
-                  <h2
-                    className="text-2xl font-bold"
-                    style={{ color: COLORS.primary }}
-                  >
+                  <h4 className="sm:text-2xl text-sm font-bold">
                     Choose Your Design
-                  </h2>
+                  </h4>
                   <Link
                     href={`/editor?product=${product.handle}`}
-                    className="px-4 py-2 rounded-lg font-semibold text-white flex items-center gap-2 transition hover:opacity-90"
-                    style={{ backgroundColor: COLORS.secondary }}
+                    className={buttonVariants({
+                      className:
+                        "flex items-center gap-2 transition hover:opacity-90 text-xs",
+                    })}
                   >
                     <Wand2 className="w-4 h-4" />
                     Customize
@@ -435,16 +389,11 @@ export default function ProductDetailPage() {
                     <div
                       className={`rounded-xl overflow-hidden border-4 transition-all ${
                         uploadedDesignUrl
-                          ? "shadow-lg scale-105 border-purple-500"
-                          : "border-dashed border-gray-300 hover:border-purple-400"
+                          ? "shadow-lg scale-105 border-accent"
+                          : "border-dashed border border-border hover:border-primary"
                       }`}
-                      style={{
-                        borderColor: uploadedDesignUrl
-                          ? COLORS.secondary
-                          : undefined,
-                      }}
                     >
-                      <div className="relative w-32 h-32 flex flex-col items-center justify-center bg-gray-50">
+                      <div className="relative w-32 h-32 flex flex-col items-center justify-center bg-card">
                         {uploadedDesignUrl ? (
                           <>
                             <div className="relative w-full h-full">
@@ -452,7 +401,7 @@ export default function ProductDetailPage() {
                                 src={uploadedDesignUrl}
                                 alt="Uploaded design"
                                 fill
-                                className="object-cover"
+                                className="object-contain"
                                 unoptimized // User-uploaded images may not be optimized
                               />
                             </div>
@@ -465,7 +414,7 @@ export default function ProductDetailPage() {
                                   setSelectedDesignId(allDesigns[0].id);
                                 }
                               }}
-                              className="absolute top-1 right-1 p-1 rounded-full bg-red-500 text-white hover:bg-red-600"
+                              className="absolute top-1 right-1 p-1 rounded-full"
                             >
                               <X className="w-3 h-3" />
                             </button>
@@ -473,17 +422,11 @@ export default function ProductDetailPage() {
                         ) : (
                           <>
                             {isUploading ? (
-                              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500" />
+                              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
                             ) : (
                               <>
-                                <Upload
-                                  className="w-8 h-8 mb-2"
-                                  style={{ color: COLORS.primary }}
-                                />
-                                <span
-                                  className="text-xs font-semibold px-2 text-center"
-                                  style={{ color: COLORS.primary }}
-                                >
+                                <Upload className="w-4 h-4 mb-2" />
+                                <span className="text-xs font-semibold px-2 text-center">
                                   Upload Design
                                 </span>
                               </>
@@ -503,7 +446,7 @@ export default function ProductDetailPage() {
                         setUploadedDesignUrl(null); // Clear uploaded design
                         generateMockup(design.imageUrl);
                       }}
-                      className={`shrink-0 rounded-xl overflow-hidden border-4 transition-all ${
+                      className={`shrink-0 rounded-xl overflow-hidden border transition-all ${
                         selectedDesignId === design.id && !uploadedDesignUrl
                           ? "shadow-lg scale-105"
                           : "border-transparent opacity-70 hover:opacity-100"
@@ -511,22 +454,19 @@ export default function ProductDetailPage() {
                       style={{
                         borderColor:
                           selectedDesignId === design.id && !uploadedDesignUrl
-                            ? COLORS.secondary
+                            ? ""
                             : "transparent",
                       }}
                     >
-                      <div className="relative w-32 h-32">
+                      <div className="relative w-auto h-32">
                         <Image
                           src={design.thumbnailUrl || design.imageUrl}
                           alt={design.title}
                           fill
-                          className="object-cover"
+                          className="object-cover w-full"
                         />
                       </div>
-                      <p
-                        className="text-center py-2 text-sm font-semibold px-2"
-                        style={{ color: COLORS.primary }}
-                      >
+                      <p className="text-center py-2 text-xs sm:text-sm font-semibold px-2">
                         {design.title}
                       </p>
                     </button>
@@ -542,7 +482,6 @@ export default function ProductDetailPage() {
                   </p>
                 )}
               </div>
-
               {/* Variant Selector */}
               <VariantSelector
                 product={product}
@@ -552,42 +491,28 @@ export default function ProductDetailPage() {
 
               {/* Quantity Selector */}
               <div>
-                <label
-                  className="block text-sm font-bold mb-3"
-                  style={{ color: COLORS.primary }}
-                >
-                  Quantity
-                </label>
+                <label className="block text-sm font-bold mb-3">Quantity</label>
                 <div className="flex items-center gap-3">
-                  <button
+                  <Button
+                    variant={"outline"}
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="w-12 h-12 rounded-lg font-bold transition-all hover:opacity-80"
-                    style={{
-                      backgroundColor: `${COLORS.primary}20`,
-                      color: COLORS.primary,
-                    }}
+                    className="w-12 h-12 rounded-lg font-bold transition-all"
                   >
                     -
-                  </button>
-                  <span
-                    className="text-xl font-bold w-12 text-center"
-                    style={{ color: COLORS.primary }}
-                  >
+                  </Button>
+                  <span className="text-xl font-bold w-12 text-center">
                     {quantity}
                   </span>
-                  <button
+                  <Button
+                    variant={"outline"}
                     onClick={() =>
                       setQuantity(Math.min(maxQuantity, quantity + 1))
                     }
                     disabled={quantity >= maxQuantity}
-                    className="w-12 h-12 rounded-lg font-bold transition-all hover:opacity-80 disabled:opacity-40"
-                    style={{
-                      backgroundColor: `${COLORS.primary}20`,
-                      color: COLORS.primary,
-                    }}
+                    className="w-12 h-12 rounded-lg font-bold transition-all disabled:opacity-40"
                   >
                     +
-                  </button>
+                  </Button>
                   {maxQuantity > 0 && (
                     <span className="text-sm opacity-70">
                       (Max: {maxQuantity})
@@ -611,51 +536,32 @@ export default function ProductDetailPage() {
               {(product.product_type?.toLowerCase().includes("shirt") ||
                 product.product_type?.toLowerCase().includes("hoodie") ||
                 product.product_type?.toLowerCase().includes("apparel")) && (
-                <button
+                <Button
+                  variant="outline"
                   onClick={() => setIsSizeChartOpen(true)}
                   className="w-full py-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all hover:opacity-80"
-                  style={{
-                    backgroundColor: `${COLORS.secondary}20`,
-                    color: COLORS.primary,
-                  }}
                 >
                   <Ruler className="w-5 h-5" />
                   Size Chart
-                </button>
+                </Button>
               )}
 
               {/* Additional Info */}
               <div
                 className="pt-6 border-t space-y-3"
-                style={{ borderColor: `${COLORS.primary}20` }}
+                style={{ borderColor: `20` }}
               >
                 <div className="flex items-start gap-3">
-                  <Sparkles
-                    className="w-5 h-5 mt-0.5"
-                    style={{ color: COLORS.accentWarm }}
-                  />
+                  <Sparkles className="w-5 h-5 mt-0.5" />
                   <div>
-                    <p
-                      className="font-semibold"
-                      style={{ color: COLORS.primary }}
-                    >
-                      Crypto Payments Accepted
-                    </p>
+                    <p className="font-semibold">Crypto Payments Accepted</p>
                     <p className="text-sm opacity-70">USDC, SOL, and more</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Zap
-                    className="w-5 h-5 mt-0.5"
-                    style={{ color: COLORS.secondary }}
-                  />
+                  <Zap className="w-5 h-5 mt-0.5" style={{ color: "" }} />
                   <div>
-                    <p
-                      className="font-semibold"
-                      style={{ color: COLORS.primary }}
-                    >
-                      Fast Shipping
-                    </p>
+                    <p className="font-semibold">Fast Shipping</p>
                     <p className="text-sm opacity-70">
                       Free shipping on orders over ₦50,000
                     </p>

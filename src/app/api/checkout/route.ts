@@ -5,7 +5,7 @@ import { createSolanaPaymentRequest } from "@/lib/payments/solana-pay";
 import { createClient } from "@supabase/supabase-js";
 import { db } from "@/lib/db";
 import { variants } from "@/lib/db/schema";
-import { inArray, eq } from "drizzle-orm";
+import { inArray } from "drizzle-orm";
 import type { CheckoutData, CartItem } from "@/types";
 
 const supabase = createClient(
@@ -53,7 +53,9 @@ export async function POST(req: NextRequest) {
       .map((item) => {
         const shopifyVariantId = variantMap.get(item.variant_id);
         if (!shopifyVariantId) {
-          console.error(`Shopify variant ID not found for variant ${item.variant_id}`);
+          console.error(
+            `Shopify variant ID not found for variant ${item.variant_id}`
+          );
           return null;
         }
         return {
@@ -61,7 +63,9 @@ export async function POST(req: NextRequest) {
           quantity: item.quantity,
         };
       })
-      .filter((item): item is { variantId: string; quantity: number } => item !== null);
+      .filter(
+        (item): item is { variantId: string; quantity: number } => item !== null
+      );
 
     if (lineItems.length === 0) {
       return NextResponse.json(
@@ -70,7 +74,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Create order in Shopify
+    // Calculate total amount (in kobo for Paystack, or in smallest unit for crypto)
+    const totalAmount = cart_items.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
+    const tax = totalAmount * 0.075; // 7.5% VAT
+    const shipping = totalAmount >= 50000 ? 0 : 2500;
+    const finalTotal = totalAmount + tax + shipping;
+
+    // Create order in Shopify with manual fulfillment tags
     let shopifyOrder;
     try {
       shopifyOrder = await createOrder({
@@ -100,26 +113,46 @@ export async function POST(req: NextRequest) {
               phone: billing_address.phone,
             }
           : undefined,
-        financialStatus: payment_method === "card" ? "pending" : "pending",
+        financialStatus: "pending", // Always pending for manual review
+        note: "MANUAL FULFILLMENT REQUIRED - Review in admin dashboard",
+        tags: ["manual-review", "pending-admin"],
       });
     } catch (error) {
       console.error("Shopify order creation error:", error);
-      // If Shopify order creation fails, we might want to still proceed
-      // with payment and create order later, or return error
       return NextResponse.json(
-        { error: `Failed to create order: ${error instanceof Error ? error.message : "Unknown error"}` },
+        {
+          error: `Failed to create order: ${
+            error instanceof Error ? error.message : "Unknown error"
+          }`,
+        },
         { status: 500 }
       );
     }
 
-    // Calculate total amount (in kobo for Paystack, or in smallest unit for crypto)
-    const totalAmount = cart_items.reduce(
-      (sum, item) => sum + item.price * item.quantity,
-      0
-    );
-    const tax = totalAmount * 0.075; // 7.5% VAT
-    const shipping = totalAmount >= 50000 ? 0 : 2500;
-    const finalTotal = totalAmount + tax + shipping;
+    // Save order to Supabase immediately (main source of truth)
+    try {
+      const shopifyOrderId = shopifyOrder.id.split("/").pop();
+
+      await supabase.from("orders").insert({
+        shopify_order_id: shopifyOrderId ? parseInt(shopifyOrderId) : null,
+        shopify_order_number: shopifyOrder.orderNumber || shopifyOrder.name,
+        customer_email: email,
+        shipping_address: shipping_address,
+        billing_address: billing_address || shipping_address,
+        line_items: cart_items,
+        total: finalTotal.toString(),
+        subtotal: totalAmount.toString(),
+        tax: tax.toString(),
+        shipping_cost: shipping.toString(),
+        payment_method: payment_method,
+        status: "paid_pending_fulfillment",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error("Failed to save order to Supabase:", error);
+      // Log error but don't fail the request - Shopify order is already created
+    }
 
     // Handle payment based on method
     let paymentUrl: string | null = null;
@@ -132,7 +165,9 @@ export async function POST(req: NextRequest) {
           email,
           amountKobo: Math.round(finalTotal * 100), // Convert to kobo
           orderId: shopifyOrder.orderNumber || shopifyOrder.name,
-          callbackUrl: `${req.nextUrl.origin}/checkout/success?order=${shopifyOrder.orderNumber || shopifyOrder.name}&email=${encodeURIComponent(email)}`,
+          callbackUrl: `${req.nextUrl.origin}/checkout/success?order=${
+            shopifyOrder.orderNumber || shopifyOrder.name
+          }&email=${encodeURIComponent(email)}`,
         });
         paymentUrl = paystackResponse.authorization_url;
         paymentReference = paystackResponse.reference;
@@ -180,7 +215,9 @@ export async function POST(req: NextRequest) {
           email,
           amountKobo: Math.round(finalTotal * 100),
           orderId: shopifyOrder.orderNumber || shopifyOrder.name,
-          callbackUrl: `${req.nextUrl.origin}/checkout/success?order=${shopifyOrder.orderNumber || shopifyOrder.name}&email=${encodeURIComponent(email)}`,
+          callbackUrl: `${req.nextUrl.origin}/checkout/success?order=${
+            shopifyOrder.orderNumber || shopifyOrder.name
+          }&email=${encodeURIComponent(email)}`,
         });
         paymentUrl = paystackResponse.authorization_url;
         paymentReference = paystackResponse.reference;
@@ -198,14 +235,25 @@ export async function POST(req: NextRequest) {
       try {
         // Extract Shopify order ID from the GID
         const shopifyOrderId = shopifyOrder.id.split("/").pop();
-        
+
         await supabase.from("payment_transactions").insert({
           order_id: shopifyOrderId ? parseInt(shopifyOrderId) : null,
-          payment_method: payment_method === "card" ? "paystack" : payment_method === "crypto" ? "solana" : "paystack",
-          payment_provider: payment_method === "card" ? "paystack" : payment_method === "crypto" ? "solana" : "paystack",
+          payment_method:
+            payment_method === "card"
+              ? "paystack"
+              : payment_method === "crypto"
+              ? "solana"
+              : "paystack",
+          payment_provider:
+            payment_method === "card"
+              ? "paystack"
+              : payment_method === "crypto"
+              ? "solana"
+              : "paystack",
           transaction_reference: paymentReference,
           amount: finalTotal.toString(),
-          currency: payment_method === "crypto" ? (crypto_currency || "USDC") : "NGN",
+          currency:
+            payment_method === "crypto" ? crypto_currency || "USDC" : "NGN",
           status: "pending",
           metadata: {
             shopify_order_id: shopifyOrder.id,
@@ -232,7 +280,10 @@ export async function POST(req: NextRequest) {
     console.error("Checkout error:", error);
     return NextResponse.json(
       {
-        error: error instanceof Error ? error.message : "An unexpected error occurred",
+        error:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred",
       },
       { status: 500 }
     );

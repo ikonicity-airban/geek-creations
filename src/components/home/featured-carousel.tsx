@@ -6,13 +6,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { PageLayout } from "@/components/page-layout";
 import Image from "next/image";
-
-const COLORS = {
-  primary: "#401268",
-  secondary: "#c5a3ff",
-  background: "#f8f6f0",
-  accentWarm: "#e2ae3d",
-};
+import { buttonVariants } from "../ui/button";
 
 interface FeaturedDesign {
   id: string;
@@ -64,8 +58,8 @@ export const FeaturedCarousel = () => {
   useEffect(() => {
     if (featuredDesigns.length === 0 || isPaused) return;
 
-    const totalWidth = featuredDesigns.length * 400; // Approximate card width
-    const duration = featuredDesigns.length * 3; // 3s per item
+    const totalWidth = featuredDesigns.length * 320; // Responsive card width
+    const duration = featuredDesigns.length * 10; // 3s per item
 
     controls.start({
       x: -totalWidth / 2,
@@ -102,36 +96,31 @@ export const FeaturedCarousel = () => {
   const totalWidth = featuredDesigns.length * 400;
 
   return (
-    <section id="featured" className="py-16 md:py-24 overflow-hidden">
+    <section
+      id="featured"
+      className="section-padding overflow-hidden bg-background"
+    >
       <PageLayout>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-12"
+          className="text-center mb-8 sm:mb-10 md:mb-12"
         >
           <motion.span
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="inline-block px-4 py-2 rounded-full text-sm font-bold mb-4"
-            style={{
-              backgroundColor: `${COLORS.secondary}20`,
-              color: COLORS.primary,
-              border: `1px solid ${COLORS.secondary}40`,
-            }}
+            className="inline-block px-3 py-1.5 sm:px-4 sm:py-2 rounded-btn text-xs sm:text-sm font-bold mb-3 sm:mb-4 border-hairline bg-secondary/20 text-foreground border-secondary/40"
           >
             ✨ Trending Now
           </motion.span>
 
-          <h2 className="text-3xl md:text-5xl font-black mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-3 sm:mb-4 px-4 text-foreground">
             Featured Designs
           </h2>
 
-          <p
-            className="text-base md:text-lg max-w-2xl mx-auto"
-            style={{ color: `${COLORS.primary}cc` }}
-          >
+          <p className="text-sm sm:text-base md:text-lg max-w-xs sm:max-w-xl md:max-w-2xl mx-auto px-4 text-muted-foreground">
             Our best sellers and trending designs, ready to print on your
             favorite products
           </p>
@@ -141,34 +130,23 @@ export const FeaturedCarousel = () => {
       {/* Marquee Container */}
       <div className="relative">
         {/* Gradient Overlays */}
-        <div
-          className="absolute left-0 top-0 bottom-0 w-32 md:w-48 z-10 pointer-events-none"
-          style={{
-            background: `linear-gradient(to right, ${COLORS.background}, transparent)`,
-          }}
-        />
-        <div
-          className="absolute right-0 top-0 bottom-0 w-32 md:w-48 z-10 pointer-events-none"
-          style={{
-            background: `linear-gradient(to left, ${COLORS.background}, transparent)`,
-          }}
-        />
+        <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-24 md:w-32 lg:w-48 z-10 pointer-events-none bg-gradient-to-r from-background to-transparent" />
+        <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-24 md:w-32 lg:w-48 z-10 pointer-events-none bg-gradient-to-l from-background to-transparent" />
 
         {/* Carousel */}
-        <div className="overflow-hidden py-8">
+        <div className="overflow-hidden py-6 sm:py-8">
           {isLoading ? (
-            <div className="flex gap-6 px-6">
+            <div className="flex gap-3 sm:gap-4 md:gap-6 px-4 sm:px-6">
               {Array.from({ length: 4 }).map((_, idx) => (
                 <div
                   key={idx}
-                  className="shrink-0 w-80 md:w-96 h-80 rounded-2xl animate-pulse"
-                  style={{ backgroundColor: `${COLORS.primary}10` }}
+                  className="shrink-0 w-64 sm:w-72 md:w-80 lg:w-96 h-64 sm:h-72 md:h-80 rounded-card animate-pulse shadow-card bg-muted"
                 />
               ))}
             </div>
           ) : (
             <motion.div
-              className="flex gap-6 px-6"
+              className="flex gap-3 sm:gap-4 md:gap-6 px-4 sm:px-6"
               animate={controls}
               onHoverStart={() => !isPaused && controls.stop()}
               onHoverEnd={() =>
@@ -192,34 +170,19 @@ export const FeaturedCarousel = () => {
                   viewport={{ once: true }}
                   whileHover={{ scale: 1.05, y: -8 }}
                   transition={{ duration: 0.3 }}
-                  className="shrink-0 w-80 md:w-96"
+                  className="shrink-0 w-64  sm:w-72 md:w-80 lg:w-96"
                 >
                   <Link href={`/designs/${design.id}`}>
                     {/* <FollowerPointerCard
                       title={`${design.name} • ${design.priceRange}`}
                     > */}
-                    <div
-                      className="group relative overflow-hidden rounded-3xl cursor-pointer bg-white/90 backdrop-blur border-2 shadow-xl transition-all duration-300 hover:shadow-2xl"
-                      style={{
-                        borderColor: `${COLORS.primary}20`,
-                      }}
-                    >
+                    <div className="group relative overflow-hidden rounded-card cursor-pointer bg-card/90 backdrop-blur border-hairline border-border shadow-card transition-smooth hover:shadow-card-elevated">
                       {/* Gradient Glow */}
-                      <div
-                        className="pointer-events-none absolute -top-24 -right-24 h-72 w-56 rounded-full blur-3xl opacity-50 transition-opacity duration-300 group-hover:opacity-80"
-                        style={{
-                          background: `radial-gradient(circle, ${COLORS.secondary}80, transparent)`,
-                        }}
-                      />
+                      <div className="pointer-events-none absolute -top-24 -right-24 h-72 w-56 rounded-full blur-3xl opacity-50 transition-opacity duration-300 group-hover:opacity-80 bg-linear-to-r from-secondary/50 to-transparent" />
 
                       {/* Image */}
-                      <div className="relative aspect-4/3 w-full overflow-hidden">
-                        <div
-                          className="absolute inset-0 z-10"
-                          style={{
-                            background: `linear-gradient(135deg, ${COLORS.secondary}15 0%, transparent 45%, ${COLORS.background}50 100%)`,
-                          }}
-                        />
+                      <div className="relative aspect-square sm:aspect-4/3 w-full overflow-hidden">
+                        <div className="absolute inset-0 z-10" />
 
                         <Image
                           width={400}
@@ -239,26 +202,14 @@ export const FeaturedCarousel = () => {
                         />
 
                         {/* Badges */}
-                        <div className="absolute left-3 top-3 z-20">
-                          <span
-                            className="rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-wider backdrop-blur-sm"
-                            style={{
-                              backgroundColor: `${COLORS.primary}90`,
-                              color: "#fff",
-                            }}
-                          >
+                        <div className="absolute left-2 sm:left-3 top-2 sm:top-3 z-20">
+                          <span className="rounded-btn px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-bold uppercase tracking-wider backdrop-blur-sm bg-primary/90 text-primary-foreground">
                             Featured
                           </span>
                         </div>
 
-                        <div className="absolute right-3 top-3 z-20">
-                          <span
-                            className="rounded-full px-3 py-1.5 text-xs font-bold backdrop-blur-sm"
-                            style={{
-                              backgroundColor: `${COLORS.accentWarm}90`,
-                              color: "#fff",
-                            }}
-                          >
+                        <div className="absolute right-2 sm:right-3 top-2 sm:top-3 z-20">
+                          <span className="rounded-full px-3 py-1.5 text-xs font-bold backdrop-blur-sm bg-accent/90 text-accent-foreground">
                             {design.priceRange}
                           </span>
                         </div>
@@ -266,31 +217,18 @@ export const FeaturedCarousel = () => {
 
                       {/* Content */}
                       <div className="p-6">
-                        <h4
-                          className="text-xl md:text-2xl font-black leading-tight mb-4"
-                          style={{ color: COLORS.primary }}
-                        >
+                        <h4 className="text-xl md:text-2xl font-black leading-tight mb-4 text-card-foreground">
                           {design.name}
                         </h4>
 
-                        <div className="flex items-center justify-between">
-                          <span
-                            className="text-sm font-semibold"
-                            style={{ color: `${COLORS.primary}99` }}
-                          >
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
+                          <span className="text-sm font-semibold text-muted-foreground">
                             Available on 5+ products
                           </span>
 
-                          <div
-                            className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold transition-all group-hover:gap-3"
-                            style={{
-                              backgroundColor: `${COLORS.secondary}20`,
-                              color: COLORS.primary,
-                              border: `1px solid ${COLORS.secondary}40`,
-                            }}
-                          >
+                          <div className="inline-flex items-center gap-2 rounded-full px-6 py-2 text-sm font-bold transition-all group-hover:gap-3 bg-secondary/20 text-foreground border border-secondary/40">
                             <span>View</span>
-                            <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+                            <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 transition-transform duration-300 group-hover/cta:translate-x-1" />
                           </div>
                         </div>
                       </div>
@@ -309,16 +247,16 @@ export const FeaturedCarousel = () => {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
             onClick={togglePause}
-            className="p-3 rounded-full shadow-lg transition-all"
-            style={{
-              backgroundColor: COLORS.primary,
-              color: "#fff",
-            }}
+            className={buttonVariants({
+              variant: "outline",
+              className:
+                "p-3 rounded-full border-accent shadow-xl [shadow:0_0_24px_rgba(34,42,53,0.06),0_1px_1px_rgba(0,0,0,0.05),0_0_0_1px_rgba(34,42,53,0.04),0_0_4px_rgba(34,42,53,0.08),0_16px_68px_rgba(47,48,55,0.05),0_1px_0_rgba(255,255,255,0.1)_inset]",
+            })}
           >
             {isPaused ? (
-              <Play className="w-5 h-5" />
+              <Play className="h-3 w-3 sm:h-4 sm:w-4" />
             ) : (
-              <Pause className="w-5 h-5" />
+              <Pause className="h-3 w-3 sm:h-4 sm:w-4" />
             )}
           </motion.button>
         </div>
@@ -336,11 +274,11 @@ export const FeaturedCarousel = () => {
             <motion.button
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.98 }}
-              className="px-8 py-2 rounded-xl font-bold text-lg shadow-xl transition-all flex items-center gap-2 mx-auto"
-              style={{
-                backgroundColor: COLORS.primary,
-                color: "#fff",
-              }}
+              className={buttonVariants({
+                variant: "default",
+                className:
+                  "px-8 py-2 font-bold text-lg shadow-xl transition-all flex items-center gap-2 mx-auto",
+              })}
             >
               View All Designs
               <ArrowRight className="w-5 h-5" />

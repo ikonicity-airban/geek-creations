@@ -2,14 +2,6 @@
 
 import { motion } from "framer-motion";
 
-const COLORS = {
-  primary: "#401268",
-  secondary: "#c5a3ff",
-  background: "#f8f6f0",
-  accentWarm: "#e2ae3d",
-  accentBold: "#e21b35",
-};
-
 // Shimmer effect component
 const Shimmer = () => (
   <div className="absolute inset-0 -translate-x-full animate-shimmer bg-linear-to-r from-transparent via-white/20 to-transparent" />
@@ -45,12 +37,7 @@ const ButtonSkeleton = () => (
 
 export default function ProductLoadingSkeleton() {
   return (
-    <div
-      className="min-h-screen"
-      style={{
-        background: `linear-gradient(180deg, ${COLORS.background} 0%, #ffffff 100%)`,
-      }}
-    >
+    <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-6 py-12">
         <motion.div
           initial={{ opacity: 0 }}
@@ -147,10 +134,7 @@ export default function ProductLoadingSkeleton() {
             <ButtonSkeleton />
 
             {/* Additional Info */}
-            <div
-              className="space-y-2 pt-4 border-t"
-              style={{ borderColor: `${COLORS.primary}20` }}
-            >
+            <div className="space-y-2 pt-4 border-t border-border">
               <TextSkeleton width="50%" height="1rem" />
               <TextSkeleton width="70%" height="1rem" />
             </div>
@@ -164,8 +148,7 @@ export default function ProductLoadingSkeleton() {
             {[1, 2, 3, 4].map((i) => (
               <div
                 key={i}
-                className="relative rounded-2xl overflow-hidden bg-white border"
-                style={{ borderColor: `${COLORS.primary}20` }}
+                className="relative rounded-2xl overflow-hidden bg-white border-border border"
               >
                 <div className="relative aspect-3/4 bg-gray-200 overflow-hidden">
                   <Shimmer />

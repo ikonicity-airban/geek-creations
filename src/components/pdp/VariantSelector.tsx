@@ -3,14 +3,7 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Product, Variant } from "@/types";
-
-const COLORS = {
-  primary: "#401268",
-  secondary: "#c5a3ff",
-  background: "#f8f6f0",
-  accentWarm: "#e2ae3d",
-  accentBold: "#e21b35",
-};
+import { Button } from "../ui/button";
 
 interface VariantSelectorProps {
   product: Product;
@@ -75,24 +68,25 @@ export default function VariantSelector({
     });
   };
 
-  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>(
-    () => {
-      const initial: Record<string, string> = {};
-      if (selectedVariant) {
-        if (selectedVariant.option1) initial.Size = selectedVariant.option1;
-        if (selectedVariant.option2) initial.Color = selectedVariant.option2;
-        if (selectedVariant.option3) initial.Style = selectedVariant.option3;
-      } else if (product.variants.length > 0) {
-        // Default to first available variant
-        const firstVariant = product.variants.find((v) => v.available) || product.variants[0];
-        if (firstVariant.option1) initial.Size = firstVariant.option1;
-        if (firstVariant.option2) initial.Color = firstVariant.option2;
-        if (firstVariant.option3) initial.Style = firstVariant.option3;
-        onVariantChange(firstVariant);
-      }
-      return initial;
+  const [selectedOptions, setSelectedOptions] = useState<
+    Record<string, string>
+  >(() => {
+    const initial: Record<string, string> = {};
+    if (selectedVariant) {
+      if (selectedVariant.option1) initial.Size = selectedVariant.option1;
+      if (selectedVariant.option2) initial.Color = selectedVariant.option2;
+      if (selectedVariant.option3) initial.Style = selectedVariant.option3;
+    } else if (product.variants.length > 0) {
+      // Default to first available variant
+      const firstVariant =
+        product.variants.find((v) => v.available) || product.variants[0];
+      if (firstVariant.option1) initial.Size = firstVariant.option1;
+      if (firstVariant.option2) initial.Color = firstVariant.option2;
+      if (firstVariant.option3) initial.Style = firstVariant.option3;
+      onVariantChange(firstVariant);
     }
-  );
+    return initial;
+  });
 
   const handleOptionChange = (optionName: string, value: string) => {
     const newSelectedOptions = { ...selectedOptions, [optionName]: value };
@@ -100,9 +94,14 @@ export default function VariantSelector({
 
     // Find matching variant
     const matchingVariant = product.variants.find((variant) => {
-      const sizeMatch = !newSelectedOptions.Size || variant.option1 === newSelectedOptions.Size;
-      const colorMatch = !newSelectedOptions.Color || variant.option2 === newSelectedOptions.Color;
-      const styleMatch = !newSelectedOptions.Style || variant.option3 === newSelectedOptions.Style;
+      const sizeMatch =
+        !newSelectedOptions.Size || variant.option1 === newSelectedOptions.Size;
+      const colorMatch =
+        !newSelectedOptions.Color ||
+        variant.option2 === newSelectedOptions.Color;
+      const styleMatch =
+        !newSelectedOptions.Style ||
+        variant.option3 === newSelectedOptions.Style;
       return sizeMatch && colorMatch && styleMatch;
     });
 
@@ -125,12 +124,7 @@ export default function VariantSelector({
     <div className="space-y-6">
       {options.map((option) => (
         <div key={option.name}>
-          <label
-            className="block text-sm font-bold mb-3"
-            style={{ color: COLORS.primary }}
-          >
-            {option.name}
-          </label>
+          <label className="block text-sm font-bold mb-3">{option.name}</label>
           <div className="flex flex-wrap gap-2">
             {option.values.map((value) => {
               const isSelected = selectedOptions[option.name] === value;
@@ -138,25 +132,17 @@ export default function VariantSelector({
               const isDisabled = !isAvailable;
 
               return (
-                <button
+                <Button
+                  variant={isSelected ? "default" : "outline"}
+                  size="sm"
                   key={value}
-                  onClick={() => !isDisabled && handleOptionChange(option.name, value)}
+                  onClick={() =>
+                    !isDisabled && handleOptionChange(option.name, value)
+                  }
                   disabled={isDisabled}
-                  className={`px-4 py-2 rounded-lg font-semibold transition-all ${
-                    isDisabled ? "opacity-40 cursor-not-allowed" : "cursor-pointer"
-                  }`}
-                  style={{
-                    backgroundColor: isSelected
-                      ? COLORS.primary
-                      : "rgba(64, 18, 104, 0.1)",
-                    color: isSelected ? "#fff" : COLORS.primary,
-                    border: isSelected
-                      ? "none"
-                      : `1px solid ${COLORS.primary}40`,
-                  }}
                 >
                   {value}
-                </button>
+                </Button>
               );
             })}
           </div>
@@ -168,27 +154,25 @@ export default function VariantSelector({
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="p-4 rounded-lg"
-          style={{ backgroundColor: `${COLORS.secondary}20` }}
+          className="p-4 rounded-lg bg-card"
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-semibold" style={{ color: COLORS.primary }}>
+              <p className="text-sm font-semibold">
                 Selected: {selectedVariant.title}
               </p>
               {!selectedVariant.available && (
-                <p className="text-xs mt-1" style={{ color: COLORS.accentBold }}>
-                  Out of Stock
-                </p>
+                <p className="text-xs mt-1 text-accent">Out of Stock</p>
               )}
-              {selectedVariant.available && selectedVariant.inventory_quantity > 0 && (
-                <p className="text-xs mt-1 opacity-70">
-                  {selectedVariant.inventory_quantity} in stock
-                </p>
-              )}
+              {selectedVariant.available &&
+                selectedVariant.inventory_quantity > 0 && (
+                  <p className="text-xs mt-1 opacity-70">
+                    {selectedVariant.inventory_quantity} in stock
+                  </p>
+                )}
             </div>
             <div className="text-right">
-              <p className="text-lg font-black" style={{ color: COLORS.primary }}>
+              <p className="text-lg font-black text-primary">
                 ₦{selectedVariant.price.toLocaleString()}
               </p>
               {selectedVariant.compare_at_price && (
@@ -203,4 +187,3 @@ export default function VariantSelector({
     </div>
   );
 }
-

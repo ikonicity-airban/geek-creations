@@ -66,8 +66,8 @@ export default function ContactPage() {
           Get in Touch
         </h1>
         <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-          Have a question or need help? We'd love to hear from you. Send us a
-          message and we'll respond as soon as possible.
+          Have a question or need help? {"We'd"} love to hear from you. Send us
+          a message and {"we'll"} respond as soon as possible.
         </p>
       </motion.div>
 
@@ -159,17 +159,17 @@ export default function ContactPage() {
 
             {success && (
               <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg flex items-start gap-3 mb-6">
-                <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
                 <p className="text-sm text-green-800 dark:text-green-200">
-                  Thank you! Your message has been sent. We'll get back to you
-                  soon.
+                  Thank you! Your message has been sent. {"We'll"} get back to
+                  you soon.
                 </p>
               </div>
             )}
 
             {error && (
               <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-start gap-3 mb-6">
-                <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
                 <p className="text-sm text-red-800 dark:text-red-200">
                   {error}
                 </p>

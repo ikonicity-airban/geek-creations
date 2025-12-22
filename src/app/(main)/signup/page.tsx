@@ -94,17 +94,17 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6 py-20">
+    <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 py-20">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md"
       >
-        <div className="bg-white/85 dark:bg-gray-800/85 backdrop-blur rounded-2xl p-8 shadow-xl border border-gray-200/70 dark:border-gray-700/70">
+        <div className="backdrop-blur rounded-2xl p-8 shadow-xl border bg-card">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-black text-gray-900 dark:text-white mb-2">
+            <h3 className="max-sm:text-xl font-black text-gray-900 dark:text-white mb-2">
               Create Your Account
-            </h1>
+            </h3>
             <p className="text-gray-600 dark:text-gray-400">
               Sign up to complete your checkout
             </p>
@@ -117,9 +117,9 @@ export default function SignupPage() {
               className="text-center py-8"
             >
               <CheckCircle2 className="w-16 h-16 mx-auto mb-4 text-green-500" />
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                 Account Created!
-              </h2>
+              </h3>
               <p className="text-gray-600 dark:text-gray-400 mb-4">
                 Redirecting to checkout...
               </p>
@@ -128,7 +128,7 @@ export default function SignupPage() {
             <form onSubmit={handleSignup} className="space-y-5">
               {error && (
                 <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                  <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
                   <p className="text-sm text-red-800 dark:text-red-200">
                     {error}
                   </p>
@@ -236,7 +236,7 @@ export default function SignupPage() {
 
               <Button
                 type="submit"
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-6"
+                className="w-full font-semibold py-6 text-xs"
                 disabled={loading}
               >
                 {loading
@@ -244,7 +244,7 @@ export default function SignupPage() {
                   : "Create Account & Continue to Checkout"}
               </Button>
 
-              <div className="text-center text-sm text-gray-600 dark:text-gray-400">
+              <div className="text-center text-xs text-gray-600 dark:text-gray-400">
                 Already have an account?{" "}
                 <Link
                   href="/login"

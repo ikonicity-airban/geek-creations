@@ -14,28 +14,30 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
 import { useCart } from "@/lib/cart-context";
+import { IconShoppingBagPlus } from "@tabler/icons-react";
 
 export default function CartPage() {
   const { cart, removeFromCart, updateQuantity } = useCart();
 
   if (cart.items.length === 0) {
     return (
-      <div className="max-w-7xl mx-auto px-6 py-20 text-center">
+      <div className="max-w-7xl min-h-[80vh] mx-auto px-6 py-20 text-center flex flex-col items-center justify-center">
         <div className="pt-10" />
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col items-center justify-center h-full"
         >
-          <ShoppingBag className="w-24 h-24 mx-auto mb-6 text-gray-400" />
-          <h1 className="text-4xl font-black text-gray-900 dark:text-white mb-4">
+          <IconShoppingBagPlus className="w-24 h-24 mx-auto mb-6 text-muted-foreground" />
+          <h3 className="text-4xl font-black text-foreground mb-4">
             Your Cart is Empty
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto">
+          </h3>
+          <p className="text-muted-foreground mb-8 max-w-md mx-auto">
             Looks like you haven&#39;t added any items to your cart yet. Start
             shopping to find your perfect geek gear!
           </p>
           <Link href="/collections/all">
-            <Button size="lg" className="bg-indigo-600 hover:bg-indigo-700">
+            <Button size="lg">
               <ShoppingBag className="w-5 h-5 mr-2" />
               Start Shopping
             </Button>
@@ -57,7 +59,7 @@ export default function CartPage() {
           <h1 className="text-4xl font-black text-gray-900 dark:text-white">
             Shopping Cart
           </h1>
-          <div className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
+          <div className="flex items-center mt-2 gap-2 text-sm font-semibold text-gray-900 dark:text-white">
             <CartIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             <span>
               {cart.item_count} {cart.item_count === 1 ? "item" : "items"}
@@ -74,11 +76,11 @@ export default function CartPage() {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="bg-white/85 dark:bg-gray-800/85 backdrop-blur rounded-xl p-6 shadow-sm border border-gray-200/70 dark:border-gray-700/70"
+                className="dark:bg-card backdrop-blur rounded-xl p-6 shadow-sm border border-border dark:border-border"
               >
-                <div className="flex gap-6">
+                <div className="flex gap-6 flex-col sm:flex-row">
                   {/* Product Image */}
-                  <div className="relative w-24 h-24 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 flex-shrink-0">
+                  <div className="relative size-10 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 shrink-0">
                     {item.image ? (
                       <Image
                         src={item.image}
@@ -96,7 +98,7 @@ export default function CartPage() {
                   {/* Product Info */}
                   <div className="flex-1">
                     <Link href={`/products/${item.product_id}`}>
-                      <h3 className="font-bold text-lg text-gray-900 dark:text-white hover:text-indigo-600 mb-1">
+                      <h3 className="font-bold text-lg text-gray-900 dark:text-white hover:text-indigo-600 mb-1 truncate">
                         {item.product_title}
                       </h3>
                     </Link>
@@ -104,29 +106,31 @@ export default function CartPage() {
                       {item.variant_title}
                     </p>
 
-                    <div className="flex items-center justify-between">
+                    <div className="flex md:items-center justify-between">
                       {/* Quantity Controls */}
                       <div className="flex items-center gap-3">
-                        <button
+                        <Button
+                          variant="outline"
+                          size="icon-sm"
                           onClick={() =>
                             updateQuantity(item.variant_id, item.quantity - 1)
                           }
-                          className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center transition"
                         >
                           <Minus className="w-4 h-4" />
-                        </button>
+                        </Button>
                         <span className="w-8 text-center font-semibold text-gray-900 dark:text-white">
                           {item.quantity}
                         </span>
-                        <button
+                        <Button
+                          size="icon-sm"
+                          variant="outline"
                           onClick={() =>
                             updateQuantity(item.variant_id, item.quantity + 1)
                           }
                           disabled={item.quantity >= item.max_quantity}
-                          className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center transition disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <Plus className="w-4 h-4" />
-                        </button>
+                        </Button>
                       </div>
 
                       {/* Price */}
@@ -142,24 +146,20 @@ export default function CartPage() {
                   </div>
 
                   {/* Remove Button */}
-                  <button
+                  <Button
+                    variant="outline"
                     onClick={() => removeFromCart(item.variant_id)}
-                    className="text-gray-400 hover:text-red-500 transition flex-shrink-0"
+                    className="text-gray-400 hover:text-red-500 transition shrink-0 absolute sm:relative max-sm:top-4 max-sm:right-4"
                     aria-label="Remove item"
                   >
                     <Trash2 className="w-5 h-5" />
-                  </button>
+                  </Button>
                 </div>
               </motion.div>
             ))}
 
             <Link href="/collections/all">
-              <Button
-                variant="outline"
-                className="w-full bg-white/70 dark:bg-transparent"
-              >
-                Continue Shopping
-              </Button>
+              <Button className="w-full">Continue Shopping</Button>
             </Link>
           </div>
 
@@ -169,11 +169,11 @@ export default function CartPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="bg-white/85 dark:bg-gray-800/85 backdrop-blur rounded-xl p-6 shadow-lg border border-gray-200/70 dark:border-gray-700/70 sticky top-24"
+              className="bg-card backdrop-blur rounded-xl p-6 shadow-lg border border-gray-200/70 dark:border-gray-700/70 sticky top-24"
             >
-              <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-6">
+              <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-6">
                 Order Summary
-              </h2>
+              </h3>
 
               <div className="space-y-4 mb-6">
                 <div className="flex justify-between text-gray-600 dark:text-gray-400">
@@ -223,10 +223,7 @@ export default function CartPage() {
               </div>
 
               <Link href="/checkout">
-                <Button
-                  size="lg"
-                  className="w-full bg-indigo-600 hover:bg-indigo-700 h-14 text-lg"
-                >
+                <Button className="w-full bg-indigo-600 hover:bg-indigo-700 h-12 text-base">
                   Proceed to Checkout
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>

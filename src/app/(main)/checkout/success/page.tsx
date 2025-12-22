@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { CheckCircle2, Package, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
-export default function CheckoutSuccessPage() {
+function CheckoutSuccessContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [orderNumber, setOrderNumber] = useState<string | null>(null);
@@ -72,15 +72,19 @@ export default function CheckoutSuccessPage() {
                 </p>
               </div>
               <p className="text-sm text-indigo-800 dark:text-indigo-300">
-                We're processing your order and will send you shipping updates via email.
-                You'll receive tracking information once your order ships.
+                We're processing your order and will send you shipping updates
+                via email. You'll receive tracking information once your order
+                ships.
               </p>
             </div>
           </div>
 
           <div className="space-y-4">
             <Link href="/collections/all">
-              <Button size="lg" className="w-full bg-indigo-600 hover:bg-indigo-700">
+              <Button
+                size="lg"
+                className="w-full bg-indigo-600 hover:bg-indigo-700"
+              >
                 Continue Shopping
               </Button>
             </Link>
@@ -103,5 +107,24 @@ export default function CheckoutSuccessPage() {
         </div>
       </motion.div>
     </div>
+  );
+}
+
+export default function CheckoutSuccessPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="max-w-2xl mx-auto px-6 py-20">
+          <div className="pt-10" />
+          <div className="text-center">
+            <div className="bg-white/85 dark:bg-gray-800/85 backdrop-blur rounded-2xl p-12 shadow-xl border border-gray-200/70 dark:border-gray-700/70">
+              <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+            </div>
+          </div>
+        </div>
+      }
+    >
+      <CheckoutSuccessContent />
+    </Suspense>
   );
 }

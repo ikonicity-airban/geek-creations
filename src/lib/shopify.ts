@@ -1,10 +1,16 @@
 // lib/shopify.ts - Shopify API utilities
-const shopifyDomain = process.env.SHOPIFY_STORE_DOMAIN!;
-const accessToken = process.env.SHOPIFY_ACCESS_TOKEN!;
+const shopifyDomain = process.env.SHOPIFY_STORE_DOMAIN;
+const accessToken = process.env.SHOPIFY_ACCESS_TOKEN;
+
+if (!shopifyDomain || !accessToken) {
+  console.error(
+    "Missing Shopify environment variables. Please set SHOPIFY_STORE_DOMAIN and SHOPIFY_ACCESS_TOKEN"
+  );
+}
 
 type ShopifyGraphQLResponse<T> = {
   data: T;
-  errors?: { message: string }[];
+  errors?: { message: string; extensions?: { code: string } }[];
 };
 
 export async function shopifyFetch<T>({
@@ -14,23 +20,48 @@ export async function shopifyFetch<T>({
   query: string;
   variables?: Record<string, unknown>;
 }): Promise<T> {
-  const response = await fetch(`https://${shopifyDomain}/admin/api/2024-10/graphql.json`, {
-    method: 'POST',
+  if (!shopifyDomain || !accessToken) {
+    throw new Error(
+      "Shopify API credentials are not configured. Please set SHOPIFY_STORE_DOMAIN and SHOPIFY_ACCESS_TOKEN environment variables."
+    );
+  }
+
+  const url = `https://${shopifyDomain}/admin/api/2024-10/graphql.json`;
+
+  const response = await fetch(url, {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
-      'X-Shopify-Access-Token': accessToken,
+      "Content-Type": "application/json",
+      "X-Shopify-Access-Token": accessToken,
     },
     body: JSON.stringify({ query, variables }),
   });
 
-  if (!response.ok) {
-    throw new Error(`Shopify API error: ${response.statusText}`);
+  // Try to parse response body even if status is not OK
+  let json: ShopifyGraphQLResponse<T> | null = null;
+  try {
+    json = (await response.json()) as ShopifyGraphQLResponse<T>;
+  } catch {
+    // If JSON parsing fails, throw with status text
+    if (!response.ok) {
+      throw new Error(
+        `Shopify API error: ${response.status} ${response.statusText}`
+      );
+    }
+    throw new Error("Failed to parse Shopify API response");
   }
 
-  const json = (await response.json()) as ShopifyGraphQLResponse<T>;
-
+  // Check for GraphQL errors first (these can occur even with 200 status)
   if (json.errors && json.errors.length > 0) {
-    throw new Error(json.errors[0].message);
+    const error = json.errors[0];
+    const errorCode = error.extensions?.code || "UNKNOWN";
+    throw new Error(`Shopify GraphQL error [${errorCode}]: ${error.message}`);
+  }
+
+  // Check HTTP status after parsing JSON
+  if (!response.ok) {
+    const errorMessage = json?.errors?.[0]?.message || response.statusText;
+    throw new Error(`Shopify API error [${response.status}]: ${errorMessage}`);
   }
 
   return json.data;
@@ -239,7 +270,9 @@ interface CreateCheckoutResponse {
   };
 }
 
-export async function createCheckout(lineItems: Array<{ variantId: string; quantity: number }>) {
+export async function createCheckout(
+  lineItems: Array<{ variantId: string; quantity: number }>
+) {
   const query = `
     mutation checkoutCreate($input: CheckoutCreateInput!) {
       checkoutCreate(input: $input) {
@@ -260,7 +293,7 @@ export async function createCheckout(lineItems: Array<{ variantId: string; quant
     query,
     variables: {
       input: {
-        lineItems: lineItems.map(item => ({
+        lineItems: lineItems.map((item) => ({
           variantId: item.variantId,
           quantity: item.quantity,
         })),
@@ -301,6 +334,8 @@ interface CreateOrderInput {
     phone: string;
   };
   financialStatus?: "pending" | "paid" | "authorized";
+  note?: string;
+  tags?: string[];
 }
 
 interface CreateOrderResponse {
@@ -334,9 +369,42 @@ export async function createOrder(input: CreateOrderInput) {
     }
   `;
 
-  const orderInput: any = {
+  interface OrderInputType {
+    email: string;
+    lineItems: Array<{
+      variantId: string;
+      quantity: number;
+    }>;
+    shippingAddress: {
+      firstName: string;
+      lastName: string;
+      address1: string;
+      address2: string;
+      city: string;
+      province: string;
+      country: string;
+      zip: string;
+      phone: string;
+    };
+    billingAddress?: {
+      firstName: string;
+      lastName: string;
+      address1: string;
+      address2: string;
+      city: string;
+      province: string;
+      country: string;
+      zip: string;
+      phone: string;
+    };
+    financialStatus: "pending" | "paid" | "authorized";
+    note?: string;
+    tags?: string[];
+  }
+
+  const orderInput: OrderInputType = {
     email: input.email,
-    lineItems: input.lineItems.map(item => ({
+    lineItems: input.lineItems.map((item) => ({
       variantId: item.variantId,
       quantity: item.quantity,
     })),
@@ -368,6 +436,15 @@ export async function createOrder(input: CreateOrderInput) {
     };
   }
 
+  // Add note and tags for manual fulfillment
+  if (input.note) {
+    orderInput.note = input.note;
+  }
+
+  if (input.tags && input.tags.length > 0) {
+    orderInput.tags = input.tags;
+  }
+
   const data = await shopifyFetch<CreateOrderResponse>({
     query: mutation,
     variables: {
@@ -391,7 +468,9 @@ interface GetProductByHandleResponse {
   product: ShopifyProduct | null;
 }
 
-export async function getProductByHandle(handle: string): Promise<ShopifyProduct | null> {
+export async function getProductByHandle(
+  handle: string
+): Promise<ShopifyProduct | null> {
   const query = `
     query GetProduct($handle: String!) {
       product(handle: $handle) {

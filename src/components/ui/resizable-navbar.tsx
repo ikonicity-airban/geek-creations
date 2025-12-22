@@ -8,7 +8,13 @@ import {
   useScroll,
 } from "framer-motion";
 
-import React, { useRef, useState, createContext, useContext } from "react";
+import React, {
+  useRef,
+  useState,
+  createContext,
+  useContext,
+  useEffect,
+} from "react";
 import { Logo } from "./logo";
 
 interface NavbarProps {
@@ -49,14 +55,56 @@ interface MobileNavMenuProps {
   onClose: () => void;
 }
 
-const NavbarVisibilityContext = createContext<boolean>(false);
+interface NavbarContextValue {
+  visible: boolean;
+  width: number;
+  setWidth: (width: number) => void;
+  isResizing: boolean;
+  setIsResizing: (isResizing: boolean) => void;
+}
 
-export const useNavbarVisibility = () => useContext(NavbarVisibilityContext);
+const NavbarVisibilityContext = createContext<NavbarContextValue>({
+  visible: false,
+  width: 60,
+  setWidth: () => {},
+  isResizing: false,
+  setIsResizing: () => {},
+});
+
+export const useNavbarVisibility = () => {
+  const context = useContext(NavbarVisibilityContext);
+  return context.visible;
+};
+
+export const useNavbarResize = () => {
+  const context = useContext(NavbarVisibilityContext);
+  return {
+    width: context.width,
+    setWidth: context.setWidth,
+    isResizing: context.isResizing,
+    setIsResizing: context.setIsResizing,
+  };
+};
 
 export const Navbar = ({ children, className }: NavbarProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollY } = useScroll();
   const [visible, setVisible] = useState<boolean>(false);
+  const [width, setWidth] = useState<number>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("navbar-width");
+      return saved ? parseFloat(saved) : 60;
+    }
+    return 60;
+  });
+  const [isResizing, setIsResizing] = useState<boolean>(false);
+
+  // Save width to localStorage when it changes
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("navbar-width", width.toString());
+    }
+  }, [width]);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     if (latest > 100) {
@@ -66,8 +114,16 @@ export const Navbar = ({ children, className }: NavbarProps) => {
     }
   });
 
+  const contextValue: NavbarContextValue = {
+    visible,
+    width,
+    setWidth,
+    isResizing,
+    setIsResizing,
+  };
+
   return (
-    <NavbarVisibilityContext.Provider value={visible}>
+    <NavbarVisibilityContext.Provider value={contextValue}>
       <motion.div
         ref={ref}
         className={cn(
@@ -89,24 +145,39 @@ export const Navbar = ({ children, className }: NavbarProps) => {
 };
 
 export const NavBody = ({ children, className, visible }: NavBodyProps) => {
+  const { width, isResizing } = useNavbarResize();
+  const navRef = useRef<HTMLDivElement>(null);
+  const startWidthRef = useRef<number>(width);
+
+  // Update startWidthRef when width changes (but not during resize)
+  useEffect(() => {
+    if (!isResizing) {
+      startWidthRef.current = width;
+    }
+  }, [width, isResizing]);
+
+  const displayWidth = visible ? width : 100;
+
   return (
     <motion.div
+      ref={navRef}
       animate={{
         backdropFilter: visible ? "blur(10px)" : "none",
         boxShadow: visible
           ? "0 0 24px rgba(34, 42, 53, 0.06), 0 1px 1px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(34, 42, 53, 0.04), 0 0 4px rgba(34, 42, 53, 0.08), 0 16px 68px rgba(47, 48, 55, 0.05), 0 1px 0 rgba(255, 255, 255, 0.1) inset"
           : "none",
-        width: visible ? "60%" : "100%",
+        width: `${displayWidth}%`,
         y: visible ? 20 : 0,
       }}
       transition={{
         type: "spring",
-        stiffness: 200,
-        damping: 50,
+        stiffness: isResizing ? 400 : 200,
+        damping: isResizing ? 30 : 50,
       }}
       className={cn(
         "relative z-60 mx-auto hidden w-full max-w-7xl md:min-w-[600px] flex-row items-center justify-between self-start rounded-full bg-transparent px-4 py-2 lg:flex dark:bg-transparent",
         visible && "bg-white/80 dark:bg-neutral-950/80",
+        isResizing && "select-none",
         className
       )}
     >
@@ -152,14 +223,8 @@ export const MobileNav = ({ children, className, visible }: MobileNavProps) => {
     <motion.div
       animate={{
         backdropFilter: visible ? "blur(10px)" : "none",
-        boxShadow: visible
-          ? "0 0 24px rgba(34, 42, 53, 0.06), 0 1px 1px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(34, 42, 53, 0.04), 0 0 4px rgba(34, 42, 53, 0.08), 0 16px 68px rgba(47, 48, 55, 0.05), 0 1px 0 rgba(255, 255, 255, 0.1) inset"
-          : "none",
-        width: visible ? "90%" : "100%",
-        paddingRight: visible ? "12px" : "0px",
-        paddingLeft: visible ? "12px" : "0px",
-        borderRadius: visible ? "4px" : "2rem",
-        // y: visible ? 20 : 0,
+
+        y: visible ? 20 : 0,
       }}
       transition={{
         type: "spring",
@@ -167,7 +232,7 @@ export const MobileNav = ({ children, className, visible }: MobileNavProps) => {
         damping: 50,
       }}
       className={cn(
-        "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between bg-transparent px-0 py-2 lg:hidden",
+        "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between bg-transparent px-0 lg:hidden rounded-xl",
         visible && "bg-white/80 dark:bg-neutral-950/80",
         className
       )}
@@ -268,7 +333,7 @@ export const NavbarButton = ({
     secondary: "bg-transparent shadow-none dark:text-white",
     dark: "bg-black text-white shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset]",
     gradient:
-      "bg-gradient-to-b from-blue-500 to-blue-700 text-white shadow-[0px_2px_0px_0px_rgba(255,255,255,0.3)_inset]",
+      "bg-linear-to-b from-blue-500 to-blue-700 text-white shadow-[0px_2px_0px_0px_rgba(255,255,255,0.3)_inset]",
   };
 
   return (

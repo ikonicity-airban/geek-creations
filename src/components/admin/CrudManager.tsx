@@ -85,7 +85,10 @@ export default function CrudManager<T extends Record<string, any>>({
         const value = formData[field.name];
         if (field.type === "tags" && typeof value === "string") {
           payload[field.name] = value
-            ? value.split(",").map((t: string) => t.trim()).filter(Boolean)
+            ? value
+                .split(",")
+                .map((t: string) => t.trim())
+                .filter(Boolean)
             : [];
         } else if (field.type === "number") {
           payload[field.name] = value ? Number(value) : undefined;
@@ -107,12 +110,16 @@ export default function CrudManager<T extends Record<string, any>>({
       });
 
       if (!res.ok) {
-        const error = await res.json().catch(() => ({ error: "Operation failed" }));
+        const error = await res
+          .json()
+          .catch(() => ({ error: "Operation failed" }));
         throw new Error(error.error || "Operation failed");
       }
 
       showToast(
-        `${config.entityName} ${editingItem ? "updated" : "created"} successfully`,
+        `${config.entityName} ${
+          editingItem ? "updated" : "created"
+        } successfully`,
         "success"
       );
       setIsModalOpen(false);
@@ -120,7 +127,11 @@ export default function CrudManager<T extends Record<string, any>>({
     } catch (error: any) {
       console.error("Operation failed", error);
       showToast(
-        `Failed to ${editingItem ? "update" : "create"} ${config.entityName.toLowerCase()}: ${error.message || "Unknown error"}`,
+        `Failed to ${
+          editingItem ? "update" : "create"
+        } ${config.entityName.toLowerCase()}: ${
+          error.message || "Unknown error"
+        }`,
         "error"
       );
     } finally {
@@ -147,13 +158,13 @@ export default function CrudManager<T extends Record<string, any>>({
   const filteredItems = items.filter((item) => {
     if (!searchQuery) return true;
     const searchLower = searchQuery.toLowerCase();
-    
+
     // Use custom search fields if provided, otherwise use display fields
     if (config.searchFields) {
       const searchableText = config.searchFields(item).join(" ").toLowerCase();
       return searchableText.includes(searchLower);
     }
-    
+
     const display = config.displayFields(item);
     return (
       display.primary.toLowerCase().includes(searchLower) ||
@@ -226,7 +237,13 @@ export default function CrudManager<T extends Record<string, any>>({
               />
             ) : (
               <input
-                type={field.type === "tags" ? "text" : field.type === "number" ? "number" : field.type}
+                type={
+                  field.type === "tags"
+                    ? "text"
+                    : field.type === "number"
+                    ? "number"
+                    : field.type
+                }
                 placeholder={field.placeholder}
                 value={formData[field.name] || ""}
                 onChange={(e) =>
@@ -320,7 +337,7 @@ export default function CrudManager<T extends Record<string, any>>({
                     onClick={() => config.onItemClick?.(item)}
                   >
                     {display.imageUrl && (
-                      <div className="w-16 h-16 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 flex-shrink-0">
+                      <div className="w-16 h-16 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shrink-0">
                         <img
                           src={display.imageUrl}
                           alt={display.primary}
@@ -335,7 +352,8 @@ export default function CrudManager<T extends Record<string, any>>({
                           <span
                             className="text-xs px-2 py-1 rounded-full"
                             style={{
-                              backgroundColor: display.badge.color || config.palette.secondary,
+                              backgroundColor:
+                                display.badge.color || config.palette.secondary,
                               color: "#ffffff",
                             }}
                           >
@@ -347,7 +365,10 @@ export default function CrudManager<T extends Record<string, any>>({
                         {display.secondary}
                       </div>
                     </div>
-                    <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                    <div
+                      className="flex items-center gap-2"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       {config.customActions?.(item)}
                       <button
                         onClick={() => openEditModal(item)}
@@ -433,8 +454,8 @@ export default function CrudManager<T extends Record<string, any>>({
               Confirm Delete
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
-              Are you sure you want to delete this {config.entityName.toLowerCase()}?
-              This action cannot be undone.
+              Are you sure you want to delete this{" "}
+              {config.entityName.toLowerCase()}? This action cannot be undone.
             </p>
             <div className="flex gap-3">
               <button
@@ -485,4 +506,3 @@ export default function CrudManager<T extends Record<string, any>>({
     </div>
   );
 }
-

@@ -5,14 +5,8 @@ import { motion } from "framer-motion";
 import { ShoppingCart, Check, Loader2 } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 import { Product, Variant } from "@/types";
-
-const COLORS = {
-  primary: "#401268",
-  secondary: "#c5a3ff",
-  background: "#f8f6f0",
-  accentWarm: "#e2ae3d",
-  accentBold: "#e21b35",
-};
+import { buttonVariants } from "../ui/button";
+import { cn } from "@/lib/utils";
 
 interface AddToCartButtonProps {
   product: Product;
@@ -99,10 +93,9 @@ export default function AddToCartButton({
       whileTap={!isDisabled ? { scale: 0.98 } : {}}
       onClick={handleAddToCart}
       disabled={isDisabled}
-      className={`w-full py-4 rounded-xl font-bold text-white text-lg flex items-center justify-center gap-2 transition-all ${
-        isDisabled ? "opacity-50 cursor-not-allowed" : "hover:opacity-90"
-      } ${className}`}
-      style={{ backgroundColor: COLORS.primary }}
+      className={buttonVariants({
+        className: cn(className, "flex items-center gap-2 w-full"),
+      })}
     >
       {isAdding ? (
         <>

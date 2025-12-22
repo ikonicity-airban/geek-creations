@@ -20,6 +20,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import type { CheckoutData, ShippingAddress } from "@/types";
+import { cn } from "@/lib/utils";
 
 export default function CheckoutPage() {
   const { cart, clearCart } = useCart();
@@ -135,7 +136,9 @@ export default function CheckoutPage() {
         },
         body: JSON.stringify({
           ...formData,
-          billing_address: useBillingAddress ? billingAddress : formData.shipping_address,
+          billing_address: useBillingAddress
+            ? billingAddress
+            : formData.shipping_address,
           cart_items: cart.items,
         }),
       });
@@ -147,7 +150,12 @@ export default function CheckoutPage() {
       }
 
       // If payment method requires redirect (card, bank transfer, or crypto with URL)
-      if (data.payment_url && (formData.payment_method === "card" || formData.payment_method === "bank_transfer" || (formData.payment_method === "crypto" && data.requires_redirect))) {
+      if (
+        data.payment_url &&
+        (formData.payment_method === "card" ||
+          formData.payment_method === "bank_transfer" ||
+          (formData.payment_method === "crypto" && data.requires_redirect))
+      ) {
         window.location.href = data.payment_url;
         return;
       }
@@ -157,7 +165,9 @@ export default function CheckoutPage() {
       clearCart();
       setStep("success");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred during checkout");
+      setError(
+        err instanceof Error ? err.message : "An error occurred during checkout"
+      );
     } finally {
       setLoading(false);
     }
@@ -203,7 +213,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-12">
+    <div className="max-w-7xl mx-auto px-4 py-12">
       <div className="pt-10" />
 
       {step === "success" ? (
@@ -212,30 +222,22 @@ export default function CheckoutPage() {
           animate={{ opacity: 1, scale: 1 }}
           className="max-w-2xl mx-auto text-center"
         >
-          <div className="bg-white/85 dark:bg-gray-800/85 backdrop-blur rounded-2xl p-12 shadow-xl border border-gray-200/70 dark:border-gray-700/70">
+          <div className="bg-card backdrop-blur rounded-2xl p-12 shadow-xl border ">
             <CheckCircle2 className="w-20 h-20 mx-auto mb-6 text-green-500" />
-            <h1 className="text-4xl font-black text-gray-900 dark:text-white mb-4">
-              Order Confirmed!
-            </h1>
-            <p className="text-lg text-gray-600 dark:text-gray-400 mb-2">
-              Thank you for your purchase
-            </p>
+            <h3 className="text-3xl font-black mb-4">Order Confirmed!</h3>
+            <p className=" mb-2">Thank you for your purchase</p>
             {orderId && (
               <p className="text-sm text-gray-500 dark:text-gray-500 mb-8">
                 Order #{orderId}
               </p>
             )}
-            <div className="space-y-4">
+            <div className="flex flex-col gap-6">
               <Link href="/collections/all">
-                <Button size="lg" className="bg-indigo-600 hover:bg-indigo-700">
-                  Continue Shopping
-                </Button>
+                <Button>Continue Shopping</Button>
               </Link>
-              <div>
-                <Link href="/orders" className="text-indigo-600 dark:text-indigo-400 hover:underline text-sm">
-                  View Order Details
-                </Link>
-              </div>
+              <Link href="/orders">
+                <Button variant="link">View Order Details</Button>
+              </Link>
             </div>
           </div>
         </motion.div>
@@ -246,18 +248,20 @@ export default function CheckoutPage() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white/85 dark:bg-gray-800/85 backdrop-blur rounded-xl p-6 shadow-sm border border-gray-200/70 dark:border-gray-700/70"
+              className="bg-card backdrop-blur rounded-xl p-6 shadow-sm border"
             >
               {step === "info" ? (
                 <form onSubmit={handleShippingSubmit} className="space-y-6">
                   <div>
-                    <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-6">
+                    <h3 className="text-2xl font-black mb-6">
                       Shipping Information
-                    </h2>
+                    </h3>
                     {error && (
                       <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-start gap-3 mb-6">
-                        <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
-                        <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
+                        <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+                        <p className="text-sm text-red-800 dark:text-red-200">
+                          {error}
+                        </p>
                       </div>
                     )}
 
@@ -273,8 +277,8 @@ export default function CheckoutPage() {
                         placeholder="you@example.com"
                         required
                       />
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        We'll send your order confirmation to this email
+                      <p className="text-xs text-gray-500 dark:mt-1">
+                        {"We'll"} send your order confirmation to this email
                       </p>
                     </div>
 
@@ -372,7 +376,7 @@ export default function CheckoutPage() {
                           name="country"
                           value={formData.shipping_address.country}
                           onChange={handleChange}
-                          className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                          className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700"
                           required
                         >
                           <option value="Nigeria">Nigeria</option>
@@ -418,16 +422,17 @@ export default function CheckoutPage() {
                         onChange={(e) => setUseBillingAddress(e.target.checked)}
                         className="w-4 h-4 rounded border-gray-300"
                       />
-                      <label htmlFor="useBilling" className="text-sm text-gray-700 dark:text-gray-300">
+                      <label
+                        htmlFor="useBilling"
+                        className="text-sm text-gray-700 dark:text-gray-300"
+                      >
                         Use different billing address
                       </label>
                     </div>
 
                     {useBillingAddress && (
                       <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                        <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
-                          Billing Address
-                        </h3>
+                        <h3 className="font-semibold mb-4">Billing Address</h3>
                         <div className="grid grid-cols-2 gap-4 mb-4">
                           <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -506,63 +511,77 @@ export default function CheckoutPage() {
                   </div>
                 </form>
               ) : (
-                <form onSubmit={handlePaymentSubmit} className="space-y-6">
+                <form
+                  onSubmit={handlePaymentSubmit}
+                  className="flex flex-col gap-6"
+                >
                   <div>
                     <button
                       type="button"
                       onClick={() => setStep("info")}
-                      className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-6"
+                      className="flex items-center gap-2 mb-6 text-muted-foreground"
                     >
-                      <ArrowLeft className="w-4 h-4" />
+                      <ArrowLeft className="size-4 sm:size-6" />
                       Back to Shipping
                     </button>
 
-                    <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-6">
-                      Payment Method
-                    </h2>
+                    <h3 className="text-2xl font-black mb-6">Payment Method</h3>
                     {error && (
                       <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-start gap-3 mb-6">
-                        <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
-                        <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
+                        <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-500 shrink-0 mt-0.5" />
+                        <p className="text-sm text-red-800 dark:text-red-100">
+                          {error}
+                        </p>
                       </div>
                     )}
 
                     <div className="space-y-4">
-                      <label className="flex items-center gap-4 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:border-indigo-500 transition">
+                      <label
+                        className={cn(
+                          "flex items-center gap-4 p-4 border rounded-lg cursor-pointer transition",
+                          {
+                            "border-accent": formData.payment_method === "card",
+                          }
+                        )}
+                      >
                         <input
                           type="radio"
                           name="payment_method"
                           value="card"
                           checked={formData.payment_method === "card"}
                           onChange={handleChange}
-                          className="w-5 h-5"
+                          className="w-5 h-5 accent-accent"
                         />
-                        <CreditCard className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+                        <CreditCard className="w-6 h-6" />
                         <div className="flex-1">
-                          <div className="font-semibold text-gray-900 dark:text-white">
-                            Credit/Debit Card
-                          </div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400">
+                          <div className="font-semibold">Credit/Debit Card</div>
+                          <div className="max-sm:text-xs ">
                             Pay with Paystack (Visa, Mastercard, Verve)
                           </div>
                         </div>
                       </label>
 
-                      <label className="flex items-center gap-4 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:border-indigo-500 transition">
+                      <label
+                        className={cn(
+                          "flex items-center gap-4 p-4 border rounded-lg cursor-pointer transition",
+                          {
+                            "border-accent":
+                              formData.payment_method === "crypto",
+                          }
+                        )}
+                      >
                         <input
                           type="radio"
                           name="payment_method"
                           value="crypto"
                           checked={formData.payment_method === "crypto"}
                           onChange={handleChange}
-                          className="w-5 h-5"
+                          className="w-5 h-5 accent-accent"
                         />
-                        <Wallet className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+                        <Wallet className="w-6 h-6 " />
                         <div className="flex-1">
-                          <div className="font-semibold text-gray-900 dark:text-white">
-                            Cryptocurrency
-                          </div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400">
+                          <div className="font-semibold">Cryptocurrency</div>
+                          <div className="text-sm ">
                             Pay with USDC or SOL on Solana
                           </div>
                         </div>
@@ -570,14 +589,18 @@ export default function CheckoutPage() {
 
                       {formData.payment_method === "crypto" && (
                         <div className="ml-12 mb-4">
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Select Currency
+                          <label className="block">
+                            <span className="text-sm font-semibold">
+                              Select Currency
+                            </span>
                           </label>
                           <select
                             name="crypto_currency"
                             value={formData.crypto_currency || "USDC"}
                             onChange={handleChange}
-                            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                            className={cn(
+                              "flex items-center gap-4 p-4 border rounded-lg cursor-pointer transition"
+                            )}
                           >
                             <option value="USDC">USDC (Solana)</option>
                             <option value="SOL">SOL (Solana)</option>
@@ -585,41 +608,50 @@ export default function CheckoutPage() {
                         </div>
                       )}
 
-                      <label className="flex items-center gap-4 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:border-indigo-500 transition">
+                      <label
+                        className={cn(
+                          "flex items-center gap-4 p-4 border rounded-lg cursor-pointer transition",
+                          {
+                            "border-accent":
+                              formData.payment_method === "bank_transfer",
+                          }
+                        )}
+                      >
                         <input
                           type="radio"
                           name="payment_method"
                           value="bank_transfer"
                           checked={formData.payment_method === "bank_transfer"}
                           onChange={handleChange}
-                          className="w-5 h-5"
+                          className="w-5 h-5 accent-accent"
                         />
-                        <Building2 className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+                        <Building2 className="w-6 h-6 " />
                         <div className="flex-1">
-                          <div className="font-semibold text-gray-900 dark:text-white">
-                            Bank Transfer
-                          </div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400">
+                          <div className="font-semibold">Bank Transfer</div>
+                          <div className="text-sm ">
                             Direct bank transfer (Paystack)
                           </div>
                         </div>
                       </label>
                     </div>
 
-                    <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg flex items-start gap-3">
-                      <Lock className="w-5 h-5 text-gray-600 dark:text-gray-400 flex-shrink-0 mt-0.5" />
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Your payment information is secure and encrypted. We never store your card details.
+                    <div className="mt-6 p-4 pb-6 bg-background/60 rounded-lg flex items-start gap-3">
+                      <Lock className="size-4 sm:size-6 text-muted-foreground shrink-0 mt-0.5" />
+                      <p className="max-sm:text-xs">
+                        Your payment information is secure and encrypted. We
+                        never store your card details.
                       </p>
                     </div>
 
                     <Button
                       type="submit"
                       size="lg"
-                      className="w-full bg-indigo-600 hover:bg-indigo-700"
+                      className="w-full -mt-2"
                       disabled={loading}
                     >
-                      {loading ? "Processing..." : `Complete Order - ₦${cart.total.toLocaleString()}`}
+                      {loading
+                        ? "Processing..."
+                        : `Complete Order - ₦${cart.total.toLocaleString()}`}
                     </Button>
                   </div>
                 </form>
@@ -633,16 +665,14 @@ export default function CheckoutPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="bg-white/85 dark:bg-gray-800/85 backdrop-blur rounded-xl p-6 shadow-lg border border-gray-200/70 dark:border-gray-700/70 sticky top-24"
+              className="bg-card backdrop-blur rounded-xl p-6 shadow-lg border border-border sticky top-24"
             >
-              <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-6">
-                Order Summary
-              </h2>
+              <h3 className="text-2xl font-black mb-6">Order Summary</h3>
 
               <div className="space-y-4 mb-6">
                 {cart.items.map((item) => (
                   <div key={item.variant_id} className="flex gap-4">
-                    <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 flex-shrink-0">
+                    <div className="relative w-16 h-16 rounded-lg overflow-hidden border-foreground/50 border shrink-0">
                       {item.image ? (
                         <Image
                           src={item.image}
@@ -651,19 +681,19 @@ export default function CheckoutPage() {
                           className="object-cover"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
+                        <div className="w-full h-full flex items-center justify-center text-xs">
                           No Image
                         </div>
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-sm text-gray-900 dark:text-white truncate">
+                      <p className="font-semibold text-sm truncate">
                         {item.product_title}
                       </p>
-                      <p className="text-xs text-gray-600 dark:text-gray-400">
+                      <p className="text-xs ">
                         {item.variant_title} × {item.quantity}
                       </p>
-                      <p className="text-sm font-bold text-gray-900 dark:text-white mt-1">
+                      <p className="text-sm font-bold mt-1">
                         ₦{(item.price * item.quantity).toLocaleString()}
                       </p>
                     </div>
@@ -671,20 +701,26 @@ export default function CheckoutPage() {
                 ))}
               </div>
 
-              <div className="space-y-3 mb-6 pt-4 border-t border-gray-200/80 dark:border-gray-700/80">
-                <div className="flex justify-between text-gray-600 dark:text-gray-400">
+              <div className="space-y-3 mb-6 pt-4 border-t border-border">
+                <div className="flex justify-between ">
                   <span>Subtotal</span>
-                  <span className="font-semibold">₦{cart.subtotal.toLocaleString()}</span>
+                  <span className="font-semibold">
+                    ₦{cart.subtotal.toLocaleString()}
+                  </span>
                 </div>
-                <div className="flex justify-between text-gray-600 dark:text-gray-400">
+                <div className="flex justify-between ">
                   <span>Tax (7.5%)</span>
-                  <span className="font-semibold">₦{cart.tax.toLocaleString()}</span>
+                  <span className="font-semibold">
+                    ₦{cart.tax.toLocaleString()}
+                  </span>
                 </div>
-                <div className="flex justify-between text-gray-600 dark:text-gray-400">
+                <div className="flex justify-between ">
                   <span>Shipping</span>
                   <span className="font-semibold">
                     {cart.shipping === 0 ? (
-                      <span className="text-green-600 dark:text-green-400">FREE</span>
+                      <span className="text-green-600 dark:text-green-400">
+                        FREE
+                      </span>
                     ) : (
                       `₦${cart.shipping.toLocaleString()}`
                     )}
@@ -692,8 +728,8 @@ export default function CheckoutPage() {
                 </div>
                 <div className="pt-4 border-t border-gray-200/80 dark:border-gray-700/80">
                   <div className="flex justify-between">
-                    <span className="text-lg font-bold text-gray-900 dark:text-white">Total</span>
-                    <span className="text-2xl font-black text-gray-900 dark:text-white">
+                    <span className="text-lg font-bold">Total</span>
+                    <span className="text-2xl font-black">
                       ₦{cart.total.toLocaleString()}
                     </span>
                   </div>

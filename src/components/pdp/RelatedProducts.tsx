@@ -6,14 +6,7 @@ import { ShoppingCart, Heart } from "lucide-react";
 import { Product } from "@/types";
 import { useCart } from "@/lib/cart-context";
 import Image from "next/image";
-
-const COLORS = {
-  primary: "#401268",
-  secondary: "#c5a3ff",
-  background: "#f8f6f0",
-  accentWarm: "#e2ae3d",
-  accentBold: "#e21b35",
-};
+import { Button } from "../ui/button";
 
 interface RelatedProductsProps {
   products: Product[];
@@ -60,16 +53,10 @@ export default function RelatedProducts({
 
   return (
     <section className="py-12">
-      <h2
-        className="text-3xl font-black mb-8"
-        style={{
-          color: COLORS.primary,
-          fontFamily: "Orbitron, sans-serif",
-        }}
-      >
+      <h3 className="text-2xl md:text-3xl font-black mb-8">
         You Might Also Like
-      </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      </h3>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
         {relatedProducts.map((product, index) => {
           const firstVariant = product.variants[0];
           const mainImage = product.images[0];
@@ -84,9 +71,8 @@ export default function RelatedProducts({
             >
               <Link
                 href={`/products/${product.handle}`}
-                className="group relative block rounded-2xl overflow-hidden"
+                className="group relative block rounded-2xl overflow-hidden bg-card border-border"
                 style={{
-                  background: "rgba(255, 255, 255, 0.7)",
                   backdropFilter: "blur(10px)",
                   border: `1px solid rgba(64, 18, 104, 0.1)`,
                   boxShadow: "0 4px 20px rgba(64, 18, 104, 0.1)",
@@ -97,7 +83,7 @@ export default function RelatedProducts({
                   {mainImage && (
                     <Image
                       width={400}
-                      height={300}
+                      height={250}
                       src={mainImage.src}
                       alt={mainImage.alt || product.title}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
@@ -106,43 +92,31 @@ export default function RelatedProducts({
 
                   {/* Quick Actions */}
                   <div className="absolute inset-0 bg-black/40 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-                    <button
+                    <Button
+                      variant="outline"
                       onClick={(e) => handleQuickAdd(e, product)}
-                      className="p-3 rounded-full bg-white/90 hover:bg-white transition"
-                      style={{ color: COLORS.primary }}
+                      className="p-3 rounded-full transition"
                     >
                       <ShoppingCart className="w-5 h-5" />
-                    </button>
-                    <button
-                      className="p-3 rounded-full bg-white/90 hover:bg-white transition"
-                      style={{ color: COLORS.accentBold }}
-                    >
+                    </Button>
+                    <Button className="p-3 rounded-full transition">
                       <Heart className="w-5 h-5" />
-                    </button>
+                    </Button>
                   </div>
                 </div>
 
                 {/* Content */}
                 <div className="p-4">
-                  <h3
-                    className="text-lg font-bold mb-2 line-clamp-2"
-                    style={{
-                      color: COLORS.primary,
-                      fontFamily: "Orbitron, sans-serif",
-                    }}
-                  >
+                  <h4 className="md:text-lg font-bold mb-2 line-clamp-2 truncate">
                     {product.title}
-                  </h3>
+                  </h4>
                   <div className="flex items-center justify-between">
                     <div>
-                      <p
-                        className="text-xl font-black"
-                        style={{ color: COLORS.primary }}
-                      >
+                      <p className="text-xl font-black text-accent">
                         ₦{firstVariant?.price.toLocaleString() || "0"}
                       </p>
                       {firstVariant?.compare_at_price && (
-                        <p className="text-sm line-through opacity-60">
+                        <p className="text-sm line-through opacity-50">
                           ₦{firstVariant.compare_at_price.toLocaleString()}
                         </p>
                       )}

@@ -3,6 +3,7 @@
 import { motion, useAnimation } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import { Package, Zap, Truck } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export const ProductionDemo = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -58,10 +59,7 @@ export const ProductionDemo = () => {
   }));
 
   return (
-    <section
-      className="py-20 relative overflow-hidden"
-      style={{ backgroundColor: "#ffffff" }}
-    >
+    <section className="py-20 relative overflow-hidden bg-background">
       <div className="max-w-[1024px] mx-auto px-8 md:px-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -69,16 +67,10 @@ export const ProductionDemo = () => {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <h2
-            className="text-3xl md:text-4xl lg:text-5xl font-black mb-4"
-            style={{ color: "#401268" }}
-          >
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-black mb-4 text-accent">
             See It Come to Life
           </h2>
-          <p
-            className="text-base md:text-lg max-w-2xl mx-auto"
-            style={{ color: "rgba(64, 18, 104, 0.8)" }}
-          >
+          <p className="text-base md:text-lg max-w-2xl mx-auto text-muted-foreground">
             Watch your design transform from concept to shipped product
           </p>
         </motion.div>
@@ -86,14 +78,7 @@ export const ProductionDemo = () => {
         {/* Production Animation Container */}
         <div className="relative max-w-3xl mx-auto">
           {/* Main Animation Area */}
-          <div
-            className="relative h-64 rounded-2xl flex items-center justify-center"
-            style={{
-              backgroundColor: "#f8f6f0",
-              borderRadius: "16px",
-              border: "2px solid rgba(197, 163, 255, 0.2)",
-            }}
-          >
+          <div className="relative h-64 rounded-2xl flex items-center justify-center bg-muted border-2 border-secondary/20">
             {/* Central Product Display */}
             <motion.div animate={controls} className="relative z-10">
               <div
@@ -154,12 +139,13 @@ export const ProductionDemo = () => {
               {steps.map((step, index) => (
                 <motion.div
                   key={index}
-                  className="w-2.5 h-2.5 rounded-full"
+                  className={cn(
+                    index === currentStep ? "" : "bg-primary/20",
+                    "w-2.5 h-2.5 rounded-full"
+                  )}
                   style={{
                     backgroundColor:
-                      index === currentStep
-                        ? step.color
-                        : "rgba(64, 18, 104, 0.2)",
+                      index === currentStep ? step.color : undefined,
                   }}
                   animate={{
                     scale: index === currentStep ? 1.5 : 1,
@@ -182,13 +168,14 @@ export const ProductionDemo = () => {
                 className="text-center"
               >
                 <div
-                  className="w-12 h-12 rounded-xl mx-auto mb-2 flex items-center justify-center"
+                  className={cn(
+                    index === currentStep ? "" : "bg-secondary/10 text-primary",
+                    "w-12 h-12 rounded-xl mx-auto mb-2 flex items-center justify-center"
+                  )}
                   style={{
                     backgroundColor:
-                      index === currentStep
-                        ? step.color
-                        : "rgba(197, 163, 255, 0.1)",
-                    color: index === currentStep ? "#ffffff" : "#401268",
+                      index === currentStep ? step.color : undefined,
+                    color: index === currentStep ? "#ffffff" : undefined,
                   }}
                 >
                   {index === 0 && <Package className="w-6 h-6" />}
@@ -196,9 +183,7 @@ export const ProductionDemo = () => {
                   {index === 2 && <Zap className="w-6 h-6" />}
                   {index === 3 && <Truck className="w-6 h-6" />}
                 </div>
-                <h4 className="text-sm font-bold" style={{ color: "#401268" }}>
-                  {step.name}
-                </h4>
+                <h4 className="text-sm font-bold text-primary">{step.name}</h4>
               </motion.div>
             ))}
           </div>
@@ -211,7 +196,7 @@ export const ProductionDemo = () => {
           viewport={{ once: true }}
           className="text-center mt-10"
         >
-          <p className="text-xs" style={{ color: "rgba(64, 18, 104, 0.6)" }}>
+          <p className="text-xs text-muted-foreground">
             * Enhanced animation with particle effects and production sequence
             coming soon
           </p>

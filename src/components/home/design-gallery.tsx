@@ -36,7 +36,7 @@ export const DesignGallery = () => {
             name: d.title ?? `Design ${index + 1}`,
             image: d.thumbnailUrl || d.imageUrl || "/placeholder-design.jpg",
             slug: d.slug || d.id,
-          })
+          }),
         );
 
         setDesigns(mapped);
@@ -53,51 +53,31 @@ export const DesignGallery = () => {
   const visibleDesigns = designs.slice(0, visibleCount);
 
   return (
-    <section className="py-16" style={{ backgroundColor: "#f8f6f0" }}>
-      <div className="max-w-[1024px] mx-auto px-8 md:px-12">
+    <section className="section-padding bg-background">
+      <div className="container-lg container-padding">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-10"
+          className="text-center mb-8 sm:mb-10 md:mb-12"
         >
-          <h2
-            className="text-3xl md:text-5xl font-black mb-3"
-            style={{ color: "#401268" }}
-          >
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-3 sm:mb-4 text-foreground">
             All Designs
           </h2>
-          <p
-            className="text-base md:text-lg mb-6"
-            style={{ color: "rgba(64, 18, 104, 0.8)" }}
-          >
+          <p className="text-sm sm:text-base md:text-lg mb-4 sm:mb-6 max-w-2xl mx-auto px-4 text-muted-foreground">
             Browse our complete collection
           </p>
 
           {/* Filters Bar */}
-          <div className="flex flex-wrap gap-3 justify-center mb-10">
+          <div className="flex flex-wrap gap-2 sm:gap-3 justify-center mb-6 sm:mb-8 md:mb-10">
             {["All", "Category", "Price", "Newest"].map((filter) => (
               <button
                 key={filter}
-                className="px-4 py-1.5 rounded-full text-sm font-semibold transition-all"
-                style={{
-                  backgroundColor: filter === "All" ? "#401268" : "#ffffff",
-                  color: filter === "All" ? "#ffffff" : "#401268",
-                  border: filter !== "All" ? "2px solid #401268" : "none",
-                  borderRadius: "12px",
-                }}
-                onMouseEnter={(e) => {
-                  if (filter !== "All") {
-                    e.currentTarget.style.backgroundColor = "#c5a3ff";
-                    e.currentTarget.style.color = "#401268";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (filter !== "All") {
-                    e.currentTarget.style.backgroundColor = "#ffffff";
-                    e.currentTarget.style.color = "#401268";
-                  }
-                }}
+                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-btn text-xs sm:text-sm font-semibold transition-smooth border-hairline shadow-card active:scale-95 ${
+                  filter === "All"
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-card text-card-foreground border-border hover:bg-accent hover:text-accent-foreground"
+                }`}
               >
                 {filter}
               </button>
@@ -106,12 +86,12 @@ export const DesignGallery = () => {
         </motion.div>
 
         {/* Masonry/Grid Layout */}
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
           {isLoading
             ? Array.from({ length: 8 }).map((_, idx) => (
                 <div
                   key={idx}
-                  className="rounded-2xl border-2 border-mauve/10 bg-white/80 p-4 animate-pulse h-72"
+                  className="rounded-card border-hairline border-mauve/10 bg-white/80 p-4 animate-pulse h-64 sm:h-72"
                 />
               ))
             : visibleDesigns.map((design, index) => (
@@ -122,44 +102,31 @@ export const DesignGallery = () => {
                   viewport={{ once: true }}
                   transition={{ delay: (index % 8) * 0.05 }}
                   whileHover={{ y: -5, scale: 1.01 }}
+                  className="h-full"
                 >
                   <Link href={`/designs/${design.id}`}>
                     <FollowerPointerCard title={design.name}>
-                      <div
-                        className="rounded-2xl overflow-hidden cursor-pointer transition-all bg-white border-2 border-mauve shadow-[0_8px_24px_rgba(64,18,104,0.15)]"
-                        style={{ borderRadius: "16px" }}
-                      >
+                      <div className="rounded-card overflow-hidden cursor-pointer transition-smooth bg-card border-hairline border-border hover:border-primary shadow-card hover:shadow-card-hover h-full flex flex-col">
                         {/* Design Image */}
-                        <div
-                          className="w-full aspect-square overflow-hidden"
-                          style={{
-                            borderBottom: "1px solid #e0e0e0",
-                          }}
-                        >
+                        <div className="w-full aspect-square overflow-hidden border-b border-hairline border-border">
                           <Image
                             src={design.image}
                             alt={design.name}
-                            width={150}
-                            height={150}
+                            width={300}
+                            height={300}
                             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                           />
                         </div>
 
-                        <div className="p-4">
-                          <h4
-                            className="font-bold mb-2"
-                            style={{ color: "#401268" }}
-                          >
+                        <div className="p-3 sm:p-4 flex-1 flex flex-col justify-between">
+                          <h4 className="font-bold mb-2 text-sm sm:text-base line-clamp-2 text-card-foreground">
                             {design.name}
                           </h4>
-                          <div
-                            className="flex items-center"
-                            style={{ color: "#c5a3ff" }}
-                          >
-                            <span className="text-xs font-semibold mr-2">
+                          <div className="flex items-center text-primary">
+                            <span className="text-xs sm:text-sm font-semibold mr-2">
                               View Products
                             </span>
-                            <ArrowRight className="w-4 h-4" />
+                            <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
                           </div>
                         </div>
                       </div>
@@ -175,24 +142,13 @@ export const DesignGallery = () => {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="text-center mt-10"
+            className="text-center mt-8 sm:mt-10 md:mt-12"
           >
             <button
               onClick={() =>
                 setVisibleCount((prev) => Math.min(prev + 12, designs.length))
               }
-              className="px-6 py-3 rounded-xl text-base font-bold transition-all text-white"
-              style={{
-                backgroundColor: "#401268",
-                color: "#fff",
-                borderRadius: "0.75rem",
-              }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.backgroundColor = "#2d0d4a")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.backgroundColor = "#401268")
-              }
+              className="px-5 py-2.5 sm:px-6 sm:py-3 md:px-8 md:py-4 rounded-btn text-sm sm:text-base md:text-lg font-bold transition-smooth shadow-card hover:shadow-card-hover active:scale-95 bg-primary text-primary-foreground hover:bg-primary/90"
             >
               Load More Designs
             </button>

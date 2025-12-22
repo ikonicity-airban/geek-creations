@@ -13,6 +13,7 @@ interface ShopifyOrder {
   order_number: number;
   email: string;
   total_price: string;
+  tags?: string;
   line_items: Array<{
     id: number;
     title: string;
@@ -248,6 +249,17 @@ export async function POST(req: NextRequest) {
     }
 
     const order: ShopifyOrder = JSON.parse(rawBody);
+
+    // Skip auto-fulfillment for manual review orders
+    // Tags come as comma-separated string from Shopify webhook
+    const orderTags = order.tags ? order.tags.split(",").map(t => t.trim()) : [];
+    if (orderTags.includes("manual-review") || orderTags.includes("pending-admin")) {
+      console.log(`⏭️ Skipping auto-fulfillment for order ${order.id} - manual review required`);
+      return NextResponse.json(
+        { received: true, skipped: "manual-review" },
+        { status: 200 }
+      );
+    }
 
     // Process fulfillment asynchronously
     Promise.resolve().then(async () => {

@@ -3,6 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
 
 type Design = {
   id: string;
@@ -54,83 +57,61 @@ export default function DesignsPage() {
   };
 
   return (
-    <main
-      className="min-h-screen"
-      style={{ backgroundColor: palette.background }}
-    >
+    <main className="min-h-screen bg-background pt-20">
       <section className="max-w-7xl mx-auto px-6 py-16">
         <div className="mb-10 text-center">
-          <span
-            className="inline-block px-4 py-2 rounded-full font-semibold text-sm mb-4"
-            style={{
-              backgroundColor: palette.secondary,
-              color: palette.primary,
-            }}
-          >
+          <span className="inline-block px-4 py-2 rounded-full font-semibold text-sm mb-4 bg-secondary/20 text-accent">
             DESIGN GALLERY
           </span>
-          <h1
-            className="text-4xl md:text-5xl font-black mb-3"
-            style={{ color: palette.primary }}
-          >
+          <h1 className="text-4xl md:text-5xl font-black mb-3 ">
             20 launch-ready designs
           </h1>
-          <p className="text-lg" style={{ color: "rgba(64, 18, 104, 0.75)" }}>
+          <p className="text-lg text-muted-foreground">
             Pick a design, choose a product, and start selling instantly.
           </p>
         </div>
 
         <div className="flex flex-col md:flex-row gap-4 md:items-center md:justify-between mb-8">
           <div className="flex flex-wrap gap-3">
-            <button
+            <Button
               onClick={() => setCategory(null)}
-              className="px-4 py-2 rounded-full border text-sm font-semibold"
-              style={{
-                borderColor: category ? "#e0e0e0" : palette.primary,
-                color: category ? palette.primary : "#ffffff",
-                backgroundColor: category ? "#ffffff" : palette.primary,
-              }}
+              className={cn(
+                "px-4 py-2 rounded-full border text-sm font-semibold transition-colors",
+                category ? "border-primary" : "border-transparent"
+              )}
             >
               All
-            </button>
+            </Button>
             {categories.map((c) => (
-              <button
+              <Button
+                variant={category === c ? "default" : "outline"}
                 key={c}
                 onClick={() => setCategory(c)}
-                className="px-4 py-2 rounded-full border text-sm font-semibold"
-                style={{
-                  borderColor: category === c ? palette.primary : "#e0e0e0",
-                  color: category === c ? "#ffffff" : palette.primary,
-                  backgroundColor: category === c ? palette.primary : "#ffffff",
-                }}
+                className="rounded-full border transition-colors hover:border-primary"
               >
                 {c}
-              </button>
+              </Button>
             ))}
           </div>
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search designs..."
-            className="px-4 py-3 rounded-lg border w-full md:w-80"
-            style={{ borderColor: "#e0e0e0", color: palette.primary }}
-          />
+          <div className="flex items-center gap-2 w-1/3">
+            <Input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search designs..."
+              className="min-w-fitrounded-full h-12"
+            />
+          </div>
         </div>
 
         {loading ? (
-          <p style={{ color: palette.primary }}>Loading designs...</p>
+          <p className="text-primary">Loading designs...</p>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {designs.map((design) => (
               <Link
                 key={design.id}
                 href={`/designs/${design.id}`}
-                className="group rounded-2xl overflow-hidden border transition"
-                style={{
-                  borderColor: "#e0e0e0",
-                  backgroundColor: "#ffffff",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-                }}
+                className="group rounded-2xl overflow-hidden border transition border-border bg-card shadow-sm hover:shadow-md"
               >
                 <div className="aspect-4/5 overflow-hidden">
                   <Image
@@ -143,38 +124,22 @@ export default function DesignsPage() {
                 </div>
                 <div className="p-4 space-y-2">
                   <div className="flex items-center gap-2 text-sm font-semibold">
-                    <span
-                      className="px-2 py-1 rounded-full"
-                      style={{
-                        backgroundColor: "rgba(197,163,255,0.2)",
-                        color: palette.primary,
-                      }}
-                    >
+                    <span className="px-2 py-1 rounded-full bg-secondary/20 text-primary">
                       {design.category || "General"}
                     </span>
                     {design.tags?.slice(0, 2).map((tag) => (
                       <span
                         key={tag}
-                        className="px-2 py-1 rounded-full text-xs"
-                        style={{
-                          backgroundColor: "rgba(226,174,61,0.15)",
-                          color: palette.primary,
-                        }}
+                        className="px-2 py-1 rounded-full text-xs bg-accent/15 text-primary"
                       >
                         {tag}
                       </span>
                     ))}
                   </div>
-                  <h3
-                    className="text-xl font-bold"
-                    style={{ color: palette.primary }}
-                  >
+                  <h4 className="text-xl font-bold text-primary">
                     {design.title}
-                  </h3>
-                  <p
-                    className="text-sm line-clamp-2"
-                    style={{ color: "rgba(64, 18, 104, 0.7)" }}
-                  >
+                  </h4>
+                  <p className="text-sm line-clamp-2 text-muted-foreground">
                     {design.description || "Ready for tees, hoodies, and mugs."}
                   </p>
                 </div>

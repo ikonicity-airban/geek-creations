@@ -15,6 +15,10 @@ import {
   IconBrandInstagram,
   IconBrandX,
 } from "@tabler/icons-react";
+import { Input } from "./ui/input";
+import { Badge } from "./ui/badge";
+import { buttonVariants } from "./ui/button";
+import { cn } from "@/lib/utils";
 
 export const Footer = () => {
   const [email, setEmail] = useState("");
@@ -102,21 +106,18 @@ export const Footer = () => {
   ];
 
   return (
-    <footer
-      className="relative py-20 px-6 overflow-hidden"
-      style={{ backgroundColor: "#f8f6f0" }}
-    >
+    <footer className="relative py-12 sm:py-16 md:py-20 px-4 sm:px-6 md:px-8 overflow-hidden bg-background">
       {/* Background decoration */}
-      <div className="absolute inset-0 opacity-30 pointer-events-none">
+      <div className="absolute inset-0 opacity-20 sm:opacity-30 pointer-events-none">
         <div
-          className="absolute top-20 left-10 w-64 h-64 rounded-full"
+          className="absolute top-10 left-5 sm:top-20 sm:left-10 w-32 h-32 sm:w-64 sm:h-64 rounded-full"
           style={{
             background:
               "radial-gradient(circle, rgba(197, 163, 255, 0.3), transparent)",
           }}
         />
         <div
-          className="absolute bottom-20 right-10 w-80 h-80 rounded-full"
+          className="absolute bottom-10 right-5 sm:bottom-20 sm:right-10 w-48 h-48 sm:w-80 sm:h-80 rounded-full"
           style={{
             background:
               "radial-gradient(circle, rgba(226, 174, 61, 0.2), transparent)",
@@ -132,72 +133,39 @@ export const Footer = () => {
         variants={containerVariants}
       >
         {/* Desktop Layout */}
-        <div className="hidden md:grid md:grid-cols-12 gap-8 mb-16">
+        <div className="hidden md:grid md:grid-cols-12 gap-6 lg:gap-8 mb-12 md:mb-16">
           {/* Brand + Newsletter Column */}
           <motion.div
             variants={itemVariants}
             className="col-span-12 lg:col-span-4"
           >
-            <h3
-              className="text-4xl font-black mb-4"
-              style={{ color: "#401268" }}
-            >
+            <h4 className="text-3xl lg:text-4xl font-black mb-3 md:mb-4 text-primary">
               GEEKS
               <br />
               CREATION
-            </h3>
-            <p
-              className="mb-6 text-base"
-              style={{ color: "rgba(64, 18, 104, 0.7)" }}
-            >
-              Made by nerds. Worn by legends. 🚀
+            </h4>
+            <p className="mb-4 md:mb-6 text-sm md:text-base text-muted-foreground">
+              Design it . Build it . Wear it.
             </p>
 
             {/* Newsletter */}
-            <div className="mb-8">
-              <h4
-                className="font-bold mb-3 text-sm uppercase tracking-wide"
-                style={{ color: "#401268" }}
-              >
-                Join the Squad
-              </h4>
+            <h4 className="font-bold mb-2 md:mb-3 md:text-sm uppercase tracking-wide text-primary">
+              Join the Squad
+            </h4>
+            <div className="mb-6 md:mb-8">
               <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
-                <input
+                <Input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="your@email.com"
-                  className="flex-1 px-4 py-2.5 rounded-lg border-2 text-sm transition-all outline-none"
-                  style={{
-                    borderColor: "rgba(64, 18, 104, 0.2)",
-                    backgroundColor: "white",
-                    color: "#401268",
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = "#c5a3ff";
-                    e.target.style.boxShadow =
-                      "0 0 0 3px rgba(197, 163, 255, 0.2)";
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = "rgba(64, 18, 104, 0.2)";
-                    e.target.style.boxShadow = "none";
-                  }}
+                  className="flex-1 px-3 md:px-4 py-2 md:py-2.5 rounded-btn border-hairline md:border-2 text-xs md:text-sm transition-smooth outline-none border-border bg-card text-primary"
                 />
                 <motion.button
                   type="submit"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-6 py-2.5 rounded-lg font-bold text-sm transition-all"
-                  style={{
-                    backgroundColor: "#401268",
-                    color: "white",
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.backgroundColor = "#2d0d4a")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.backgroundColor = "#401268")
-                  }
+                  className="px-4 md:px-6 py-2 md:py-2.5 rounded-btn font-bold text-xs md:text-sm transition-smooth shadow-card bg-primary text-primary-foreground hover:opacity-90"
                 >
                   <Mail className="w-4 h-4" />
                 </motion.button>
@@ -205,11 +173,19 @@ export const Footer = () => {
             </div>
 
             {/* Social Icons - Glassmorphic */}
-            <div className="flex gap-3">
+            <div className="flex gap-2 md:gap-3">
               {[
-                { Icon: Instagram, label: "Instagram", color: "#e21b35" },
-                { Icon: Twitter, label: "Twitter", color: "#c5a3ff" },
-                { Icon: Facebook, label: "Facebook", color: "#e2ae3d" },
+                {
+                  Icon: IconBrandInstagram,
+                  label: "Instagram",
+                  color: "#e21b35",
+                },
+                { Icon: IconBrandX, label: "Twitter", color: "#c5a3ff" },
+                {
+                  Icon: IconBrandFacebook,
+                  label: "Facebook",
+                  color: "#e2ae3d",
+                },
               ].map(({ Icon, label, color }) => (
                 <motion.a
                   key={label}
@@ -218,27 +194,9 @@ export const Footer = () => {
                   variants={socialIconVariants}
                   initial="rest"
                   whileHover="hover"
-                  className="relative w-12 h-12 rounded-xl flex items-center justify-center backdrop-blur-sm transition-all"
-                  style={{
-                    background: "rgba(255, 255, 255, 0.4)",
-                    border: "1px solid rgba(255, 255, 255, 0.6)",
-                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = `${color}15`;
-                    e.currentTarget.style.borderColor = color;
-                    e.currentTarget.style.boxShadow = `0 8px 24px ${color}30`;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background =
-                      "rgba(255, 255, 255, 0.4)";
-                    e.currentTarget.style.borderColor =
-                      "rgba(255, 255, 255, 0.6)";
-                    e.currentTarget.style.boxShadow =
-                      "0 4px 12px rgba(0, 0, 0, 0.05)";
-                  }}
+                  className="relative w-10 h-10 md:w-12 md:h-12 rounded flex items-center justify-center backdrop-blur-sm transition-smooth"
                 >
-                  <Icon className="w-5 h-5" style={{ color: "#401268" }} />
+                  <Icon className="w-4 h-4 md:w-5 md:h-5" style={{ color }} />
                 </motion.a>
               ))}
             </div>
@@ -251,13 +209,10 @@ export const Footer = () => {
               variants={itemVariants}
               className="col-span-6 lg:col-span-2"
             >
-              <h4
-                className="font-bold mb-4 text-sm uppercase tracking-wide"
-                style={{ color: "#401268" }}
-              >
+              <h4 className="font-bold mb-3 md:mb-4 text-xs md:text-sm uppercase tracking-wide text-primary">
                 {section.title}
               </h4>
-              <ul className="space-y-2.5">
+              <ul className="space-y-2">
                 {section.links.map((link) => {
                   const linkName = typeof link === "string" ? link : link.name;
                   const linkHref = typeof link === "string" ? "#" : link.href;
@@ -269,15 +224,7 @@ export const Footer = () => {
                     >
                       <a
                         href={linkHref}
-                        className="text-sm transition-colors inline-block"
-                        style={{ color: "rgba(64, 18, 104, 0.7)" }}
-                        onMouseEnter={(e) =>
-                          (e.currentTarget.style.color = "#e21b35")
-                        }
-                        onMouseLeave={(e) =>
-                          (e.currentTarget.style.color =
-                            "rgba(64, 18, 104, 0.7)")
-                        }
+                        className="text-xs md:text-sm transition-smooth inline-block text-muted-foreground hover:text-destructive"
                       >
                         {linkName}
                       </a>
@@ -293,22 +240,14 @@ export const Footer = () => {
             variants={itemVariants}
             className="col-span-12 lg:col-span-2"
           >
-            <h4
-              className="font-bold mb-4 text-sm uppercase tracking-wide"
-              style={{ color: "#401268" }}
-            >
+            <h4 className="font-bold mb-3 md:mb-4 text-xs md:text-sm uppercase tracking-wide text-primary">
               We Accept
             </h4>
             <div className="flex flex-wrap gap-2">
               {["USDC", "SOL", "NGN"].map((method) => (
                 <span
                   key={method}
-                  className="px-3 py-1.5 rounded-lg text-xs font-bold backdrop-blur-sm"
-                  style={{
-                    background: "rgba(197, 163, 255, 0.15)",
-                    border: "1px solid rgba(197, 163, 255, 0.3)",
-                    color: "#401268",
-                  }}
+                  className="px-2.5 md:px-3 py-1 md:py-1.5 rounded-btn text-xs font-bold backdrop-blur-sm border-hairline bg-secondary/15 border-secondary/30 text-primary"
                 >
                   {method}
                 </span>
@@ -318,7 +257,7 @@ export const Footer = () => {
         </div>
 
         {/* Mobile Accordion Layout */}
-        <div className="md:hidden space-y-4 mb-12">
+        <div className="md:hidden space-y-3 sm:space-y-4 mb-10 sm:mb-12">
           {/* Brand Section - Always Visible */}
           <motion.div
             variants={itemVariants}
@@ -326,39 +265,31 @@ export const Footer = () => {
             whileInView="visible"
             viewport={{ once: true }}
           >
-            <h3
-              className="text-3xl font-black mb-3"
-              style={{ color: "#401268" }}
-            >
+            <h4 className="text-2xl sm:text-3xl font-black mb-2 sm:mb-3 text-primary">
               GEEKS
               <br />
               CREATION
-            </h3>
-            <p
-              className="mb-6 text-sm"
-              style={{ color: "rgba(64, 18, 104, 0.7)" }}
-            >
+            </h4>
+            <p className="mb-4 sm:mb-6 text-xs sm:text-sm">
               Made by nerds. Worn by legends. 🚀
             </p>
 
             {/* Newsletter Mobile */}
-            <form onSubmit={handleNewsletterSubmit} className="flex gap-2 mb-6">
-              <input
+            <form
+              onSubmit={handleNewsletterSubmit}
+              className="flex gap-2 mb-4 sm:mb-6 p-2 "
+            >
+              <Input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
-                className="flex-1 px-3 py-2 rounded-lg border-2 text-sm"
-                style={{
-                  borderColor: "rgba(64, 18, 104, 0.2)",
-                  backgroundColor: "white",
-                  color: "#401268",
-                }}
+                className="flex-1 px-3 py-2 rounded-btn border-hairline text-xs sm:text-sm transition-smooth"
               />
               <motion.button
                 type="submit"
                 whileTap={{ scale: 0.95 }}
-                className="px-4 py-2 rounded-lg font-bold"
+                className="px-3 sm:px-4 py-2 rounded-btn font-bold shadow-card"
                 style={{
                   backgroundColor: "#401268",
                   color: "white",
@@ -369,7 +300,7 @@ export const Footer = () => {
             </form>
 
             {/* Social Icons Mobile */}
-            <div className="flex gap-3 mb-6">
+            <div className="flex gap-2 sm:gap-3 mb-4 sm:mb-6">
               {[
                 { Icon: IconBrandInstagram, color: "#e21b35" },
                 { Icon: IconBrandX, color: "#c5a3ff" },
@@ -378,14 +309,12 @@ export const Footer = () => {
                 <motion.div
                   key={idx}
                   whileTap={{ scale: 0.9 }}
-                  className="w-11 h-11 rounded-xl flex items-center justify-center backdrop-blur-sm"
-                  style={{
-                    background: "rgba(255, 255, 255, 0.4)",
-                    border: "1px solid rgba(255, 255, 255, 0.6)",
-                    color: color,
-                  }}
+                  className={buttonVariants({
+                    variant: "outline",
+                    className: cn(`transition-colors border-accent`),
+                  })}
                 >
-                  <Icon className="w-5 h-5" style={{ color: "#401268" }} />
+                  <Icon className="w-4 h-4 sm:w-5 sm:h-5" style={{ color }} />
                 </motion.div>
               ))}
             </div>
@@ -399,19 +328,16 @@ export const Footer = () => {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              className="rounded-xl backdrop-blur-sm overflow-hidden"
-              style={{
-                background: "rgba(255, 255, 255, 0.4)",
-                border: "1px solid rgba(255, 255, 255, 0.6)",
-              }}
+              className="rounded-card backdrop-blur-sm overflow-hidden border-hairline bg-secondary/20"
             >
               <button
                 onClick={() => toggleSection(section.title)}
-                className="w-full px-4 py-3 flex items-center justify-between"
+                className="w-full px-3 sm:px-4 py-3 sm:py-3.5 flex items-center justify-between transition-smooth active:bg-white/20"
               >
                 <span
-                  className="font-bold text-sm"
-                  style={{ color: "#401268" }}
+                  className={cn("font-bold text-xs sm:text-sm ", {
+                    "text-primary": openSection === section.title,
+                  })}
                 >
                   {section.title}
                 </span>
@@ -419,10 +345,7 @@ export const Footer = () => {
                   animate={{ rotate: openSection === section.title ? 180 : 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <ChevronDown
-                    className="w-4 h-4"
-                    style={{ color: "#401268" }}
-                  />
+                  <ChevronDown className="w-4 h-4" />
                 </motion.div>
               </button>
               <AnimatePresence>
@@ -432,15 +355,14 @@ export const Footer = () => {
                     animate={{ height: "auto", opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.3 }}
-                    className="px-4 pb-3"
+                    className="px-3 sm:px-4 pb-3"
                   >
                     <ul className="space-y-2">
                       {section.links.map((link) => (
                         <li key={link.name}>
                           <a
-                            href="#"
-                            className="text-sm block py-1"
-                            style={{ color: "rgba(64, 18, 104, 0.7)" }}
+                            href={link.href}
+                            className="text-xs sm:text-sm block py-1 transition-smooth active:text-destructive text-muted-foreground hover:text-destructive"
                           >
                             {link.name}
                           </a>
@@ -456,27 +378,19 @@ export const Footer = () => {
           {/* Payment Methods Mobile */}
           <motion.div
             variants={itemVariants}
-            className="rounded-xl backdrop-blur-sm p-4"
-            style={{
-              background: "rgba(255, 255, 255, 0.4)",
-              border: "1px solid rgba(255, 255, 255, 0.6)",
-            }}
+            className="rounded-card backdrop-blur-sm p-3 sm:p-4 border-hairline bg-card"
           >
-            <h4 className="font-bold mb-3 text-sm" style={{ color: "#401268" }}>
+            <h4 className="font-bold mb-2 sm:mb-3 text-xs sm:text-sm">
               WE ACCEPT
             </h4>
             <div className="flex flex-wrap gap-2">
               {["USDC", "SOL", "NGN"].map((method) => (
-                <span
+                <Badge
                   key={method}
-                  className="px-3 py-1.5 rounded-lg text-xs font-bold"
-                  style={{
-                    background: "rgba(197, 163, 255, 0.2)",
-                    color: "#401268",
-                  }}
+                  className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-btn text-xs font-bold bg-secondary/20"
                 >
                   {method}
-                </span>
+                </Badge>
               ))}
             </div>
           </motion.div>
@@ -485,13 +399,10 @@ export const Footer = () => {
         {/* Bottom Bar */}
         <motion.div
           variants={itemVariants}
-          className="pt-8 border-t flex flex-col md:flex-row items-center justify-between gap-4"
+          className="pt-6 sm:pt-8 border-t border-hairline flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4"
           style={{ borderColor: "rgba(64, 18, 104, 0.1)" }}
         >
-          <p
-            className="text-sm text-center md:text-left"
-            style={{ color: "rgba(64, 18, 104, 0.7)" }}
-          >
+          <p className="text-xs sm:text-sm text-center md:text-left text-muted-foreground">
             © 2025 Geeks Creation. All rights reserved. Powered by CodeOven 🔥
           </p>
 
@@ -502,8 +413,7 @@ export const Footer = () => {
             whileTap={{ scale: 0.9 }}
             className="w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-sm"
             style={{
-              background: "rgba(197, 163, 255, 0.2)",
-              border: "2px solid #c5a3ff",
+              border: "1px solid #c5a3ff",
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.background = "#c5a3ff";
@@ -515,7 +425,7 @@ export const Footer = () => {
               e.currentTarget.style.boxShadow = "none";
             }}
           >
-            <ArrowUp className="w-5 h-5" style={{ color: "#401268" }} />
+            <ArrowUp className="w-5 h-5 text-primary" />
           </motion.button>
         </motion.div>
       </motion.div>

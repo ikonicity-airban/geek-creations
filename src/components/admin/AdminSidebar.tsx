@@ -128,7 +128,7 @@ export function AdminSidebar({ email }: AdminSidebarProps) {
 export const AdminLogo = () => {
   return (
     <div className="relative z-20 flex items-center space-x-2 py-1 text-sm font-normal">
-      <div className="h-5 w-6 shrink-0 rounded-tl-lg rounded-tr-sm rounded-br-lg rounded-bl-sm bg-gradient-to-br from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400" />
+      <div className="h-5 w-6 shrink-0 rounded-tl-lg rounded-tr-sm rounded-br-lg rounded-bl-sm bg-linear-to-br from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400" />
       <motion.span
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -143,7 +143,7 @@ export const AdminLogo = () => {
 export const AdminLogoIcon = () => {
   return (
     <div className="relative z-20 flex items-center space-x-2 py-1 text-sm font-normal">
-      <div className="h-5 w-6 shrink-0 rounded-tl-lg rounded-tr-sm rounded-br-lg rounded-bl-sm bg-gradient-to-br from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400" />
+      <div className="h-5 w-6 shrink-0 rounded-tl-lg rounded-tr-sm rounded-br-lg rounded-bl-sm bg-linear-to-br from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400" />
     </div>
   );
 };

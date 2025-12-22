@@ -9,22 +9,38 @@ export default function MainLayout({
 }) {
   return (
     <ThemeProvider>
-      <div
-        className="relative min-h-screen overflow-x-hidden bg-porcelain text-foreground"
-        data-main-bg="true"
-        style={{
-          backgroundImage: `
-            radial-gradient(900px 500px at 15% 10%, rgba(197, 163, 255, 0.18), transparent 60%),
-            radial-gradient(800px 450px at 85% 15%, rgba(226, 174, 61, 0.14), transparent 55%),
-            radial-gradient(900px 520px at 75% 85%, rgba(64, 18, 104, 0.10), transparent 60%),
-            linear-gradient(180deg, rgba(248, 246, 240, 1) 0%, rgba(255, 255, 255, 0.95) 35%, rgba(248, 246, 240, 1) 100%)
-          `,
-          backgroundAttachment: "fixed",
-        }}
-      >
-        {/* Advert / promo strip slot (60px–10vh tall) */}
-        <div className="w-full h-[60px] md:h-[5vh] lg:h-[10vh] flex items-center justify-center px-4 sticky top-0 z-50">
-          {/* Ad / promo content goes here */}
+      <div className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
+        {/* Light mode gradient background */}
+        <div className="fixed inset-0 -z-10 dark:hidden">
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `
+                radial-gradient(900px 500px at 15% 10%, rgba(197, 163, 255, 0.18), transparent 60%),
+                radial-gradient(800px 450px at 85% 15%, rgba(226, 174, 61, 0.14), transparent 55%),
+                radial-gradient(900px 520px at 75% 85%, rgba(64, 18, 104, 0.10), transparent 60%)
+              `,
+              backgroundColor: "#f8f6f0",
+            }}
+          />
+        </div>
+
+        {/* Dark mode gradient background */}
+        <div
+          className="hidden dark:block fixed inset-0 -z-10"
+          data-main-bg="true"
+        >
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `
+                radial-gradient(900px 500px at 15% 10%, rgba(197, 163, 255, 0.12), transparent 60%),
+                radial-gradient(800px 450px at 85% 15%, rgba(226, 174, 61, 0.08), transparent 55%),
+                radial-gradient(900px 520px at 75% 85%, rgba(64, 18, 104, 0.15), transparent 60%)
+              `,
+              backgroundColor: "#010110",
+            }}
+          />
         </div>
 
         <Navbar />
@@ -33,7 +49,7 @@ export default function MainLayout({
           id="main-content"
           className="transition-transform duration-300 ease-out"
         >
-          <main className="pt-10">{children}</main>
+          <main className="pt-4 sm:pt-10 md:pt-20">{children}</main>
           <Footer />
         </div>
       </div>

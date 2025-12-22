@@ -3,14 +3,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 
-const COLORS = {
-  primary: "#401268",
-  secondary: "#c5a3ff",
-  background: "#f8f6f0",
-  accentWarm: "#e2ae3d",
-  accentBold: "#e21b35",
-};
-
 interface SizeChartModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -18,7 +10,10 @@ interface SizeChartModalProps {
 }
 
 // Size chart data for different product types
-const SIZE_CHARTS: Record<string, { sizes: string[]; measurements: Record<string, { [key: string]: string }> }> = {
+const SIZE_CHARTS: Record<
+  string,
+  { sizes: string[]; measurements: Record<string, { [key: string]: string }> }
+> = {
   "T-Shirts": {
     sizes: ["XS", "S", "M", "L", "XL", "2XL", "3XL"],
     measurements: {
@@ -80,7 +75,7 @@ const SIZE_CHARTS: Record<string, { sizes: string[]; measurements: Record<string
   Default: {
     sizes: ["One Size"],
     measurements: {
-      "Dimensions": {
+      Dimensions: {
         "One Size": "Fits All",
       },
     },
@@ -115,53 +110,28 @@ export default function SizeChartModal({
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <div
-              className="relative w-full max-w-3xl rounded-2xl overflow-hidden"
-              style={{
-                background: "rgba(255, 255, 255, 0.95)",
-                backdropFilter: "blur(20px)",
-              }}
-            >
+            <div className="relative w-full max-w-3xl rounded-2xl overflow-hidden bg-card border-border">
               <button
                 onClick={onClose}
-                className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/80 hover:bg-white transition"
-                style={{ color: COLORS.primary }}
+                className="absolute top-4 right-4 z-10 p-2 rounded-full bg-accent hover:bg-white transition"
               >
                 <X className="w-5 h-5" />
               </button>
 
               <div className="p-6 md:p-8">
-                <h2
-                  className="text-3xl font-black mb-6"
-                  style={{
-                    color: COLORS.primary,
-                    fontFamily: "Orbitron, sans-serif",
-                  }}
-                >
-                  Size Chart
-                </h2>
+                <h3 className="text-3xl font-black mb-6">Size Chart</h3>
 
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse">
                     <thead>
                       <tr>
-                        <th
-                          className="px-4 py-3 text-left font-bold border-b-2"
-                          style={{
-                            borderColor: COLORS.primary,
-                            color: COLORS.primary,
-                          }}
-                        >
+                        <th className="px-4 py-3 text-left font-bold border-b-2">
                           Size
                         </th>
                         {chartData.sizes.map((size) => (
                           <th
                             key={size}
                             className="px-4 py-3 text-center font-bold border-b-2"
-                            style={{
-                              borderColor: COLORS.primary,
-                              color: COLORS.primary,
-                            }}
                           >
                             {size}
                           </th>
@@ -173,20 +143,17 @@ export default function SizeChartModal({
                         ([measurement, values], idx) => (
                           <tr
                             key={measurement}
-                            className={idx % 2 === 0 ? "bg-white" : `${COLORS.secondary}10`}
+                            className={
+                              idx % 2 === 0
+                                ? "bg-background"
+                                : `bg-secondary/20`
+                            }
                           >
-                            <td
-                              className="px-4 py-3 font-semibold"
-                              style={{ color: COLORS.primary }}
-                            >
+                            <td className="px-4 py-3 font-semibold text-primary">
                               {measurement}
                             </td>
                             {chartData.sizes.map((size) => (
-                              <td
-                                key={size}
-                                className="px-4 py-3 text-center"
-                                style={{ color: COLORS.primary }}
-                              >
+                              <td key={size} className="px-4 py-3 text-center">
                                 {values[size] || "-"}
                               </td>
                             ))}
@@ -197,11 +164,11 @@ export default function SizeChartModal({
                   </table>
                 </div>
 
-                <div className="mt-6 p-4 rounded-lg" style={{ backgroundColor: `${COLORS.secondary}20` }}>
-                  <p className="text-sm" style={{ color: COLORS.primary }}>
-                    <strong>Note:</strong> All measurements are in inches. Please refer to
-                    this chart to find your perfect fit. If you&apos;re between sizes, we
-                    recommend sizing up.
+                <div className="mt-6 p-4 rounded-lg bg-secondary/20">
+                  <p className="text-sm text-cente">
+                    <strong>Note:</strong> All measurements are in inches.
+                    Please refer to this chart to find your perfect fit. If
+                    you&apos;re between sizes, we recommend sizing up.
                   </p>
                 </div>
               </div>
@@ -212,4 +179,3 @@ export default function SizeChartModal({
     </AnimatePresence>
   );
 }
-

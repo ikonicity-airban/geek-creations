@@ -64,14 +64,6 @@ export const CategoryGrid = () => {
       handle: "tote-bags",
       size: "small",
     },
-    // {
-    //   id: "6",
-    //   name: "Posters",
-    //   icon: ImageIcon,
-    //   count: "90+ designs",
-    //   handle: "posters",
-    //   size: "small"
-    // },
   ];
 
   const getSizeClasses = (size: string) => {
@@ -90,40 +82,34 @@ export const CategoryGrid = () => {
   const getIconSize = (size: string) => {
     switch (size) {
       case "large":
-        return "w-16 h-16";
+        return "w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16";
       case "medium":
-        return "w-12 h-12";
+        return "w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12";
       case "small":
-        return "w-10 h-10";
+        return "w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10";
       default:
-        return "w-10 h-10";
+        return "w-8 h-8 sm:w-10 sm:h-10";
     }
   };
 
   return (
-    <section className="py-16" style={{ backgroundColor: "#ffffff" }}>
+    <section className="section-padding bg-background">
       <PageLayout>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-10"
+          className="text-center mb-8 sm:mb-10 md:mb-12"
         >
-          <h1
-            className="text-3xl md:text-5xl font-black mb-3"
-            style={{ color: "#401268" }}
-          >
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-2 sm:mb-3 text-foreground">
             Shop by Category
           </h1>
-          <p
-            className="text-base md:text-lg"
-            style={{ color: "rgba(64, 18, 104, 0.8)" }}
-          >
+          <p className="text-sm sm:text-base md:text-lg px-4 text-muted-foreground">
             Find your perfect product type
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-9 gap-3 md:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-9 gap-3 sm:gap-4 md:gap-4">
           {categories.map((category, index) => (
             <motion.div
               key={category.id}
@@ -137,73 +123,54 @@ export const CategoryGrid = () => {
               <FollowerPointerCard
                 title={
                   <div className="flex items-center gap-2 group">
-                    <div className="w-8 h-8 overflow-hidden">
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 overflow-hidden">
                       <Image
                         src={
                           category.image ||
                           "/img/blank_isolated_white_and_black_t_shirt_front_view.png"
                         }
                         alt={category.name}
-                        width={20}
-                        height={20}
+                        width={32}
+                        height={32}
                         className="w-full h-full object-cover rounded-full"
                       />
                     </div>
-                    <div className="mx-4">
-                      <p>{category.name}</p>
+                    <div className="mx-2 sm:mx-4">
+                      <p className="text-xs sm:text-sm md:text-base">
+                        {category.name}
+                      </p>
                     </div>
                   </div>
                 }
                 className="h-full"
               >
                 <Link href={`/collections/${category.handle}`}>
-                  <div
-                    className="h-full rounded-2xl overflow-hidden cursor-pointer transition-all flex flex-col relative"
-                    style={{
-                      backgroundColor: index % 2 === 0 ? "#f8f6f0" : "#ffffff",
-                      borderRadius: "16px",
-                      boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-                      border: "1px solid #e0e0e0",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.boxShadow =
-                        "0 8px 24px rgba(64,18,104,0.15)";
-                      e.currentTarget.style.borderColor = "#c5a3ff";
-                      e.currentTarget.style.borderWidth = "2px";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.boxShadow =
-                        "0 4px 12px rgba(0,0,0,0.05)";
-                      e.currentTarget.style.borderColor = "#e0e0e0";
-                      e.currentTarget.style.borderWidth = "1px";
-                    }}
-                  >
+                  <div className="h-full rounded-card overflow-hidden cursor-pointer transition-smooth flex flex-col relative border-hairline bg-card border-border shadow-card hover:shadow-card-hover hover:border-primary">
                     {category.image ? (
-                      <div className="relative w-full flex-1 min-h-[80px] md:min-h-[120px] overflow-hidden">
+                      <div className="relative w-full flex-1 min-h-[100px] sm:min-h-[120px] md:min-h-[140px] overflow-hidden">
                         <Image
-                          width={150}
-                          height={150}
+                          width={300}
+                          height={300}
                           src={category.image}
                           alt={category.name}
                           className="w-full h-full object-cover"
                         />
-                        <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                       </div>
                     ) : (
                       <div
                         className={`${getIconSize(
-                          category.size
-                        )} mb-3 mt-4 mx-auto rounded-xl flex items-center justify-center`}
-                        style={{ backgroundColor: "#401268" }}
+                          category.size,
+                        )} mb-3 mt-4 mx-auto rounded-btn flex items-center justify-center shadow-card bg-primary`}
                       >
                         <category.icon
                           className={getIconSize(category.size)}
-                          style={{ color: "#ffffff" }}
+                          style={{ color: "currentColor" }}
                         />
                       </div>
                     )}
-                    <div className="absolute px-4 py-2 flex items-center gap-2 justify-center bg-white/10 backdrop-blur-sm">
-                      <h5 className="text-xs font-bold mb-2 text-center group-hover:text-primary">
+                    <div className="absolute bottom-0 left-0 right-0 px-3 py-2 sm:px-4 sm:py-3 flex items-center gap-2 justify-center bg-card/80 backdrop-blur-sm border-t border-border">
+                      <h5 className="text-xs sm:text-sm font-bold text-center text-card-foreground group-hover:text-primary">
                         {category.name}
                       </h5>
                     </div>

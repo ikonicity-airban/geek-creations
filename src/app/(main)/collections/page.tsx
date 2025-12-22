@@ -31,7 +31,7 @@ export default function CollectionsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900">
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-indigo-900 via-purple-900 to-pink-900">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
@@ -42,11 +42,11 @@ export default function CollectionsPage() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen -mt-30 bg-background">
       <div className="pt-10" />
 
       {/* Header */}
-      <section className="relative py-20 px-6 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 overflow-hidden">
+      <section className="relative py-10 pt-40 px-6 bg-linear-to-br from-indigo-600 via-purple-600 to-pink-600 overflow-hidden">
         <div className="absolute inset-0 bg-black/30" />
         <div className="relative z-10 max-w-7xl mx-auto text-center">
           <motion.div
@@ -60,7 +60,7 @@ export default function CollectionsPage() {
             <h1 className="text-5xl md:text-7xl font-black text-white mb-6">
               Our Collections
             </h1>
-            <p className="text-xl text-white/90 max-w-2xl mx-auto">
+            <p className="text-white/90 max-w-2xl mx-auto">
               Discover curated collections of our best designs, organized by
               theme and style
             </p>
@@ -106,7 +106,7 @@ export default function CollectionsPage() {
                           </div>
                         </div>
                       )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
                   </Link>
 
@@ -129,7 +129,11 @@ export default function CollectionsPage() {
                           : "products"}
                       </Badge>
                       <Link href={`/collections/${collection.handle}`}>
-                        <Button variant="ghost" size="sm" className="gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="gap-2 text-accent"
+                        >
                           View Collection
                           <ArrowRight className="w-4 h-4" />
                         </Button>

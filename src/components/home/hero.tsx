@@ -5,14 +5,7 @@ import { ShoppingBag, ArrowRight, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { BackgroundLines } from "@/components/ui/background-lines";
 import { IconPhoto } from "@tabler/icons-react";
-
-const COLORS = {
-  primary: "#401268",
-  secondary: "#c5a3ff",
-  background: "#f8f6f0",
-  accentWarm: "#e2ae3d",
-  accentBold: "#e21b35",
-};
+import { buttonVariants } from "../ui/button";
 
 export const Hero = ({ darkMode }: { darkMode: boolean }) => {
   const { scrollY } = useScroll();
@@ -21,10 +14,10 @@ export const Hero = ({ darkMode }: { darkMode: boolean }) => {
 
   return (
     <BackgroundLines
-      className="flex items-center justify-center w-full min-h-fit md:min-h-screen relative overflow-hidden"
+      className="flex items-center pt-20 -mt-20 justify-center w-full min-h-fit md:min-h-screen relative overflow-hidden"
       darkMode={darkMode}
     >
-      <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 grid md:grid-cols-2 gap-12 items-center w-full py-12 md:py-0">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 grid md:grid-cols-2 gap-12 items-center w-full pt-20 pb-10 md:py-0">
         {/* Text Content */}
         <motion.div
           style={{ y, opacity }}
@@ -34,22 +27,10 @@ export const Hero = ({ darkMode }: { darkMode: boolean }) => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="inline-block px-4 py-2 rounded-full mb-4"
-            style={{
-              backgroundColor: darkMode
-                ? "rgba(197, 163, 255, 0.15)"
-                : "rgba(197, 163, 255, 0.2)",
-              border: `1px solid ${
-                darkMode ? "rgba(197, 163, 255, 0.3)" : "rgba(64, 18, 104, 0.2)"
-              }`,
-            }}
+            className="inline-block px-4 py-2 rounded-full mb-4 bg-background"
           >
-            <span
-              className="text-sm font-bold flex items-center gap-2"
-              style={{ color: darkMode ? COLORS.secondary : COLORS.primary }}
-            >
-              <Sparkles className="w-4 h-4" />
-              20+ Premium Designs Ready
+            <span className="text-xs font-bold flex items-center gap-2 text-primary dark:text-foreground">
+              ✨ 20+ Premium Designs Ready
             </span>
           </motion.div>
 
@@ -57,27 +38,11 @@ export const Hero = ({ darkMode }: { darkMode: boolean }) => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight leading-tight"
-            style={{
-              color: darkMode ? COLORS.background : COLORS.primary,
-              fontFamily: "Over the Rainbow, sans-serif",
-            }}
+            className="text-5xl md:text-4xl lg:text-5xl font-black tracking-tight leading-tight text-primary dark:text-foreground"
           >
-            Premium Geek Art
+            Geek Creations
             <br />
-            <span
-              style={{
-                fontSize: "smaller",
-                fontFamily: "Orbitron, sans-serif",
-                color: darkMode ? COLORS.accentWarm : COLORS.secondary,
-                background: darkMode
-                  ? "linear-gradient(135deg, #e2ae3d, #c5a3ff)"
-                  : "linear-gradient(135deg, #c5a3ff, #401268)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
+            <span className="text-accent text-3xl md:text-4xl">
               Print on Demand
             </span>
           </motion.h1>
@@ -86,7 +51,7 @@ export const Hero = ({ darkMode }: { darkMode: boolean }) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="text-lg md:text-xl leading-relaxed max-w-xl"
+            className="text-base md:text-xl leading-relaxed max-w-xl"
             style={{
               color: darkMode
                 ? "rgba(248, 246, 240, 0.85)"
@@ -129,11 +94,11 @@ export const Hero = ({ darkMode }: { darkMode: boolean }) => {
               <motion.button
                 whileHover={{ scale: 1.02, y: -2 }}
                 whileTap={{ scale: 0.98 }}
-                className="group relative w-full  px-8 py-4 rounded-xl font-bold text-base shadow-xl transition-all flex items-center justify-center gap-2"
-                style={{
-                  backgroundColor: COLORS.primary,
-                  color: "#ffffff",
-                }}
+                className={buttonVariants({
+                  variant: "default",
+                  className:
+                    "group relative w-full transition-all flex items-center justify-center gap-2",
+                })}
               >
                 <IconPhoto className="w-5 h-5" />
                 Browse Designs
@@ -145,14 +110,11 @@ export const Hero = ({ darkMode }: { darkMode: boolean }) => {
               <motion.button
                 whileHover={{ scale: 1.02, y: -2 }}
                 whileTap={{ scale: 0.98 }}
-                className="w-full sm:w-auto px-8 py-4 border-2 rounded-xl font-bold text-base transition-all flex items-center justify-center gap-2"
-                style={{
-                  borderColor: darkMode ? COLORS.secondary : COLORS.primary,
-                  color: darkMode ? COLORS.secondary : COLORS.primary,
-                  backgroundColor: darkMode
-                    ? "rgba(197, 163, 255, 0.05)"
-                    : "rgba(64, 18, 104, 0.05)",
-                }}
+                className={buttonVariants({
+                  variant: "outline",
+                  className:
+                    "w-full sm:w-auto px-8 py-4 font-bold text-base transition-all flex items-center justify-center gap-2",
+                })}
               >
                 <ShoppingBag className="w-5 h-5" />
                 Shop all products
@@ -268,17 +230,9 @@ export const Hero = ({ darkMode }: { darkMode: boolean }) => {
                         repeat: Infinity,
                       }}
                     >
-                      <Sparkles
-                        className="w-12 h-12 mx-auto mb-2"
-                        style={{ color: COLORS.primary }}
-                      />
+                      <Sparkles className="w-12 h-12 mx-auto mb-2" />
                     </motion.div>
-                    <p
-                      className="text-xs font-bold"
-                      style={{ color: COLORS.primary }}
-                    >
-                      Your Design Here
-                    </p>
+                    <p className="text-xs font-bold">Your Design Here</p>
                   </div>
                 </motion.div>
 
@@ -294,10 +248,6 @@ export const Hero = ({ darkMode }: { darkMode: boolean }) => {
                     delay: 0.5,
                   }}
                   className="absolute -top-4 -right-4 w-16 h-16 rounded-full flex items-center justify-center"
-                  style={{
-                    backgroundColor: COLORS.accentWarm,
-                    boxShadow: "0 10px 30px rgba(226, 174, 61, 0.4)",
-                  }}
                 >
                   <span className="text-2xl">✨</span>
                 </motion.div>
@@ -313,10 +263,6 @@ export const Hero = ({ darkMode }: { darkMode: boolean }) => {
                     delay: 1,
                   }}
                   className="absolute -bottom-4 -left-4 w-20 h-20 rounded-full flex items-center justify-center"
-                  style={{
-                    backgroundColor: COLORS.secondary,
-                    boxShadow: "0 10px 30px rgba(197, 163, 255, 0.4)",
-                  }}
                 >
                   <span className="text-2xl">🎨</span>
                 </motion.div>
@@ -338,7 +284,6 @@ export const Hero = ({ darkMode }: { darkMode: boolean }) => {
                     delay: i * 0.5,
                   }}
                   className="w-2 h-2 rounded-full"
-                  style={{ backgroundColor: COLORS.secondary }}
                 />
               ))}
             </div>
@@ -368,14 +313,7 @@ export const Hero = ({ darkMode }: { darkMode: boolean }) => {
                     : "1px solid rgba(64, 18, 104, 0.1)",
                 }}
               >
-                <p
-                  className="text-2xl font-black"
-                  style={{
-                    color: darkMode ? COLORS.secondary : COLORS.primary,
-                  }}
-                >
-                  {stat.value}
-                </p>
+                <p className="text-2xl font-black">{stat.value}</p>
                 <p
                   className="text-xs mt-1"
                   style={{
