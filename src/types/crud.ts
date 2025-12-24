@@ -1,6 +1,14 @@
 // types/crud.ts - Types for reusable CRUD manager component
 
-export type FieldType = "text" | "textarea" | "url" | "email" | "tags" | "select" | "number" | "checkbox";
+export type FieldType =
+  | "text"
+  | "textarea"
+  | "url"
+  | "email"
+  | "tags"
+  | "select"
+  | "number"
+  | "checkbox";
 
 export interface Field {
   name: string;
@@ -10,10 +18,10 @@ export interface Field {
   placeholder?: string;
   options?: string[]; // for select type
   span?: 1 | 2; // column span in form grid
-  defaultValue?: any;
+  defaultValue?: string | number | boolean | string[];
 }
 
-export interface DisplayFields<T> {
+export interface DisplayFields {
   primary: string;
   secondary: string;
   imageUrl?: string;
@@ -23,12 +31,12 @@ export interface DisplayFields<T> {
   };
 }
 
-export interface CrudConfig<T extends Record<string, any>> {
+export interface CrudConfig<T extends Record<string, unknown>> {
   entityName: string;
   entityNamePlural: string;
   apiEndpoint: string;
   fields: Field[];
-  displayFields: (item: T) => DisplayFields<T>;
+  displayFields: (item: T) => DisplayFields;
   getItemId: (item: T) => string;
   palette: {
     primary: string;
@@ -45,4 +53,3 @@ export interface CrudConfig<T extends Record<string, any>> {
     icon?: React.ReactNode;
   };
 }
-

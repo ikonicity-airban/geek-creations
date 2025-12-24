@@ -1,47 +1,63 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Mail, Lock, AlertCircle } from "lucide-react";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Mail, Lock } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 function LoginContent() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = createClient();
 
-  const redirectTo = searchParams.get("redirect") || "/checkout";
+  const redirectTo = searchParams.get("redirect") || "/login";
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
+  const loginSchema = z.object({
+    email: z.string().email("Please enter a valid email address"),
+    password: z.string().min(1, "Password is required"),
+  });
 
-    if (!email || !password) {
-      setError("Please fill in all fields");
-      setLoading(false);
-      return;
-    }
+  const form = useForm<z.infer<typeof loginSchema>>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
+  const handleLogin = async (values: z.infer<typeof loginSchema>) => {
     try {
       const { data, error: authError } = await supabase.auth.signInWithPassword(
         {
-          email,
-          password,
+          email: values.email,
+          password: values.password,
         }
       );
 
       if (authError) {
-        setError(authError.message);
-        setLoading(false);
+        form.setError("root", { message: authError.message });
         return;
       }
 
@@ -51,18 +67,14 @@ function LoginContent() {
         router.push(redirectTo);
         router.refresh();
       } else {
-        setError("Failed to create session. Please try again.");
-        setLoading(false);
+        form.setError("root", {
+          message: "Failed to create session. Please try again.",
+        });
       }
-    } catch (err) {
-      setError("An unexpected error occurred. Please try again.");
-      setLoading(false);
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !loading) {
-      handleLogin(e as React.KeyboardEvent);
+    } catch {
+      form.setError("root", {
+        message: "An unexpected error occurred. Please try again.",
+      });
     }
   };
 
@@ -73,87 +85,105 @@ function LoginContent() {
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md"
       >
-        <div className="bg-card backdrop-blur rounded-2xl p-8 shadow-xl border border-gray-200/70 dark:border-gray-700/70">
-          <div className="text-center mb-8">
-            <h3 className="text-3xl font-black text-gray-900 dark:text-white mb-2">
-              Welcome Back
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Sign in to continue to checkout
-            </p>
-          </div>
+        <Card>
+          <CardHeader className="text-center mb-8">
+            <CardTitle>
+              <h3 className="text-3xl font-black text-gray-900 dark:text-white mb-2">
+                Welcome Back
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                {redirectTo == "/checkout"
+                  ? "Sign in to checkout"
+                  : "Sign in to dashboard"}
+              </p>
+            </CardTitle>
+          </CardHeader>
 
-          <form onSubmit={handleLogin} className="space-y-5">
-            {error && (
-              <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
-                <p className="text-sm text-red-800 dark:text-red-200">
-                  {error}
-                </p>
-              </div>
-            )}
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Email
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <Input
-                  type="email"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  className="pl-10"
-                  disabled={loading}
-                  required
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <Input
-                  type="password"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  className="pl-10"
-                  disabled={loading}
-                  required
-                />
-              </div>
-            </div>
-
-            <Button
-              type="submit"
-              className="w-full font-semibold"
-              disabled={loading}
-            >
-              {loading ? "Signing in..." : "Sign In"}
-            </Button>
-
-            <div className="text-center text-sm text-gray-600 dark:text-gray-400">
-              {"Don't"} have an account?{" "}
-              <Link
-                href={`/signup${
-                  redirectTo !== "/checkout"
-                    ? `?redirect=${encodeURIComponent(redirectTo)}`
-                    : ""
-                }`}
-                className="text-primary hover:underline font-semibold"
+          <CardContent>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(handleLogin)}
+                className="space-y-5"
               >
-                Sign up
-              </Link>
-            </div>
-          </form>
-        </div>
+                {form.formState.errors.root && (
+                  <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                    <p className="text-sm text-red-800 dark:text-red-200">
+                      {form.formState.errors.root.message}
+                    </p>
+                  </div>
+                )}
+
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <FormControl>
+                          <Input
+                            type="email"
+                            placeholder="you@example.com"
+                            className="pl-10"
+                            disabled={form.formState.isSubmitting}
+                            {...field}
+                          />
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="Enter your password"
+                            className="pl-10"
+                            disabled={form.formState.isSubmitting}
+                            {...field}
+                          />
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Button
+                  type="submit"
+                  className="w-full font-semibold"
+                  disabled={form.formState.isSubmitting}
+                >
+                  {form.formState.isSubmitting ? "Signing in..." : "Sign In"}
+                </Button>
+              </form>
+            </Form>
+          </CardContent>
+
+          <CardFooter className="flex items-baseline gap-2 text-xs mx-auto w-fit">
+            {"Don't"} have an account?{" "}
+            <Link
+              href={`/signup${
+                redirectTo !== "/checkout"
+                  ? `?redirect=${encodeURIComponent(redirectTo)}`
+                  : ""
+              }`}
+              className="text-primary hover:underline font-semibold"
+            >
+              Sign up
+            </Link>
+          </CardFooter>
+        </Card>
       </motion.div>
     </div>
   );

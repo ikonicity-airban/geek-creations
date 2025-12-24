@@ -9,21 +9,18 @@ import {
   MessageCircle,
   Info,
   ShoppingCart,
-  Search,
-  User,
-  Moon,
-  Sun,
   ChevronDown,
-  X,
   Menu,
+  X,
+  User,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { useCart } from "@/lib/cart-context";
-import { useTheme } from "@/lib/theme-context";
 import {
   MobileNav,
   NavBody,
+  NavbarLogo,
   Navbar as ResizableNavbar,
   useNavbarVisibility,
 } from "@/components/ui/resizable-navbar";
@@ -31,6 +28,9 @@ import { cn } from "@/lib/utils";
 import { Logo } from "./ui/logo";
 import { Button } from "./ui/button";
 import { IconUserShield } from "@tabler/icons-react";
+import { CurrencySwitcher, LanguageSwitcher } from "@/components/locale";
+import { SearchTrigger } from "@/components/search";
+import { ThemeToggle } from "@/components/theme";
 
 /* === REUSABLE NAV ITEM WITH HOVER PILL === */
 const NavItem = ({
@@ -41,6 +41,7 @@ const NavItem = ({
   currentHover,
   onMouseEnter,
   onMouseLeave,
+  isCondensed,
 }: {
   href: string;
   children: React.ReactNode;
@@ -49,34 +50,39 @@ const NavItem = ({
   currentHover: string | null;
   onMouseEnter: (key: string) => void;
   onMouseLeave: () => void;
-}) => (
-  <Link
-    href={href}
-    onMouseEnter={() => onMouseEnter(hoverKey)}
-    onMouseLeave={onMouseLeave}
-    className="relative px-2 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-semibold text-foreground transition-smooth"
-  >
-    {currentHover === hoverKey && (
-      <motion.span
-        layoutId="nav-hover-pill"
-        className="absolute inset-0 rounded-full bg-secondary/20 dark:bg-secondary/30"
-        transition={{ type: "spring", stiffness: 260, damping: 20 }}
-      />
-    )}
-    <span className="relative z-10 flex items-center gap-1.5 sm:gap-2">
-      {icon && (
-        <span
-          className={`transition-opacity duration-150 ${
-            currentHover === hoverKey ? "opacity-100" : "opacity-0"
-          }`}
-        >
-          {icon}
-        </span>
+  isCondensed?: boolean;
+}) => {
+  return !isCondensed ? (
+    <Link
+      href={href}
+      onMouseEnter={() => onMouseEnter(hoverKey)}
+      onMouseLeave={onMouseLeave}
+      className={cn(
+        "relative px-2 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-semibold text-foreground transition-smooth"
       )}
-      {children}
-    </span>
-  </Link>
-);
+    >
+      {currentHover === hoverKey && (
+        <motion.span
+          layoutId="nav-hover-pill"
+          className="absolute inset-0 rounded-full bg-secondary/30 dark:bg-primary/30"
+          transition={{ type: "spring", stiffness: 260, damping: 20 }}
+        />
+      )}
+      <span className="relative z-10 flex items-center gap-1.5 sm:gap-2">
+        {icon && (
+          <span
+            className={`transition-opacity duration-150 ${
+              currentHover === hoverKey ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            {icon}
+          </span>
+        )}
+        {children}
+      </span>
+    </Link>
+  ) : null;
+};
 
 /* === DESKTOP NAVBAR CONTENT === */
 const DesktopNavbarContent = () => {
@@ -85,7 +91,6 @@ const DesktopNavbarContent = () => {
   const [isAccountOpen, setIsAccountOpen] = useState(false);
 
   const { cart } = useCart();
-  const { darkMode, toggleDarkMode } = useTheme();
   const isCondensed = useNavbarVisibility();
 
   const designsMenu = [
@@ -107,12 +112,7 @@ const DesktopNavbarContent = () => {
   return (
     <>
       {/* Logo */}
-      <Link
-        href="/"
-        className="relative z-20 mr-2 sm:mr-4 md:mr-6 flex items-center"
-      >
-        <Logo />
-      </Link>
+      <NavbarLogo />
 
       {/* Main Navigation */}
       <div className="hidden md:flex items-center gap-1 lg:gap-2">
@@ -123,8 +123,8 @@ const DesktopNavbarContent = () => {
             currentHover={hoveredKey}
             onMouseEnter={setHoveredKey}
             onMouseLeave={() => setHoveredKey(null)}
+            icon={<Home className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
           >
-            <Home className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             Home
           </NavItem>
 
@@ -144,7 +144,7 @@ const DesktopNavbarContent = () => {
               {hoveredKey === "designs" && (
                 <motion.span
                   layoutId="nav-hover-pill"
-                  className="absolute inset-0 rounded-full bg-secondary/20 dark:bg-secondary/30"
+                  className="absolute inset-0 rounded-full bg-secondary/30 dark:bg-primary/30"
                   transition={{ type: "spring", stiffness: 260, damping: 20 }}
                 />
               )}
@@ -163,7 +163,7 @@ const DesktopNavbarContent = () => {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="block rounded-md px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm text-card-foreground hover:bg-accent transition-smooth"
+                    className="block rounded-md px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm text-card-foreground hover:bg-accent hover:text-accent-foreground transition-smooth"
                   >
                     {item.name}
                   </Link>
@@ -171,43 +171,42 @@ const DesktopNavbarContent = () => {
               </div>
             )}
           </div>
-
           <NavItem
             href="/editor"
             hoverKey="editor"
             currentHover={hoveredKey}
             onMouseEnter={setHoveredKey}
             onMouseLeave={() => setHoveredKey(null)}
+            isCondensed={isCondensed}
+            icon={<Wand2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
           >
-            <Wand2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             Editor
           </NavItem>
 
-          <div
-            className={cn(
-              "flex items-center gap-2",
-              isCondensed ? "hidden" : "flex"
-            )}
-          >
+          <div className="max-xl:hidden flex">
             <NavItem
               href="/contact"
               hoverKey="contact"
               currentHover={hoveredKey}
               onMouseEnter={setHoveredKey}
               onMouseLeave={() => setHoveredKey(null)}
+              isCondensed={isCondensed}
+              icon={<MessageCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
             >
-              <MessageCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               Contact us
             </NavItem>
+          </div>
 
+          <div className="max-xl:hidden flex">
             <NavItem
               href="/about"
               hoverKey="about"
               currentHover={hoveredKey}
               onMouseEnter={setHoveredKey}
               onMouseLeave={() => setHoveredKey(null)}
+              isCondensed={isCondensed}
+              icon={<Info className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
             >
-              <Info className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               About
             </NavItem>
           </div>
@@ -216,49 +215,16 @@ const DesktopNavbarContent = () => {
         {/* Right side actions */}
         <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
           {/* Search */}
-          <div
-            className={`relative transition-all duration-300 ${
-              isCondensed ? "w-10" : "w-64"
-            }`}
-          >
-            {!isCondensed && (
-              <input
-                type="text"
-                placeholder="Search..."
-                className="w-48 lg:w-64 rounded-full bg-muted px-3 py-1.5 sm:px-4 sm:py-2 pr-9 sm:pr-10 text-xs sm:text-sm border-hairline border-border focus:outline-none focus:ring-2 focus:ring-ring transition-smooth"
-                aria-label="Search"
-              />
-            )}
-            <Button
-              className="absolute right-0.5 top-1/2 cursor-pointer -translate-y-1/2 flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full text-primary-foreground shadow-[0_0_24px_rgba(34,42,53,0.06),0_1px_1px_rgba(0,0,0,0.05),0_0_0_1px_rgba(34,42,53,0.04),0_0_4px_rgba(34,42,53,0.08),0_16px_68px_rgba(47,48,55,0.05),0_1px_0_rgba(255,255,255,0.1)_inset] hover:shadow-card-hover transition-smooth"
-              aria-label="Search"
-            >
-              <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            </Button>
-          </div>
+          <SearchTrigger variant="minimal" />
 
-          {/* Mobile Search Icon */}
-          <Button
-            className="sm:hidden p-1.5 sm:p-2 rounded-full bg-muted text-foreground shadow-card active:scale-95 transition-smooth"
-            aria-label="Search"
-          >
-            <Search className="w-4 h-4 sm:w-5 sm:h-5" />
-          </Button>
+          {/* Currency Switcher */}
+          <CurrencySwitcher variant="minimal" />
+
+          {/* Language Switcher */}
+          <LanguageSwitcher variant="minimal" />
 
           {/* Theme Toggle */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleDarkMode}
-            className="rounded-full bg-muted shadow-card hover:shadow-card-hover transition-smooth active:scale-95 hover:border border-accent"
-            aria-label={darkMode ? "Light mode" : "Dark mode"}
-          >
-            {darkMode ? (
-              <Sun className="w-4 h-4 sm:w-5 sm:h-5 text-accent" />
-            ) : (
-              <Moon className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-            )}
-          </Button>
+          <ThemeToggle variant="minimal" />
 
           {/* Cart */}
           <Link href="/cart" className="relative">
@@ -321,7 +287,6 @@ interface MobileLink {
 const MobileNavbarContent = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { cart } = useCart();
-  const { darkMode, toggleDarkMode } = useTheme();
 
   const links: MobileLink[] = [
     { name: "Home", href: "/", icon: <Home className="w-5 h-5" /> },
@@ -352,6 +317,8 @@ const MobileNavbarContent = () => {
       </Link>
 
       <div className="flex items-center gap-2 sm:gap-3">
+        <SearchTrigger variant="icon-only" />
+
         <Link href="/cart" className="relative">
           <button
             className="p-2 rounded-full bg-muted text-foreground shadow-card active:scale-95 transition-smooth"
@@ -416,39 +383,39 @@ const MobileNavbarContent = () => {
                 ))}
               </div>
 
-              {/* Theme Toggle */}
-              <div className="mt-6 pt-6 border-t border-border">
-                <button
-                  onClick={toggleDarkMode}
-                  className="w-full flex items-center justify-between px-4 py-3.5 rounded-btn text-base font-medium text-foreground bg-muted hover:bg-accent transition-smooth"
-                >
-                  <span className="flex items-center gap-3">
-                    {darkMode ? (
-                      <>
-                        <Sun className="w-5 h-5" />
-                        Light Mode
-                      </>
-                    ) : (
-                      <>
-                        <Moon className="w-5 h-5" />
-                        Dark Mode
-                      </>
-                    )}
-                  </span>
-                  <div className="relative inline-flex items-center">
-                    <div
-                      className={`w-11 h-6 ${
-                        darkMode ? "bg-primary" : "bg-muted-foreground/30"
-                      } rounded-full transition-colors`}
-                    >
-                      <div
-                        className={`absolute top-[2px] ${
-                          darkMode ? "left-[22px]" : "left-[2px]"
-                        } w-5 h-5 bg-background rounded-full transition-all shadow-sm`}
-                      />
+              {/* Locale & Theme Controls */}
+              <div className="mt-6 pt-6 border-t border-border space-y-3">
+                <div className="px-4">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                    Preferences
+                  </p>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-foreground">
+                        Search
+                      </span>
+                      <SearchTrigger variant="icon-only" />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-foreground">
+                        Currency
+                      </span>
+                      <CurrencySwitcher variant="minimal" />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-foreground">
+                        Language
+                      </span>
+                      <LanguageSwitcher variant="minimal" />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-foreground">
+                        Theme
+                      </span>
+                      <ThemeToggle variant="minimal" />
                     </div>
                   </div>
-                </button>
+                </div>
               </div>
 
               {/* User Info / Login */}

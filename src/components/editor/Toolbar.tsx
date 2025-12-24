@@ -1,9 +1,15 @@
 "use client";
 
-import React from "react";
-import { Edit, Eye, Grid3x3, Undo2, Redo2, ZoomIn, ZoomOut } from "lucide-react";
+import {
+  Edit,
+  Eye,
+  Grid3x3,
+  Undo2,
+  Redo2,
+  ZoomIn,
+  ZoomOut,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
 interface ToolbarProps {
   editMode: "edit" | "preview";
@@ -103,7 +109,7 @@ export function Toolbar({
             >
               <ZoomOut className="w-4 h-4" />
             </Button>
-            <span className="text-sm font-medium min-w-[3rem] text-center">
+            <span className="text-sm font-medium min-w-12 text-center">
               {zoomLevel}%
             </span>
             <Button
@@ -120,4 +126,3 @@ export function Toolbar({
     </div>
   );
 }
-

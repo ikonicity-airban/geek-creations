@@ -1,16 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import {
-  Target,
-  Users,
-  Sparkles,
-  Heart,
-  Award,
-  Globe,
-  Zap,
-  Shield,
-} from "lucide-react";
+import { Target, Users, Sparkles, Heart, Shield } from "lucide-react";
 
 export default function AboutPage() {
   const values = [
@@ -61,9 +52,9 @@ export default function AboutPage() {
           About Geek Creations
         </h1>
         <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-          We're a passionate team of designers, developers, and geeks dedicated
-          to bringing your creative visions to life through high-quality
-          print-on-demand products.
+          {"We're"} a passionate team of designers, developers, and geeks
+          dedicated to bringing your creative visions to life through
+          high-quality print-on-demand products.
         </p>
       </motion.div>
 
@@ -110,15 +101,15 @@ export default function AboutPage() {
             <p className="text-gray-600 dark:text-gray-400 mb-4">
               We specialize in print-on-demand products, allowing you to
               customize everything from t-shirts and hoodies to mugs and
-              posters. Whether you're a gaming enthusiast, anime lover, tech
-              geek, or have your own unique interests, we've got something for
-              you.
+              posters. Whether {"you're"} a gaming enthusiast, anime lover, tech
+              geek, or have your own unique interests, {"we've"} got something
+              for you.
             </p>
             <p className="text-gray-600 dark:text-gray-400">
               Our team works tirelessly to curate the best designs, partner with
               reliable fulfillment providers, and ensure every order meets our
-              quality standards. We're not just a store—we're a community of
-              creators and enthusiasts.
+              quality standards. {"We're"} not just a {"store—we're"} a
+              community of creators and enthusiasts.
             </p>
           </div>
         </div>
@@ -171,8 +162,8 @@ export default function AboutPage() {
             Join Our Community
           </h2>
           <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-6">
-            We're always looking for talented designers, developers, and
-            passionate geeks to join our team. If you share our vision, we'd
+            {" We're"} always looking for talented designers, developers, and
+            passionate geeks to join our team. If you share our vision, {"we'd"}
             love to hear from you.
           </p>
           <a

@@ -2,10 +2,21 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { useCart } from "@/lib/cart-context";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { motion } from "framer-motion";
 import {
   CreditCard,
@@ -30,6 +41,39 @@ export default function CheckoutPage() {
   const [error, setError] = useState("");
   const [step, setStep] = useState<"info" | "payment" | "success">("info");
   const [orderId, setOrderId] = useState<string | null>(null);
+
+  const shippingSchema = z.object({
+    email: z.string().email("Please enter a valid email address"),
+    shipping_address: z.object({
+      first_name: z.string().min(1, "First name is required"),
+      last_name: z.string().min(1, "Last name is required"),
+      address1: z.string().min(1, "Address is required"),
+      address2: z.string().optional(),
+      city: z.string().min(1, "City is required"),
+      province: z.string().min(1, "State/Province is required"),
+      country: z.string().min(1, "Country is required"),
+      zip: z.string().min(1, "ZIP/Postal code is required"),
+      phone: z.string().min(1, "Phone number is required"),
+    }),
+  });
+
+  const form = useForm<z.infer<typeof shippingSchema>>({
+    resolver: zodResolver(shippingSchema),
+    defaultValues: {
+      email: "",
+      shipping_address: {
+        first_name: "",
+        last_name: "",
+        address1: "",
+        address2: "",
+        city: "",
+        province: "",
+        country: "Nigeria",
+        zip: "",
+        phone: "",
+      },
+    },
+  });
 
   const [formData, setFormData] = useState<CheckoutData>({
     email: "",
@@ -74,19 +118,27 @@ export default function CheckoutPage() {
         data: { session },
       } = await supabase.auth.getSession();
       if (session?.user) {
+        const email = session.user.email || "";
+        const firstName = session.user.user_metadata?.first_name || "";
+        const lastName = session.user.user_metadata?.last_name || "";
+
         setFormData((prev) => ({
           ...prev,
-          email: session.user.email || "",
+          email,
         }));
-        if (session.user.user_metadata?.first_name) {
+
+        form.setValue("email", email);
+        if (firstName) {
           setFormData((prev) => ({
             ...prev,
             shipping_address: {
               ...prev.shipping_address,
-              first_name: session.user.user_metadata.first_name || "",
-              last_name: session.user.user_metadata.last_name || "",
+              first_name: firstName,
+              last_name: lastName,
             },
           }));
+          form.setValue("shipping_address.first_name", firstName);
+          form.setValue("shipping_address.last_name", lastName);
         }
       } else {
         // If not logged in, redirect to signup
@@ -96,31 +148,14 @@ export default function CheckoutPage() {
     getUser();
   }, [cart.items.length, router, step, supabase]);
 
-  const validateShippingInfo = (): boolean => {
-    const addr = formData.shipping_address;
-    if (
-      !formData.email ||
-      !addr.first_name ||
-      !addr.last_name ||
-      !addr.address1 ||
-      !addr.city ||
-      !addr.province ||
-      !addr.country ||
-      !addr.zip ||
-      !addr.phone
-    ) {
-      setError("Please fill in all required shipping fields");
-      return false;
-    }
-    return true;
-  };
-
-  const handleShippingSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (validateShippingInfo()) {
-      setError("");
-      setStep("payment");
-    }
+  const handleShippingSubmit = (values: z.infer<typeof shippingSchema>) => {
+    setFormData((prev) => ({
+      ...prev,
+      email: values.email,
+      shipping_address: values.shipping_address,
+    }));
+    setError("");
+    setStep("payment");
   };
 
   const handlePaymentSubmit = async (e: React.FormEvent) => {
@@ -251,8 +286,11 @@ export default function CheckoutPage() {
               className="bg-card backdrop-blur rounded-xl p-6 shadow-sm border"
             >
               {step === "info" ? (
-                <form onSubmit={handleShippingSubmit} className="space-y-6">
-                  <div>
+                <Form {...form}>
+                  <form
+                    onSubmit={form.handleSubmit(handleShippingSubmit)}
+                    className="space-y-6"
+                  >
                     <h3 className="text-2xl font-black mb-6">
                       Shipping Information
                     </h3>
@@ -265,154 +303,195 @@ export default function CheckoutPage() {
                       </div>
                     )}
 
-                    <div className="mb-6">
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Email Address *
-                      </label>
-                      <Input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        placeholder="you@example.com"
-                        required
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem className="mb-6">
+                          <FormLabel>Email Address *</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="email"
+                              placeholder="you@example.com"
+                              {...field}
+                            />
+                          </FormControl>
+                          <p className="text-xs text-gray-500 dark:mt-1">
+                            {"We'll"} send your order confirmation to this email
+                          </p>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                      <FormField
+                        control={form.control}
+                        name="shipping_address.first_name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>First Name *</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="text"
+                                placeholder="John"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
-                      <p className="text-xs text-gray-500 dark:mt-1">
-                        {"We'll"} send your order confirmation to this email
-                      </p>
+                      <FormField
+                        control={form.control}
+                        name="shipping_address.last_name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Last Name *</FormLabel>
+                            <FormControl>
+                              <Input type="text" placeholder="Doe" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <FormField
+                      control={form.control}
+                      name="shipping_address.address1"
+                      render={({ field }) => (
+                        <FormItem className="mb-4">
+                          <FormLabel>Address *</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="text"
+                              placeholder="123 Main Street"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="shipping_address.address2"
+                      render={({ field }) => (
+                        <FormItem className="mb-4">
+                          <FormLabel>
+                            Apartment, suite, etc. (optional)
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              type="text"
+                              placeholder="Apt 4B"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                      <FormField
+                        control={form.control}
+                        name="shipping_address.city"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>City *</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="text"
+                                placeholder="Lagos"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="shipping_address.province"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>State/Province *</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="text"
+                                placeholder="Lagos"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4 mb-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          First Name *
-                        </label>
-                        <Input
-                          type="text"
-                          name="first_name"
-                          value={formData.shipping_address.first_name}
-                          onChange={handleChange}
-                          placeholder="John"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          Last Name *
-                        </label>
-                        <Input
-                          type="text"
-                          name="last_name"
-                          value={formData.shipping_address.last_name}
-                          onChange={handleChange}
-                          placeholder="Doe"
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Address *
-                      </label>
-                      <Input
-                        type="text"
-                        name="address1"
-                        value={formData.shipping_address.address1}
-                        onChange={handleChange}
-                        placeholder="123 Main Street"
-                        required
+                      <FormField
+                        control={form.control}
+                        name="shipping_address.country"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Country *</FormLabel>
+                            <FormControl>
+                              <select
+                                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700"
+                                {...field}
+                              >
+                                <option value="Nigeria">Nigeria</option>
+                                <option value="Ghana">Ghana</option>
+                                <option value="Kenya">Kenya</option>
+                                <option value="South Africa">
+                                  South Africa
+                                </option>
+                              </select>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="shipping_address.zip"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>ZIP/Postal Code *</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="text"
+                                placeholder="100001"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
                     </div>
 
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Apartment, suite, etc. (optional)
-                      </label>
-                      <Input
-                        type="text"
-                        name="address2"
-                        value={formData.shipping_address.address2}
-                        onChange={handleChange}
-                        placeholder="Apt 4B"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4 mb-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          City *
-                        </label>
-                        <Input
-                          type="text"
-                          name="city"
-                          value={formData.shipping_address.city}
-                          onChange={handleChange}
-                          placeholder="Lagos"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          State/Province *
-                        </label>
-                        <Input
-                          type="text"
-                          name="province"
-                          value={formData.shipping_address.province}
-                          onChange={handleChange}
-                          placeholder="Lagos"
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4 mb-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          Country *
-                        </label>
-                        <select
-                          name="country"
-                          value={formData.shipping_address.country}
-                          onChange={handleChange}
-                          className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700"
-                          required
-                        >
-                          <option value="Nigeria">Nigeria</option>
-                          <option value="Ghana">Ghana</option>
-                          <option value="Kenya">Kenya</option>
-                          <option value="South Africa">South Africa</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          ZIP/Postal Code *
-                        </label>
-                        <Input
-                          type="text"
-                          name="zip"
-                          value={formData.shipping_address.zip}
-                          onChange={handleChange}
-                          placeholder="100001"
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    <div className="mb-6">
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Phone Number *
-                      </label>
-                      <Input
-                        type="tel"
-                        name="phone"
-                        value={formData.shipping_address.phone}
-                        onChange={handleChange}
-                        placeholder="+234 800 000 0000"
-                        required
-                      />
-                    </div>
+                    <FormField
+                      control={form.control}
+                      name="shipping_address.phone"
+                      render={({ field }) => (
+                        <FormItem className="mb-6">
+                          <FormLabel>Phone Number *</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="tel"
+                              placeholder="+234 800 000 0000"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
                     <div className="flex items-center gap-2 mb-6">
                       <input
@@ -508,8 +587,8 @@ export default function CheckoutPage() {
                       Continue to Payment
                       <ArrowRight className="w-5 h-5 ml-2" />
                     </Button>
-                  </div>
-                </form>
+                  </form>
+                </Form>
               ) : (
                 <form
                   onSubmit={handlePaymentSubmit}

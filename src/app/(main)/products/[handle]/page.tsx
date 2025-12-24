@@ -22,7 +22,7 @@ import RelatedProducts from "@/components/pdp/RelatedProducts";
 import SizeChartModal from "@/components/pdp/SizeChartModal";
 import MiniCartDrawer from "@/components/cart/MiniCartDrawer";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { IconBabyBottle, IconClothesRack } from "@tabler/icons-react";
+import { IconBabyBottle, IconFidgetSpinner } from "@tabler/icons-react";
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -202,6 +202,14 @@ export default function ProductDetailPage() {
   const maxQuantity = selectedVariant
     ? Math.min(selectedVariant.inventory_quantity, 10)
     : 1;
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center">
+        <IconFidgetSpinner className="w-16 h-16 text-primary animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <>

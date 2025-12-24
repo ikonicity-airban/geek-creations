@@ -98,7 +98,7 @@ export default function CartPage() {
                   {/* Product Info */}
                   <div className="flex-1">
                     <Link href={`/products/${item.product_id}`}>
-                      <h3 className="font-bold text-lg text-gray-900 dark:text-white hover:text-indigo-600 mb-1 truncate">
+                      <h3 className="font-bold text-lg text-gray-900 dark:text-white hover:text-indigo-600 mb-1 wrap-break-word">
                         {item.product_title}
                       </h3>
                     </Link>

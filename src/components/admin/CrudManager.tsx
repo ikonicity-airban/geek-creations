@@ -1,14 +1,29 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { toast } from "sonner";
 import { X, Plus, Edit2, Trash2, Search } from "lucide-react";
 import type { CrudConfig, Field } from "@/types/crud";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
-interface CrudManagerProps<T extends Record<string, any>> {
+interface CrudManagerProps<T extends Record<string, unknown>> {
   config: CrudConfig<T>;
 }
 
-export default function CrudManager<T extends Record<string, any>>({
+export default function CrudManager<T extends Record<string, unknown>>({
   config,
 }: CrudManagerProps<T>) {
   const [items, setItems] = useState<T[]>([]);
@@ -16,18 +31,59 @@ export default function CrudManager<T extends Record<string, any>>({
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<T | null>(null);
-  const [formData, setFormData] = useState<Record<string, any>>({});
-  const [submitting, setSubmitting] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
-  const [toast, setToast] = useState<{
-    message: string;
-    type: "success" | "error";
-  } | null>(null);
 
-  const showToast = (message: string, type: "success" | "error") => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
-  };
+  // Build dynamic zod schema from fields
+  const schema = useMemo(() => {
+    const shape: Record<string, z.ZodTypeAny> = {};
+    config.fields.forEach((field) => {
+      let fieldSchema: z.ZodTypeAny;
+
+      if (field.type === "number") {
+        fieldSchema = z.coerce.number();
+      } else if (field.type === "checkbox") {
+        fieldSchema = z.boolean();
+      } else if (field.type === "email") {
+        fieldSchema = z.string().email();
+      } else if (field.type === "url") {
+        fieldSchema = z.string().url();
+      } else if (field.type === "tags") {
+        fieldSchema = z.string();
+      } else {
+        fieldSchema = z.string();
+      }
+
+      if (field.required) {
+        if (field.type === "checkbox" || field.type === "number") {
+          // Checkboxes and numbers don't need min validation
+          shape[field.name] = fieldSchema;
+        } else {
+          // For string types, add min validation
+          shape[field.name] = (fieldSchema as z.ZodString).min(
+            1,
+            `${field.label} is required`
+          );
+        }
+      } else {
+        shape[field.name] = fieldSchema.optional();
+      }
+    });
+    return z.object(shape);
+  }, [config.fields]);
+
+  type FormData = z.infer<typeof schema>;
+
+  const form = useForm<FormData>({
+    resolver: zodResolver(schema),
+    defaultValues: (() => {
+      const defaults: Record<string, unknown> = {};
+      config.fields.forEach((field) => {
+        defaults[field.name] =
+          field.defaultValue ?? (field.type === "checkbox" ? false : "");
+      });
+      return defaults as FormData;
+    })(),
+  });
 
   const fetchItems = async () => {
     setLoading(true);
@@ -39,7 +95,7 @@ export default function CrudManager<T extends Record<string, any>>({
       setItems(json.data || []);
     } catch (error) {
       console.error(`Failed to load ${config.entityNamePlural}`, error);
-      showToast(`Failed to load ${config.entityNamePlural}`, "error");
+      toast.error(`Failed to load ${config.entityNamePlural}`);
     } finally {
       setLoading(false);
     }
@@ -47,21 +103,23 @@ export default function CrudManager<T extends Record<string, any>>({
 
   useEffect(() => {
     fetchItems();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const openCreateModal = () => {
     setEditingItem(null);
-    const initialData: Record<string, any> = {};
+    const initialData: Record<string, unknown> = {};
     config.fields.forEach((field) => {
-      initialData[field.name] = field.defaultValue ?? "";
+      initialData[field.name] =
+        field.defaultValue ?? (field.type === "checkbox" ? false : "");
     });
-    setFormData(initialData);
+    form.reset(initialData as FormData);
     setIsModalOpen(true);
   };
 
   const openEditModal = (item: T) => {
     setEditingItem(item);
-    const editData: Record<string, any> = {};
+    const editData: Record<string, unknown> = {};
     config.fields.forEach((field) => {
       const value = item[field.name];
       if (field.type === "tags" && Array.isArray(value)) {
@@ -72,17 +130,15 @@ export default function CrudManager<T extends Record<string, any>>({
         editData[field.name] = value || "";
       }
     });
-    setFormData(editData);
+    form.reset(editData as FormData);
     setIsModalOpen(true);
   };
 
-  const handleSubmit = async () => {
-    setSubmitting(true);
-
+  const handleSubmit = async (values: FormData) => {
     try {
-      const payload: Record<string, any> = {};
+      const payload: Record<string, unknown> = {};
       config.fields.forEach((field) => {
-        const value = formData[field.name];
+        const value = values[field.name];
         if (field.type === "tags" && typeof value === "string") {
           payload[field.name] = value
             ? value
@@ -91,7 +147,7 @@ export default function CrudManager<T extends Record<string, any>>({
                 .filter(Boolean)
             : [];
         } else if (field.type === "number") {
-          payload[field.name] = value ? Number(value) : undefined;
+          payload[field.name] = value !== undefined ? Number(value) : undefined;
         } else if (field.type === "checkbox") {
           payload[field.name] = Boolean(value);
         } else {
@@ -116,26 +172,22 @@ export default function CrudManager<T extends Record<string, any>>({
         throw new Error(error.error || "Operation failed");
       }
 
-      showToast(
+      toast.success(
         `${config.entityName} ${
           editingItem ? "updated" : "created"
-        } successfully`,
-        "success"
+        } successfully`
       );
       setIsModalOpen(false);
       await fetchItems();
-    } catch (error: any) {
+    } catch (error) {
       console.error("Operation failed", error);
-      showToast(
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      toast.error(
         `Failed to ${
           editingItem ? "update" : "create"
-        } ${config.entityName.toLowerCase()}: ${
-          error.message || "Unknown error"
-        }`,
-        "error"
+        } ${config.entityName.toLowerCase()}: ${errorMessage}`
       );
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -146,12 +198,12 @@ export default function CrudManager<T extends Record<string, any>>({
       });
       if (!res.ok) throw new Error("Delete failed");
 
-      showToast(`${config.entityName} deleted successfully`, "success");
+      toast.success(`${config.entityName} deleted successfully`);
       setDeleteConfirm(null);
       await fetchItems();
     } catch (error) {
       console.error("Delete failed", error);
-      showToast(`Failed to delete ${config.entityName.toLowerCase()}`, "error");
+      toast.error(`Failed to delete ${config.entityName.toLowerCase()}`);
     }
   };
 
@@ -179,83 +231,96 @@ export default function CrudManager<T extends Record<string, any>>({
     const colSpan = field.span === 2 ? "md:col-span-2" : "";
 
     return (
-      <div key={field.name} className={colSpan}>
-        {isCheckbox ? (
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={formData[field.name] || false}
-              onChange={(e) =>
-                setFormData({ ...formData, [field.name]: e.target.checked })
-              }
-              className="w-4 h-4 rounded"
-              style={{ accentColor: config.palette.primary }}
-            />
-            <span
-              className="text-sm font-semibold"
-              style={{ color: config.palette.primary }}
-            >
-              {field.label}
-              {field.required && <span style={{ color: "#dc2626" }}> *</span>}
-            </span>
-          </label>
-        ) : (
-          <>
-            <label
-              className="block text-sm font-semibold mb-2"
-              style={{ color: config.palette.primary }}
-            >
-              {field.label}
-              {field.required && <span style={{ color: "#dc2626" }}> *</span>}
-            </label>
-            {isSelect ? (
-              <select
-                value={formData[field.name] || ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, [field.name]: e.target.value })
-                }
-                className="w-full px-4 py-3 rounded-lg border dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-                style={{ borderColor: "#e0e0e0" }}
-              >
-                <option value="">Select {field.label}</option>
-                {field.options?.map((opt) => (
-                  <option key={opt} value={opt}>
-                    {opt}
-                  </option>
-                ))}
-              </select>
-            ) : isTextarea ? (
-              <textarea
-                placeholder={field.placeholder}
-                value={formData[field.name] || ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, [field.name]: e.target.value })
-                }
-                rows={4}
-                className="w-full px-4 py-3 rounded-lg border resize-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-                style={{ borderColor: "#e0e0e0" }}
-              />
+      <FormField
+        key={field.name}
+        control={form.control}
+        name={field.name}
+        render={({ field: formField }) => (
+          <FormItem className={colSpan}>
+            {isCheckbox ? (
+              <div className="flex items-center gap-2">
+                <FormControl>
+                  <input
+                    type="checkbox"
+                    checked={Boolean(formField.value)}
+                    onChange={(e) => formField.onChange(e.target.checked)}
+                    className="w-4 h-4 rounded"
+                    style={{ accentColor: config.palette.primary }}
+                  />
+                </FormControl>
+                <FormLabel
+                  className="cursor-pointer"
+                  style={{ color: config.palette.primary }}
+                >
+                  {field.label}
+                  {field.required && (
+                    <span style={{ color: "#dc2626" }}> *</span>
+                  )}
+                </FormLabel>
+              </div>
             ) : (
-              <input
-                type={
-                  field.type === "tags"
-                    ? "text"
-                    : field.type === "number"
-                    ? "number"
-                    : field.type
-                }
-                placeholder={field.placeholder}
-                value={formData[field.name] || ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, [field.name]: e.target.value })
-                }
-                className="w-full px-4 py-3 rounded-lg border dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-                style={{ borderColor: "#e0e0e0" }}
-              />
+              <>
+                <FormLabel style={{ color: config.palette.primary }}>
+                  {field.label}
+                  {field.required && (
+                    <span style={{ color: "#dc2626" }}> *</span>
+                  )}
+                </FormLabel>
+                {isSelect ? (
+                  <FormControl>
+                    <select
+                      className="w-full px-4 py-3 rounded-lg border dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                      style={{ borderColor: "#e0e0e0" }}
+                      value={String(formField.value ?? "")}
+                      onChange={(e) => formField.onChange(e.target.value)}
+                      onBlur={formField.onBlur}
+                      name={formField.name}
+                    >
+                      <option value="">Select {field.label}</option>
+                      {field.options?.map((opt) => (
+                        <option key={opt} value={opt}>
+                          {opt}
+                        </option>
+                      ))}
+                    </select>
+                  </FormControl>
+                ) : isTextarea ? (
+                  <FormControl>
+                    <textarea
+                      placeholder={field.placeholder}
+                      rows={4}
+                      className="w-full px-4 py-3 rounded-lg border resize-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                      style={{ borderColor: "#e0e0e0" }}
+                      value={String(formField.value ?? "")}
+                      onChange={(e) => formField.onChange(e.target.value)}
+                      onBlur={formField.onBlur}
+                      name={formField.name}
+                    />
+                  </FormControl>
+                ) : (
+                  <FormControl>
+                    <Input
+                      type={
+                        field.type === "tags"
+                          ? "text"
+                          : field.type === "number"
+                          ? "number"
+                          : field.type
+                      }
+                      placeholder={field.placeholder}
+                      value={String(formField.value ?? "")}
+                      onChange={(e) => formField.onChange(e.target.value)}
+                      onBlur={formField.onBlur}
+                      name={formField.name}
+                    />
+                  </FormControl>
+                )}
+                <FormMessage />
+              </>
             )}
-          </>
+          </FormItem>
         )}
-      </div>
+      />
     );
   };
 
@@ -338,7 +403,8 @@ export default function CrudManager<T extends Record<string, any>>({
                   >
                     {display.imageUrl && (
                       <div className="w-16 h-16 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shrink-0">
-                        <img
+                        <Image
+                          fill
                           src={display.imageUrl}
                           alt={display.primary}
                           className="w-full h-full object-cover"
@@ -416,25 +482,38 @@ export default function CrudManager<T extends Record<string, any>>({
             </div>
 
             <div className="p-6">
-              <div className="grid md:grid-cols-2 gap-4">
-                {config.fields.map(renderField)}
-              </div>
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(handleSubmit)}
+                  className="space-y-4"
+                >
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {config.fields.map(renderField)}
+                  </div>
 
-              <div className="flex gap-3 mt-6">
-                <button
-                  onClick={() => setIsModalOpen(false)}
-                  className="flex-1 px-6 py-3 rounded-lg font-bold border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 transition hover:bg-gray-50 dark:hover:bg-gray-700"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSubmit}
-                  disabled={submitting}
-                  className="flex-1 px-6 py-3 rounded-lg font-bold bg-indigo-600 text-white transition hover:bg-indigo-700 disabled:opacity-50"
-                >
-                  {submitting ? "Saving..." : editingItem ? "Update" : "Create"}
-                </button>
-              </div>
+                  <div className="flex gap-3 mt-6">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setIsModalOpen(false)}
+                      className="flex-1"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="submit"
+                      disabled={form.formState.isSubmitting}
+                      className="flex-1 bg-indigo-600 hover:bg-indigo-700"
+                    >
+                      {form.formState.isSubmitting
+                        ? "Saving..."
+                        : editingItem
+                        ? "Update"
+                        : "Create"}
+                    </Button>
+                  </div>
+                </form>
+              </Form>
             </div>
           </div>
         </div>
@@ -474,35 +553,6 @@ export default function CrudManager<T extends Record<string, any>>({
           </div>
         </div>
       )}
-
-      {/* Toast Notification */}
-      {toast && (
-        <div
-          className="fixed bottom-6 right-6 px-6 py-4 rounded-lg shadow-lg z-50 animate-slide-up"
-          style={{
-            backgroundColor: toast.type === "success" ? "#10b981" : "#dc2626",
-            color: "#ffffff",
-          }}
-        >
-          {toast.message}
-        </div>
-      )}
-
-      <style jsx>{`
-        @keyframes slide-up {
-          from {
-            transform: translateY(100%);
-            opacity: 0;
-          }
-          to {
-            transform: translateY(0);
-            opacity: 1;
-          }
-        }
-        .animate-slide-up {
-          animation: slide-up 0.3s ease-out;
-        }
-      `}</style>
     </div>
   );
 }

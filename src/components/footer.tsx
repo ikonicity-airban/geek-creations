@@ -1,14 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Instagram,
-  Twitter,
-  Facebook,
-  Mail,
-  ArrowUp,
-  ChevronDown,
-} from "lucide-react";
+import { Mail, ArrowUp, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import {
   IconBrandFacebook,
@@ -19,8 +12,11 @@ import { Input } from "./ui/input";
 import { Badge } from "./ui/badge";
 import { buttonVariants } from "./ui/button";
 import { cn } from "@/lib/utils";
+import { CurrencySwitcher, LanguageSwitcher } from "@/components/locale";
+import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 
 export const Footer = () => {
+  const { settings } = useSiteSettings();
   const [email, setEmail] = useState("");
   const [openSection, setOpenSection] = useState<string | null>(null);
 
@@ -140,12 +136,10 @@ export const Footer = () => {
             className="col-span-12 lg:col-span-4"
           >
             <h4 className="text-3xl lg:text-4xl font-black mb-3 md:mb-4 text-primary">
-              GEEKS
-              <br />
-              CREATION
+              {settings.siteName.toUpperCase()}
             </h4>
             <p className="mb-4 md:mb-6 text-sm md:text-base text-muted-foreground">
-              Design it . Build it . Wear it.
+              {settings.siteSlogan}
             </p>
 
             {/* Newsletter */}
@@ -172,6 +166,12 @@ export const Footer = () => {
               </form>
             </div>
 
+            {/* Locale Switchers */}
+            <div className="flex gap-2 md:gap-3 mb-4 md:mb-6">
+              <CurrencySwitcher variant="minimal" />
+              <LanguageSwitcher variant="minimal" />
+            </div>
+
             {/* Social Icons - Glassmorphic */}
             <div className="flex gap-2 md:gap-3">
               {[
@@ -179,17 +179,26 @@ export const Footer = () => {
                   Icon: IconBrandInstagram,
                   label: "Instagram",
                   color: "#e21b35",
+                  href: settings.instagramUrl,
                 },
-                { Icon: IconBrandX, label: "Twitter", color: "#c5a3ff" },
+                {
+                  Icon: IconBrandX,
+                  label: "Twitter",
+                  color: "#c5a3ff",
+                  href: settings.twitterUrl,
+                },
                 {
                   Icon: IconBrandFacebook,
                   label: "Facebook",
                   color: "#e2ae3d",
+                  href: settings.facebookUrl,
                 },
-              ].map(({ Icon, label, color }) => (
+              ].map(({ Icon, label, color, href }) => (
                 <motion.a
                   key={label}
-                  href="#"
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label={label}
                   variants={socialIconVariants}
                   initial="rest"
@@ -266,12 +275,10 @@ export const Footer = () => {
             viewport={{ once: true }}
           >
             <h4 className="text-2xl sm:text-3xl font-black mb-2 sm:mb-3 text-primary">
-              GEEKS
-              <br />
-              CREATION
+              {settings.siteName.toUpperCase()}
             </h4>
             <p className="mb-4 sm:mb-6 text-xs sm:text-sm">
-              Made by nerds. Worn by legends. 🚀
+              {settings.siteSlogan}
             </p>
 
             {/* Newsletter Mobile */}
@@ -299,15 +306,36 @@ export const Footer = () => {
               </motion.button>
             </form>
 
+            {/* Locale Switchers Mobile */}
+            <div className="flex gap-2 sm:gap-3 mb-4 sm:mb-6">
+              <CurrencySwitcher variant="minimal" />
+              <LanguageSwitcher variant="minimal" />
+            </div>
+
             {/* Social Icons Mobile */}
             <div className="flex gap-2 sm:gap-3 mb-4 sm:mb-6">
               {[
-                { Icon: IconBrandInstagram, color: "#e21b35" },
-                { Icon: IconBrandX, color: "#c5a3ff" },
-                { Icon: IconBrandFacebook, color: "#e2ae3d" },
-              ].map(({ Icon, color }, idx) => (
-                <motion.div
+                {
+                  Icon: IconBrandInstagram,
+                  color: "#e21b35",
+                  href: settings.instagramUrl,
+                },
+                {
+                  Icon: IconBrandX,
+                  color: "#c5a3ff",
+                  href: settings.twitterUrl,
+                },
+                {
+                  Icon: IconBrandFacebook,
+                  color: "#e2ae3d",
+                  href: settings.facebookUrl,
+                },
+              ].map(({ Icon, color, href }, idx) => (
+                <motion.a
                   key={idx}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   whileTap={{ scale: 0.9 }}
                   className={buttonVariants({
                     variant: "outline",
@@ -315,7 +343,7 @@ export const Footer = () => {
                   })}
                 >
                   <Icon className="w-4 h-4 sm:w-5 sm:h-5" style={{ color }} />
-                </motion.div>
+                </motion.a>
               ))}
             </div>
           </motion.div>
@@ -403,7 +431,8 @@ export const Footer = () => {
           style={{ borderColor: "rgba(64, 18, 104, 0.1)" }}
         >
           <p className="text-xs sm:text-sm text-center md:text-left text-muted-foreground">
-            © 2025 Geeks Creation. All rights reserved. Powered by CodeOven 🔥
+            © 2025 {settings.siteName}. All rights reserved. Powered by CodeOven
+            🔥
           </p>
 
           {/* Scroll to Top Button */}

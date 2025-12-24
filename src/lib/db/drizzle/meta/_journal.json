@@ -15,6 +15,20 @@
       "when": 1766059543396,
       "tag": "0001_striped_doctor_faustus",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1766502049041,
+      "tag": "0002_yummy_devos",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1766563837738,
+      "tag": "0003_petite_dakota_north",
+      "breakpoints": true
     }
   ]
 }

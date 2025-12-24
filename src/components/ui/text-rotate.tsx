@@ -194,7 +194,7 @@ const TextRotate = forwardRef<TextRotateRef, TextRotateProps>(
   (
     {
       texts,
-      as = "p",
+      // as = "p",
       transition = { type: "spring", damping: 25, stiffness: 300 },
       initial = { y: "100%", opacity: 0 },
       animate = { y: 0, opacity: 1 },

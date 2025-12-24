@@ -2,28 +2,19 @@
 
 import { useState } from "react";
 import { Tabs } from "@/components/ui/tabs";
-import {
-  Store,
-  Mail,
-  CreditCard,
-  Shield,
-  Palette,
-  Bell,
-  Globe,
-  Truck,
-  Save,
-  RefreshCw,
-} from "lucide-react";
+import { Store, Mail, CreditCard, Shield, Save, RefreshCw } from "lucide-react";
 import { motion } from "framer-motion";
+import { CONFIG } from "@/lib/config";
+import { EmailDebug } from "@/components/debug/EmailDebug";
 
 export default function AdminSettingsPage() {
   // Store Settings State
   const [storeSettings, setStoreSettings] = useState({
-    storeName: "Geek Creations",
-    storeEmail: "contact@geekcreations.com",
-    storePhone: "+234 800 000 0000",
-    storeAddress: "123 Tech Street, Lagos, Nigeria",
-    currency: "NGN",
+    storeName: CONFIG.SITE.name,
+    storeEmail: CONFIG.CONTACT.email,
+    storePhone: CONFIG.CONTACT.phone,
+    storeAddress: `${CONFIG.BUSINESS.address}, ${CONFIG.BUSINESS.city}, ${CONFIG.BUSINESS.country}`,
+    currency: CONFIG.SHOPIFY.currencyCode,
     timezone: "Africa/Lagos",
     taxRate: "7.5",
   });
@@ -32,24 +23,28 @@ export default function AdminSettingsPage() {
   const [emailSettings, setEmailSettings] = useState({
     smtpHost: "smtp.gmail.com",
     smtpPort: "587",
-    smtpUser: "noreply@geekcreations.com",
+    smtpUser: CONFIG.SITE.email,
     smtpPassword: "••••••••",
-    fromName: "Geek Creations",
-    fromEmail: "noreply@geekcreations.com",
+    fromName: CONFIG.SITE.name,
+    fromEmail: CONFIG.SITE.email,
     enableOrderConfirmation: true,
     enableShippingNotification: true,
-    enableMarketingEmails: false,
+    enableMarketingEmails: CONFIG.FEATURES.newsletter,
   });
 
   // Payment Settings State
   const [paymentSettings, setPaymentSettings] = useState({
-    enablePaystack: true,
-    paystackPublicKey: "pk_test_••••••••",
-    paystackSecretKey: "sk_test_••••••••",
-    enableFlutterwave: false,
-    flutterwavePublicKey: "",
-    flutterwaveSecretKey: "",
-    enableCrypto: true,
+    enablePaystack: !!CONFIG.PAYMENT.paystack.publicKey,
+    paystackPublicKey: CONFIG.PAYMENT.paystack.publicKey || "pk_test_••••••••",
+    paystackSecretKey: CONFIG.PAYMENT.paystack.secretKey
+      ? "sk_test_••••••••"
+      : "",
+    enableFlutterwave: !!CONFIG.PAYMENT.flutterwave.publicKey,
+    flutterwavePublicKey: CONFIG.PAYMENT.flutterwave.publicKey || "",
+    flutterwaveSecretKey: CONFIG.PAYMENT.flutterwave.secretKey
+      ? "••••••••"
+      : "",
+    enableCrypto: !!CONFIG.CRYPTO.solana.rpcUrl,
     cryptoWalletAddress: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
   });
 
@@ -65,11 +60,11 @@ export default function AdminSettingsPage() {
 
   // Design Settings State
   const [designSettings, setDesignSettings] = useState({
-    primaryColor: "#401268",
-    secondaryColor: "#c5a3ff",
-    accentColor: "#e2ae3d",
-    logoUrl: "/logo.png",
-    faviconUrl: "/favicon.ico",
+    primaryColor: CONFIG.THEME.primaryColor,
+    secondaryColor: CONFIG.THEME.secondaryColor,
+    accentColor: CONFIG.THEME.accentColor,
+    logoUrl: CONFIG.SITE.logoUrl,
+    faviconUrl: CONFIG.SITE.faviconUrl,
     enableDarkMode: true,
   });
 
@@ -84,7 +79,7 @@ export default function AdminSettingsPage() {
   });
 
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">(
-    "idle"
+    "idle",
   );
 
   const handleSave = (settingType: string) => {
@@ -486,6 +481,11 @@ export default function AdminSettingsPage() {
                 </>
               )}
             </motion.button>
+
+            {/* EmailJS Debug Panel */}
+            <div className="mt-8">
+              <EmailDebug />
+            </div>
           </div>
         </div>
       ),

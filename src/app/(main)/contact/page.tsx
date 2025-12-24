@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { motion } from "framer-motion";
 import {
   Mail,
@@ -10,47 +13,51 @@ import {
   MessageSquare,
   Clock,
   CheckCircle2,
-  AlertCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 export default function ContactPage() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
-  });
-  const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    setSuccess(false);
+  const contactSchema = z.object({
+    name: z.string().min(1, "Name is required"),
+    email: z.string().email("Please enter a valid email address"),
+    subject: z.string().min(1, "Subject is required"),
+    message: z.string().min(1, "Message is required"),
+  });
 
+  const form = useForm<z.infer<typeof contactSchema>>({
+    resolver: zodResolver(contactSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      subject: "",
+      message: "",
+    },
+  });
+
+  const handleSubmit = async (values: z.infer<typeof contactSchema>) => {
+    console.log("🚀 ~ handleSubmit ~ values:", values);
     try {
       // TODO: Implement actual contact form submission
       await new Promise((resolve) => setTimeout(resolve, 1000));
       setSuccess(true);
-      setFormData({ name: "", email: "", subject: "", message: "" });
+      form.reset();
     } catch (err) {
-      setError("Failed to send message. Please try again.");
-    } finally {
-      setLoading(false);
+      console.log("🚀 ~ handleSubmit ~ err:", err);
+      form.setError("root", {
+        message: "Failed to send message. Please try again.",
+      });
     }
-  };
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
   };
 
   return (
@@ -167,95 +174,115 @@ export default function ContactPage() {
               </div>
             )}
 
-            {error && (
-              <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-start gap-3 mb-6">
-                <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+            {form.formState.errors.root && (
+              <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg mb-6">
                 <p className="text-sm text-red-800 dark:text-red-200">
-                  {error}
+                  {form.formState.errors.root.message}
                 </p>
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Your Name *
-                  </label>
-                  <Input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    placeholder="John Doe"
-                    required
-                    disabled={loading}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Email Address *
-                  </label>
-                  <Input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="you@example.com"
-                    required
-                    disabled={loading}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Subject *
-                </label>
-                <Input
-                  type="text"
-                  name="subject"
-                  value={formData.subject}
-                  onChange={handleChange}
-                  placeholder="How can we help?"
-                  required
-                  disabled={loading}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Message *
-                </label>
-                <textarea
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  rows={6}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
-                  placeholder="Tell us more about your inquiry..."
-                  required
-                  disabled={loading}
-                />
-              </div>
-
-              <Button
-                type="submit"
-                size="lg"
-                className="w-full bg-indigo-600 hover:bg-indigo-700"
-                disabled={loading}
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(handleSubmit)}
+                className="space-y-6"
               >
-                {loading ? (
-                  "Sending..."
-                ) : (
-                  <>
-                    <Send className="w-5 h-5 mr-2" />
-                    Send Message
-                  </>
-                )}
-              </Button>
-            </form>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Your Name *</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="text"
+                            placeholder="John Doe"
+                            disabled={form.formState.isSubmitting}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email Address *</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="email"
+                            placeholder="you@example.com"
+                            disabled={form.formState.isSubmitting}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="subject"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Subject *</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          placeholder="How can we help?"
+                          disabled={form.formState.isSubmitting}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="message"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Message *</FormLabel>
+                      <FormControl>
+                        <textarea
+                          rows={6}
+                          className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+                          placeholder="Tell us more about your inquiry..."
+                          disabled={form.formState.isSubmitting}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Button
+                  type="submit"
+                  size="lg"
+                  className="w-full bg-indigo-600 hover:bg-indigo-700"
+                  disabled={form.formState.isSubmitting}
+                >
+                  {form.formState.isSubmitting ? (
+                    "Sending..."
+                  ) : (
+                    <>
+                      <Send className="w-5 h-5 mr-2" />
+                      Send Message
+                    </>
+                  )}
+                </Button>
+              </form>
+            </Form>
           </motion.div>
         </div>
       </div>

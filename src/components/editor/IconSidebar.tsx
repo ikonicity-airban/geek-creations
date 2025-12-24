@@ -1,17 +1,6 @@
 "use client";
 
-import React from "react";
-import {
-  Type,
-  Upload,
-  Circle,
-  Square,
-  Palette,
-  Image as ImageIcon,
-  Sparkles,
-  FolderOpen,
-  Shapes,
-} from "lucide-react";
+import { Type, Upload, Palette, Shapes } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface IconSidebarProps {
@@ -55,10 +44,10 @@ export function IconSidebar({
   onToolSelect,
   onTextClick,
   onUploadClick,
-  onShapeClick,
+  // onShapeClick,
   onColorClick,
 }: IconSidebarProps) {
-  const handleToolClick = (tool: typeof tools[0]) => {
+  const handleToolClick = (tool: (typeof tools)[0]) => {
     onToolSelect(tool.id);
     switch (tool.action) {
       case "text":
@@ -103,4 +92,3 @@ export function IconSidebar({
     </div>
   );
 }
-

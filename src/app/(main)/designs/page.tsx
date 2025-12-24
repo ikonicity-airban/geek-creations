@@ -49,13 +49,6 @@ export default function DesignsPage() {
     return Array.from(set);
   }, [designs]);
 
-  const palette = {
-    primary: "#401268",
-    secondary: "#c5a3ff",
-    background: "#f8f6f0",
-    accentWarm: "#e2ae3d",
-  };
-
   return (
     <main className="min-h-screen bg-background pt-20">
       <section className="max-w-7xl mx-auto px-6 py-16">

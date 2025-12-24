@@ -1,17 +1,15 @@
 // app/api/cron/sync-inventory/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { db, products, variants, collections } from "@/lib/db";
-import {
-  syncProducts,
-  syncCollections
-} from "@/lib/shopify";
+import { syncProducts, syncCollections } from "@/lib/shopify";
 import { eq } from "drizzle-orm";
+import { CONFIG } from "@/lib/config";
 
 export async function GET(req: NextRequest) {
   try {
     // Verify cron secret
     const authHeader = req.headers.get("authorization");
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    if (authHeader !== `Bearer ${CONFIG.CRON.secret}`) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -38,7 +36,7 @@ export async function GET(req: NextRequest) {
           product.metafields?.edges?.find(
             (m) =>
               m.node.namespace === "custom" &&
-              m.node.key === "fulfillment_provider"
+              m.node.key === "fulfillment_provider",
           )?.node.value || "printful",
         images: product.images.edges.map((img, idx: number) => ({
           id: img.node.id,
@@ -85,8 +83,6 @@ export async function GET(req: NextRequest) {
           compareAtPrice: variant.compareAtPrice || null,
           sku: variant.sku || "",
           inventoryQuantity: variant.inventoryQuantity || 0,
-          weight: variant.weight ? String(variant.weight) : null,
-          weightUnit: variant.weightUnit || "kg",
           option1: variant.selectedOptions[0]?.value || null,
           option2: variant.selectedOptions[1]?.value || null,
           option3: variant.selectedOptions[2]?.value || null,
@@ -115,7 +111,7 @@ export async function GET(req: NextRequest) {
 
     for (const collection of shopifyCollections) {
       const shopifyCollectionId = parseInt(
-        collection.id.split("/").pop() || "0"
+        collection.id.split("/").pop() || "0",
       );
 
       const collectionData = {
@@ -157,7 +153,7 @@ export async function GET(req: NextRequest) {
     console.error("Inventory sync error:", error);
     return NextResponse.json(
       { error: "Sync failed", details: String(error) },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
