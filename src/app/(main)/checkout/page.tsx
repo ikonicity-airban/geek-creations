@@ -43,7 +43,7 @@ export default function CheckoutPage() {
   const [orderId, setOrderId] = useState<string | null>(null);
 
   const shippingSchema = z.object({
-    email: z.string().email("Please enter a valid email address"),
+    email: z.email("Please enter a valid email address"),
     shipping_address: z.object({
       first_name: z.string().min(1, "First name is required"),
       last_name: z.string().min(1, "Last name is required"),
@@ -146,7 +146,7 @@ export default function CheckoutPage() {
       }
     };
     getUser();
-  }, [cart.items.length, router, step, supabase]);
+  }, [cart.items.length, router, step, supabase, form]);
 
   const handleShippingSubmit = (values: z.infer<typeof shippingSchema>) => {
     setFormData((prev) => ({

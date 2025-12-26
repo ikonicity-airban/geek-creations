@@ -76,7 +76,7 @@ export default function CartPage() {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="dark:bg-card backdrop-blur rounded-xl p-6 shadow-sm border border-border dark:border-border"
+                className="bg-card backdrop-blur rounded-xl p-6 shadow-sm border border-border dark:border-border"
               >
                 <div className="flex gap-6 flex-col sm:flex-row">
                   {/* Product Image */}
