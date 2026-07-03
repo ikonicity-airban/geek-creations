@@ -51,7 +51,7 @@ export default function MainLayout({
           id="main-content"
           className="transition-transform duration-300 ease-out"
         >
-          <main className="pt-4 sm:pt-10 md:pt-20">{children}</main>
+          <main>{children}</main>
           <Footer />
         </div>
       </div>

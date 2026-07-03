@@ -1,334 +1,421 @@
 "use client";
 
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ShoppingBag, ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles, ShoppingBag } from "lucide-react";
 import Link from "next/link";
-import { BackgroundLines } from "@/components/ui/background-lines";
 import { IconPhoto } from "@tabler/icons-react";
 import { buttonVariants } from "../ui/button";
+import { useRef } from "react";
 
 export const Hero = ({ darkMode }: { darkMode: boolean }) => {
-  const { scrollY } = useScroll();
-  const y = useTransform(scrollY, [0, 400], [0, 100]);
-  const opacity = useTransform(scrollY, [0, 1000], [1, 0]);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Hook scroll progress specifically for this container
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"],
+  });
+
+  // Background Media Configuration (Paths for background video or image)
+  const bgVideo = "/1111312_Sketch_Cloth_3840x2160.mp4";
+  const bgImage = "";
+
+  // Parallax transforms for floating background elements
+  const yLeftDecor = useTransform(scrollYProgress, [0, 1], [0, -120]);
+  const yRightDecor = useTransform(scrollYProgress, [0, 1], [0, -180]);
+  const rotateDecor = useTransform(scrollYProgress, [0, 1], [0, 60]);
+
+  // Parallax transforms for the 3 bottom cards
+  const yCard1 = useTransform(scrollYProgress, [0, 1], [0, -100]);
+  const yCard2 = useTransform(scrollYProgress, [0, 1], [0, -160]);
+  const yCard3 = useTransform(scrollYProgress, [0, 1], [0, -70]);
+
+  // Parallax transforms for background media (sticky parallax effect)
+  const yBgMedia = useTransform(scrollYProgress, [0, 1], [0, 150]);
+  const scaleBgMedia = useTransform(scrollYProgress, [0, 1], [1.05, 1.15]);
+
+  // Framer Motion Animation Variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.05,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        type: "spring" as const,
+        stiffness: 100,
+        damping: 15,
+      },
+    },
+  };
+
+  const cardVariantsLeft = {
+    hidden: { opacity: 0, y: 80, rotate: -10, scale: 0.95 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      rotate: -4,
+      scale: 1,
+      transition: {
+        type: "spring" as const,
+        stiffness: 60,
+        damping: 15,
+        delay: 0.4,
+      },
+    },
+  };
+
+  const cardVariantsCenter = {
+    hidden: { opacity: 0, y: 100, rotate: 6, scale: 0.98 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      rotate: 2,
+      scale: 1,
+      transition: {
+        type: "spring" as const,
+        stiffness: 60,
+        damping: 15,
+        delay: 0.55,
+      },
+    },
+  };
+
+  const cardVariantsRight = {
+    hidden: { opacity: 0, y: 80, rotate: 10, scale: 0.95 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      rotate: -2,
+      scale: 1,
+      transition: {
+        type: "spring" as const,
+        stiffness: 60,
+        damping: 15,
+        delay: 0.45,
+      },
+    },
+  };
+
+  // Stacked client avatars data (using design-conscious Unsplash placeholders)
+  const avatars = [
+    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80",
+  ];
 
   return (
-    <BackgroundLines
-      className="flex items-center pt-20 -mt-20 justify-center w-full min-h-fit md:min-h-screen relative overflow-hidden"
-      darkMode={darkMode}
+    <section
+      ref={containerRef}
+      className="relative w-full min-h-screen flex flex-col justify-between overflow-hidden pt-40 pb-12 sm:pb-20 md:pb-24"
+      style={{
+        backgroundColor: darkMode ? "#401268" : "#f8f6f0",
+      }}
     >
-      <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 grid md:grid-cols-2 gap-12 items-center w-full pt-20 pb-10 md:py-0">
-        {/* Text Content */}
+      {/* Background Media Container */}
+      {(bgVideo || bgImage) && (
         <motion.div
-          style={{ y, opacity }}
-          className="text-center md:text-left space-y-6"
+          style={{ y: yBgMedia, scale: scaleBgMedia }}
+          className="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden origin-center"
         >
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="inline-block px-4 py-2 rounded-full mb-4 bg-background"
-          >
-            <span className="text-xs font-bold flex items-center gap-2 text-primary dark:text-foreground">
-              ✨ 20+ Premium Designs Ready
+          {bgVideo ? (
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-contain bg-top"
+            >
+              <source src={bgVideo} type="video/mp4" />
+            </video>
+          ) : (
+            bgImage && (
+              <img
+                src={bgImage}
+                alt="Brand Essence Background"
+                className="w-full h-full object-cover"
+              />
+            )
+          )}
+        </motion.div>
+      )}
+
+      {/* Readability Overlay */}
+      <div
+        className="absolute inset-0 z-0 pointer-events-none transition-colors duration-300"
+        style={{
+          backgroundColor: darkMode
+            ? "rgba(64, 18, 104, 0.82)"
+            : "rgba(248, 246, 240, 0.72)",
+          backdropFilter: (bgVideo || bgImage) ? "blur(8px)" : "none",
+          WebkitBackdropFilter: (bgVideo || bgImage) ? "blur(8px)" : "none",
+        }}
+      />
+
+      {/* Subtle top light reflection or background gradient stripe for custom feel */}
+      <div
+        className="absolute top-0 left-0 right-0 h-[500px] pointer-events-none opacity-20 dark:opacity-10 z-0"
+        style={{
+          background: "radial-gradient(ellipse at top, #c5a3ff 0%, transparent 60%)",
+        }}
+      />
+
+      {/* Floating Decorative Elements (Parallax Left & Right) */}
+      <motion.div
+        style={{ y: yLeftDecor, rotate: rotateDecor }}
+        className="absolute left-6 sm:left-12 md:left-20 top-[20%] z-10 pointer-events-none select-none hidden sm:block animate-pulse"
+      >
+        <svg width="40" height="80" viewBox="0 0 40 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="opacity-40 dark:opacity-60">
+          <path d="M10 0L30 20L10 40L30 60L10 80" stroke={darkMode ? "#c5a3ff" : "#401268"} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </motion.div>
+      <motion.div
+        style={{ y: yRightDecor }}
+        className="absolute left-10 sm:left-16 md:left-32 bottom-[35%] z-10 pointer-events-none select-none hidden sm:block"
+      >
+        <div className="grid grid-cols-3 gap-2 opacity-30 dark:opacity-50">
+          {[...Array(9)].map((_, i) => (
+            <div
+              key={i}
+              className="w-1.5 h-1.5 rounded-full"
+              style={{ backgroundColor: darkMode ? "#e2ae3d" : "#e2ae3d" }}
+            />
+          ))}
+        </div>
+      </motion.div>
+
+      <motion.div
+        style={{ y: yRightDecor, rotate: rotateDecor }}
+        className="absolute right-6 sm:right-12 md:right-20 top-[25%] z-10 pointer-events-none select-none hidden sm:block animate-pulse"
+      >
+        <div className="grid grid-cols-3 gap-2 opacity-30 dark:opacity-50">
+          {[...Array(9)].map((_, i) => (
+            <div
+              key={i}
+              className="w-1.5 h-1.5 rounded-full"
+              style={{ backgroundColor: darkMode ? "#c5a3ff" : "#401268" }}
+            />
+          ))}
+        </div>
+      </motion.div>
+      <motion.div
+        style={{ y: yLeftDecor }}
+        className="absolute right-10 sm:right-16 md:right-32 bottom-[30%] z-10 pointer-events-none select-none hidden sm:block"
+      >
+        <svg width="40" height="80" viewBox="0 0 40 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="opacity-40 dark:opacity-60">
+          <path d="M30 0L10 20L30 40L10 60L30 80" stroke={darkMode ? "#e2ae3d" : "#e21b35"} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </motion.div>
+
+      {/* Main Core Content Container */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 flex flex-col items-center justify-center flex-1 text-center select-none pt-4 sm:pt-8">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="space-y-6 md:space-y-8 max-w-4xl mx-auto"
+        >
+          {/* Top Pill Badge */}
+          <motion.div variants={itemVariants} className="inline-block">
+            <span
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-black tracking-wide uppercase transition-all shadow-sm"
+              style={{
+                backgroundColor: darkMode ? "rgba(197, 163, 255, 0.15)" : "rgba(64, 18, 104, 0.06)",
+                border: darkMode ? "1px solid rgba(197, 163, 255, 0.25)" : "1px solid rgba(64, 18, 104, 0.1)",
+                color: darkMode ? "#f8f6f0" : "#401268",
+              }}
+            >
+              <Sparkles className="w-3.5 h-3.5 text-[#e2ae3d] fill-[#e2ae3d]" />
+              20+ Premium Designs Ready
             </span>
           </motion.div>
 
+          {/* Centered Heading */}
           <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="text-5xl md:text-4xl lg:text-5xl font-black tracking-tight leading-tight text-primary dark:text-foreground"
+            variants={itemVariants}
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-[7rem] font-extrabold tracking-tight leading-15"
+            style={{
+              fontFamily: "var(--font-poppins), 'Poppins', 'Inter', sans-serif",
+              color: darkMode ? "#f8f6f0" : "#401268",
+            }}
           >
             Geek Creations
             <br />
-            <span className="text-accent text-3xl md:text-4xl">
+            <span className="text-accent text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black">
               Print on Demand
             </span>
           </motion.h1>
 
+          {/* Subheading Description */}
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="text-base md:text-xl leading-relaxed max-w-xl"
+            variants={itemVariants}
+            className="text-base md:text-xl leading-relaxed max-w-2xl mx-auto px-4"
             style={{
-              color: darkMode
-                ? "rgba(248, 246, 240, 0.85)"
-                : "rgba(64, 18, 104, 0.75)",
+              color: darkMode ? "rgba(248, 246, 240, 0.85)" : "rgba(64, 18, 104, 0.75)",
             }}
           >
             Choose from curated designs or upload your own. We handle printing,
             shipping, and crypto payments.
           </motion.p>
 
+          {/* CTAs and Client Avatar Cluster */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="flex flex-wrap gap-3 text-sm font-semibold"
-            style={{
-              color: darkMode
-                ? "rgba(248, 246, 240, 0.6)"
-                : "rgba(64, 18, 104, 0.6)",
-            }}
+            variants={itemVariants}
+            className="flex flex-col lg:flex-row items-center justify-center gap-6 pt-4 px-4"
           >
-            <span>🎨 T-Shirts</span>
-            <span>•</span>
-            <span>👕 Hoodies</span>
-            <span>•</span>
-            <span>☕ Mugs</span>
-            <span>•</span>
-            <span>📱 Phone Cases</span>
-            <span>•</span>
-            <span>🖼️ Posters</span>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-            className="flex flex-col sm:flex-row gap-4 pt-4"
-          >
-            <Link href="/designs" className="flex-1 ">
-              <motion.button
-                whileHover={{ scale: 1.02, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-                className={buttonVariants({
-                  variant: "default",
-                  className:
-                    "group relative w-full transition-all flex items-center justify-center gap-2",
-                })}
-              >
-                <IconPhoto className="w-5 h-5" />
-                Browse Designs
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </motion.button>
-            </Link>
-
-            <Link href="/collections/all" className="sm:flex-initial flex-1">
-              <motion.button
-                whileHover={{ scale: 1.02, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-                className={buttonVariants({
-                  variant: "outline",
-                  className:
-                    "w-full sm:w-auto px-8 py-4 font-bold text-base transition-all flex items-center justify-center gap-2",
-                })}
-              >
-                <ShoppingBag className="w-5 h-5" />
-                Shop all products
-              </motion.button>
-            </Link>
-          </motion.div>
-
-          {/* Trust Indicators */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1 }}
-            className="flex flex-wrap items-center gap-6 pt-6 text-sm"
-            style={{
-              color: darkMode
-                ? "rgba(248, 246, 240, 0.6)"
-                : "rgba(64, 18, 104, 0.6)",
-            }}
-          >
-            <div className="flex items-center gap-2">
-              <div
-                className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: "#10b981" }}
-              />
-              <span>Free Shipping ₦50k+</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div
-                className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: "#10b981" }}
-              />
-              <span>Crypto Accepted</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div
-                className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: "#10b981" }}
-              />
-              <span>7-Day Returns</span>
-            </div>
-          </motion.div>
-        </motion.div>
-
-        {/* Print Animation */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.9, duration: 0.6 }}
-          className="relative w-full md:w-[70%] max-w-lg mx-auto"
-        >
-          <div
-            className="relative w-full aspect-square rounded-3xl overflow-hidden"
-            style={{
-              background: darkMode
-                ? "linear-gradient(135deg, rgba(197, 163, 255, 0.1), rgba(226, 174, 61, 0.05))"
-                : "linear-gradient(135deg, rgba(64, 18, 104, 0.05), rgba(197, 163, 255, 0.1))",
-              border: darkMode
-                ? "2px solid rgba(197, 163, 255, 0.2)"
-                : "2px solid rgba(64, 18, 104, 0.15)",
-            }}
-          >
-            {/* Animated Mockup */}
-            <div className="absolute inset-0 flex items-center justify-center p-8">
-              {/* T-Shirt Mockup */}
-              <motion.div
-                animate={{
-                  y: [0, -10, 0],
-                  rotate: [0, 2, -2, 0],
-                }}
-                transition={{
-                  duration: 4,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-                className="relative w-full h-full"
-              >
-                {/* Main T-Shirt Shape */}
-                <div
-                  className="absolute inset-0 rounded-2xl"
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
+              {/* Primary Action Button */}
+              <Link href="/designs" className="w-full sm:w-auto">
+                <motion.button
+                  whileHover={{ scale: 1.03, y: -2 }}
+                  whileTap={{ scale: 0.97 }}
+                  className={buttonVariants({
+                    variant: "default",
+                    size: "lg",
+                    className: "group w-full sm:w-auto px-8 py-4 font-bold text-base flex items-center justify-center gap-2 rounded-full shadow-lg",
+                  })}
                   style={{
-                    background: darkMode
-                      ? "linear-gradient(135deg, #2d0d4a, #401268)"
-                      : "linear-gradient(135deg, #401268, #c5a3ff)",
-                    boxShadow: darkMode
-                      ? "0 20px 60px rgba(197, 163, 255, 0.3)"
-                      : "0 20px 60px rgba(64, 18, 104, 0.3)",
-                  }}
-                />
-
-                {/* Print Area */}
-                <motion.div
-                  animate={{
-                    opacity: [0.5, 1, 0.5],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                  className="absolute inset-[20%] rounded-xl flex items-center justify-center"
-                  style={{
-                    backgroundColor: "rgba(255, 255, 255, 0.9)",
-                    border: "2px dashed rgba(64, 18, 104, 0.3)",
+                    backgroundColor: "#401268",
+                    color: "#ffffff",
                   }}
                 >
-                  <div className="text-center">
-                    <motion.div
-                      animate={{
-                        scale: [1, 1.1, 1],
-                      }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                      }}
-                    >
-                      <Sparkles className="w-12 h-12 mx-auto mb-2" />
-                    </motion.div>
-                    <p className="text-xs font-bold">Your Design Here</p>
-                  </div>
-                </motion.div>
+                  <IconPhoto className="w-5 h-5 text-white" />
+                  Browse Designs
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform text-white" />
+                </motion.button>
+              </Link>
 
-                {/* Floating Elements */}
-                <motion.div
-                  animate={{
-                    y: [0, -15, 0],
-                    x: [0, 10, 0],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    delay: 0.5,
-                  }}
-                  className="absolute -top-4 -right-4 w-16 h-16 rounded-full flex items-center justify-center"
+              {/* Secondary Action Button */}
+              <Link href="/collections/all" className="w-full sm:w-auto">
+                <motion.button
+                  whileHover={{ scale: 1.03, y: -2 }}
+                  whileTap={{ scale: 0.97 }}
+                  className={buttonVariants({
+                    variant: "outline",
+                    size: "lg",
+                    className: "w-full sm:w-auto px-8 py-4 font-bold text-base flex items-center justify-center gap-2 rounded-full shadow-md",
+                  })}
                 >
-                  <span className="text-2xl">✨</span>
-                </motion.div>
-
-                <motion.div
-                  animate={{
-                    y: [0, 15, 0],
-                    x: [0, -10, 0],
-                  }}
-                  transition={{
-                    duration: 3.5,
-                    repeat: Infinity,
-                    delay: 1,
-                  }}
-                  className="absolute -bottom-4 -left-4 w-20 h-20 rounded-full flex items-center justify-center"
-                >
-                  <span className="text-2xl">🎨</span>
-                </motion.div>
-              </motion.div>
+                  <ShoppingBag className="w-5 h-5" />
+                  Shop all products
+                </motion.button>
+              </Link>
             </div>
 
-            {/* Process Steps */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-              {[0, 1, 2].map((i) => (
+            {/* Avatars Stack & Plus Counter */}
+            <div className="flex items-center gap-3">
+              <div className="flex -space-x-3">
+                {avatars.map((url, idx) => (
+                  <motion.img
+                    key={idx}
+                    src={url}
+                    alt={`Customer Avatar ${idx + 1}`}
+                    whileHover={{ y: -6, zIndex: 10 }}
+                    className="w-10 h-10 rounded-full border-2 object-cover cursor-pointer shadow-md transition-all size-10"
+                    style={{
+                      borderColor: darkMode ? "#401268" : "#f8f6f0",
+                    }}
+                  />
+                ))}
                 <motion.div
-                  key={i}
-                  animate={{
-                    scale: [1, 1.2, 1],
-                    opacity: [0.5, 1, 0.5],
-                  }}
-                  transition={{
-                    duration: 1.5,
-                    repeat: Infinity,
-                    delay: i * 0.5,
-                  }}
-                  className="w-2 h-2 rounded-full"
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Stats Cards */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.2 }}
-            className="grid grid-cols-3 gap-4 mt-6"
-          >
-            {[
-              { label: "Designs", value: "20+" },
-              { label: "Products", value: "50+" },
-              { label: "Delivery", value: "5-7d" },
-            ].map((stat, i) => (
-              <div
-                key={i}
-                className="text-center p-4 rounded-xl"
-                style={{
-                  backgroundColor: darkMode
-                    ? "rgba(197, 163, 255, 0.1)"
-                    : "rgba(64, 18, 104, 0.05)",
-                  border: darkMode
-                    ? "1px solid rgba(197, 163, 255, 0.2)"
-                    : "1px solid rgba(64, 18, 104, 0.1)",
-                }}
-              >
-                <p className="text-2xl font-black">{stat.value}</p>
-                <p
-                  className="text-xs mt-1"
+                  whileHover={{ y: -4 }}
+                  className="w-10 h-10 rounded-full border-2 flex items-center justify-center text-xs font-black shadow-md cursor-pointer select-none size-10"
                   style={{
-                    color: darkMode
-                      ? "rgba(248, 246, 240, 0.6)"
-                      : "rgba(64, 18, 104, 0.6)",
+                    backgroundColor: darkMode ? "#c5a3ff" : "#401268",
+                    borderColor: darkMode ? "#401268" : "#f8f6f0",
+                    color: darkMode ? "#401268" : "#ffffff",
                   }}
                 >
-                  {stat.label}
+                  +
+                </motion.div>
+              </div>
+
+              <div className="text-left">
+                <p className="text-xs font-bold leading-tight" style={{ color: darkMode ? "#f8f6f0" : "#401268" }}>
+                  Join 1,200+ Creators
+                </p>
+                <p className="text-[10px]" style={{ color: darkMode ? "rgba(248, 246, 240, 0.65)" : "rgba(64, 18, 104, 0.65)" }}>
+                  Daily payouts & custom packaging
                 </p>
               </div>
-            ))}
+            </div>
           </motion.div>
         </motion.div>
       </div>
-    </BackgroundLines>
+
+      {/* Showcase Cards - Sliding entry + individual scroll-based parallax */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 mt-12 md:mt-16">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8 items-center max-w-5xl mx-auto">
+
+          {/* Card 1: Left card - beautiful-floral-still-life.jpg */}
+          <motion.div
+            style={{
+              y: yCard1,
+              borderColor: darkMode ? "rgba(197, 163, 255, 0.15)" : "rgba(255, 255, 255, 0.8)",
+            }}
+            variants={cardVariantsLeft}
+            initial="hidden"
+            animate="visible"
+            className="w-full aspect-[4/3] sm:aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl hover:shadow-[0_24px_50px_rgba(64,18,104,0.25)] transition-shadow duration-300 relative border-4 cursor-pointer"
+          >
+            <img
+              src="/img/beautiful-floral-still-life.jpg"
+              alt="Beautiful floral still life print"
+              className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+          </motion.div>
+
+          {/* Card 2: Center card - pretty-woman-wearing-tshirt.jpg */}
+          <motion.div
+            style={{
+              y: yCard2,
+              borderColor: darkMode ? "rgba(197, 163, 255, 0.25)" : "rgba(255, 255, 255, 0.95)",
+            }}
+            variants={cardVariantsCenter}
+            initial="hidden"
+            animate="visible"
+            className="w-full aspect-[4/3] sm:aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl hover:shadow-[0_24px_50px_rgba(64,18,104,0.3)] transition-shadow duration-300 relative border-4 z-20 cursor-pointer"
+          >
+            <img
+              src="/img/pretty-woman-wearing-tshirt.jpg"
+              alt="Pretty woman wearing custom printed t-shirt"
+              className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+          </motion.div>
+
+          {/* Card 3: Right card - hero_girl.png */}
+          <motion.div
+            style={{
+              y: yCard3,
+              borderColor: darkMode ? "rgba(197, 163, 255, 0.15)" : "rgba(255, 255, 255, 0.8)",
+            }}
+            variants={cardVariantsRight}
+            initial="hidden"
+            animate="visible"
+            className="w-full aspect-[4/3] sm:aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl hover:shadow-[0_24px_50px_rgba(64,18,104,0.25)] transition-shadow duration-300 relative border-4 cursor-pointer"
+          >
+            <img
+              src="/img/hero_girl.png"
+              alt="Woman wearing custom prints"
+              className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+          </motion.div>
+
+        </div>
+      </div>
+    </section>
   );
 };
