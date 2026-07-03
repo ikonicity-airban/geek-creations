@@ -67,9 +67,9 @@ interface NavbarContextValue {
 const NavbarVisibilityContext = createContext<NavbarContextValue>({
   visible: false,
   width: 60,
-  setWidth: () => {},
+  setWidth: () => { },
   isResizing: false,
-  setIsResizing: () => {},
+  setIsResizing: () => { },
 });
 
 export const useNavbarVisibility = () => {
@@ -94,9 +94,9 @@ export const Navbar = ({ children, className }: NavbarProps) => {
   const [width, setWidth] = useState<number>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("navbar-width");
-      return saved ? parseFloat(saved) : 60;
+      return saved ? parseFloat(saved) : 70;
     }
-    return 60;
+    return 70;
   });
   const [isResizing, setIsResizing] = useState<boolean>(false);
 
@@ -135,9 +135,9 @@ export const Navbar = ({ children, className }: NavbarProps) => {
         {React.Children.map(children, (child) =>
           React.isValidElement(child)
             ? React.cloneElement(
-                child as React.ReactElement<{ visible?: boolean }>,
-                { visible }
-              )
+              child as React.ReactElement<{ visible?: boolean }>,
+              { visible }
+            )
             : child
         )}
       </motion.div>
@@ -319,9 +319,9 @@ export const NavbarButton = ({
   className?: string;
   variant?: "primary" | "secondary" | "dark" | "gradient";
 } & (
-  | React.ComponentPropsWithoutRef<"a">
-  | React.ComponentPropsWithoutRef<"button">
-)) => {
+    | React.ComponentPropsWithoutRef<"a">
+    | React.ComponentPropsWithoutRef<"button">
+  )) => {
   const baseStyles =
     "px-4 py-2 rounded-md bg-white button bg-white text-black text-sm font-bold relative cursor-pointer hover:-translate-y-0.5 transition duration-200 inline-block text-center";
 

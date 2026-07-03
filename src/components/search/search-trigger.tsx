@@ -46,7 +46,7 @@ export function SearchTrigger({
           "flex items-center gap-2 px-3 py-1.5 rounded-btn text-sm",
           "transition-all hover:bg-secondary/20",
           "border border-border/50 hover:border-border",
-          "bg-background/80 backdrop-blur-sm",
+          "backdrop-blur-sm",
           "text-muted-foreground hover:text-foreground",
           className
         )}

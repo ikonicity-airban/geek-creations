@@ -18,25 +18,25 @@ const themeOptions: Array<{
   icon: React.ComponentType<{ className?: string }>;
   description: string;
 }> = [
-  {
-    mode: "light",
-    label: "Light",
-    icon: Sun,
-    description: "Light theme",
-  },
-  {
-    mode: "dark",
-    label: "Dark",
-    icon: Moon,
-    description: "Dark theme",
-  },
-  {
-    mode: "system",
-    label: "System",
-    icon: Monitor,
-    description: "Follow system",
-  },
-];
+    {
+      mode: "light",
+      label: "Light",
+      icon: Sun,
+      description: "Light theme",
+    },
+    {
+      mode: "dark",
+      label: "Dark",
+      icon: Moon,
+      description: "Dark theme",
+    },
+    {
+      mode: "system",
+      label: "System",
+      icon: Monitor,
+      description: "Follow system",
+    },
+  ];
 
 export function ThemeToggle({
   variant = "minimal",
@@ -87,7 +87,7 @@ export function ThemeToggle({
             "flex items-center gap-1.5 px-2.5 py-1.5 rounded-btn text-sm font-semibold",
             "transition-all hover:bg-secondary/20",
             "border border-border/50 hover:border-border",
-            "bg-background/80 backdrop-blur-sm"
+            " backdrop-blur-sm"
           )}
           aria-label="Select theme"
         >

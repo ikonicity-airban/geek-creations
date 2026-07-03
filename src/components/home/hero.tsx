@@ -6,6 +6,7 @@ import Link from "next/link";
 import { IconPhoto } from "@tabler/icons-react";
 import { buttonVariants } from "../ui/button";
 import { useRef } from "react";
+import { FlipWords } from "@/components/ui/flip-words";
 
 export const Hero = ({ darkMode }: { darkMode: boolean }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -235,7 +236,7 @@ export const Hero = ({ darkMode }: { darkMode: boolean }) => {
                 color: darkMode ? "#f8f6f0" : "#401268",
               }}
             >
-              <Sparkles className="w-3.5 h-3.5 text-[#e2ae3d] fill-[#e2ae3d]" />
+              <Sparkles className="w-3.5 h-3.5 text-honey-bronze fill-honey-bronze" />
               20+ Premium Designs Ready
             </span>
           </motion.div>
@@ -243,23 +244,29 @@ export const Hero = ({ darkMode }: { darkMode: boolean }) => {
           {/* Centered Heading */}
           <motion.h1
             variants={itemVariants}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-[7rem] font-extrabold tracking-tight leading-15"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-[6.5rem] font-extrabold tracking-tight leading-15"
             style={{
-              fontFamily: "var(--font-poppins), 'Poppins', 'Inter', sans-serif",
+              fontFamily: "var(--font-archivo-black), 'Archivo Black', 'Inter', sans-serif",
               color: darkMode ? "#f8f6f0" : "#401268",
             }}
           >
             Geek Creations
             <br />
-            <span className="text-accent text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black">
-              Print on Demand
+            <span className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl over-the-rainbow leading-0"> {" "}
+              Print{" "}
+              <FlipWords
+                words={["T-Shirts", "Hoodies", "Mugs", "Phone Cases", "Tote Bags", "Designs"]}
+                duration={3000}
+                className="text-accent p-0 inline-block font-black"
+              />{" "}
+              on Demand
             </span>
           </motion.h1>
 
           {/* Subheading Description */}
           <motion.p
             variants={itemVariants}
-            className="text-base md:text-xl leading-relaxed max-w-2xl mx-auto px-4"
+            className="text-base font-(--font-over-the-rainbow) md:text-xl leading-relaxed max-w-2xl mx-auto px-4"
             style={{
               color: darkMode ? "rgba(248, 246, 240, 0.85)" : "rgba(64, 18, 104, 0.75)",
             }}

@@ -47,7 +47,7 @@ export function LanguageSwitcher({
             "flex items-center gap-1.5 px-2.5 py-1.5 rounded-btn text-sm font-semibold",
             "transition-all hover:bg-secondary/20",
             "border border-border/50 hover:border-border",
-            "bg-background/80 backdrop-blur-sm"
+            " backdrop-blur-sm"
           )}
           aria-label="Select language"
         >
@@ -90,7 +90,7 @@ export function LanguageSwitcher({
                       "rounded-btn text-sm transition-all",
                       "hover:bg-secondary/20",
                       lang.code === language.code &&
-                        "bg-secondary/30 text-primary font-semibold"
+                      "bg-secondary/30 text-primary font-semibold"
                     )}
                   >
                     <div className="flex items-center gap-2">
@@ -184,7 +184,7 @@ export function LanguageSwitcher({
                       "rounded-btn text-sm transition-all",
                       "hover:bg-secondary/20",
                       lang.code === language.code &&
-                        "bg-secondary/30 text-primary font-semibold"
+                      "bg-secondary/30 text-primary font-semibold"
                     )}
                   >
                     <div className="flex items-center gap-3">

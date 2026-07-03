@@ -6,6 +6,7 @@ import {
   Space_Mono,
   Over_the_Rainbow,
   Roboto,
+  Archivo_Black
 } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
@@ -19,7 +20,7 @@ import {
   generateStructuredData,
 } from "@/lib/metadata-generator";
 
-const poppins = Roboto({
+const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
   weight: ["400", "500", "600"],
@@ -42,6 +43,12 @@ const spaceMono = Space_Mono({
   variable: "--font-space-mono",
   subsets: ["latin"],
   weight: ["400", "700"],
+});
+
+const archivoBlack = Archivo_Black({
+  variable: "--font-archivo-black",
+  subsets: ["latin"],
+  weight: ["400"],
 });
 
 export const viewport: Viewport = {
@@ -80,7 +87,7 @@ export default async function RootLayout({
         />
       </head>
       <body
-        className={`${poppins.variable} ${orbitron.variable} ${spaceMono.variable} ${overTheRainbow.variable} antialiased `}
+        className={`${poppins.variable} ${orbitron.variable} ${spaceMono.variable} ${overTheRainbow.variable} ${archivoBlack.variable} antialiased `}
       >
         <SiteSettingsProvider>
           <SearchProvider>

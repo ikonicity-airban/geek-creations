@@ -71,9 +71,8 @@ const NavItem = ({
       <span className="relative z-10 flex items-center gap-1.5 sm:gap-2">
         {icon && (
           <span
-            className={`transition-opacity duration-150 ${
-              currentHover === hoverKey ? "opacity-100" : "opacity-0"
-            }`}
+            className={`transition-opacity duration-150 ${currentHover === hoverKey ? "opacity-100" : "opacity-0"
+              }`}
           >
             {icon}
           </span>
@@ -149,9 +148,8 @@ const DesktopNavbarContent = () => {
                 />
               )}
               <Grid3x3
-                className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-opacity ${
-                  hoveredKey === "designs" ? "opacity-100" : "opacity-0"
-                }`}
+                className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-opacity ${hoveredKey === "designs" ? "opacity-100" : "opacity-0"
+                  }`}
               />
               <span className="relative z-10">Designs</span>
               <ChevronDown className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -231,7 +229,7 @@ const DesktopNavbarContent = () => {
             <Button
               variant="ghost"
               size="icon"
-              className="rounded-full bg-muted text-foreground shadow-card hover:shadow-card-hover transition-smooth active:scale-95 hover:border border-accent"
+              className="rounded-full bg-muted text-foreground shadow-card hover:shadow-card-hover transition-smooth active:scale-95 hover:border border-primary"
               aria-label="Cart"
             >
               <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 text-foreground" />
