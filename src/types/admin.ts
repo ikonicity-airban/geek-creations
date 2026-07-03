@@ -28,7 +28,12 @@ export interface OrderStats {
   revenueToday: number;
 }
 
-export type FulfillmentProvider = "printify" | "printful" | "local_print";
+export type FulfillmentProvider =
+  | "printify"
+  | "printful"
+  | "ikonshop"
+  | "local_print"
+  | "manual";
 
 export interface FulfillmentResult {
   success: boolean;

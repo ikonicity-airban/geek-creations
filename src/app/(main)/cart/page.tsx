@@ -76,7 +76,7 @@ export default function CartPage() {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="dark:bg-card backdrop-blur rounded-xl p-6 shadow-sm border border-border dark:border-border"
+                className="bg-card backdrop-blur rounded-xl p-6 shadow-sm border border-border dark:border-border"
               >
                 <div className="flex gap-6 flex-col sm:flex-row">
                   {/* Product Image */}
@@ -98,7 +98,7 @@ export default function CartPage() {
                   {/* Product Info */}
                   <div className="flex-1">
                     <Link href={`/products/${item.product_id}`}>
-                      <h3 className="font-bold text-lg text-gray-900 dark:text-white hover:text-indigo-600 mb-1 truncate">
+                      <h3 className="font-bold text-lg text-gray-900 dark:text-white hover:text-indigo-600 mb-1 wrap-break-word">
                         {item.product_title}
                       </h3>
                     </Link>

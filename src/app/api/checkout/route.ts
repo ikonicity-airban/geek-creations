@@ -1,16 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createOrder } from "@/lib/shopify";
-import { initializePaystackPayment } from "@/lib/payments/paystack";
+import { createDraftOrder } from "@/lib/shopify";
+import { initializePayment } from "@/lib/payments";
 import { createSolanaPaymentRequest } from "@/lib/payments/solana-pay";
 import { createClient } from "@supabase/supabase-js";
-import { db } from "@/lib/db";
-import { variants } from "@/lib/db/schema";
-import { inArray } from "drizzle-orm";
 import type { CheckoutData, CartItem } from "@/types";
+import { CONFIG } from "@/lib/config";
+
+const SHOPIFY_CURRENCY_CODE = CONFIG.SHOPIFY.currencyCode.trim().toUpperCase();
 
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+  CONFIG.DATABASE.supabaseUrl,
+  CONFIG.DATABASE.supabaseServiceRoleKey,
 );
 
 export async function POST(req: NextRequest) {
@@ -29,64 +29,78 @@ export async function POST(req: NextRequest) {
     if (!email || !shipping_address || !cart_items || cart_items.length === 0) {
       return NextResponse.json(
         { error: "Missing required fields" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    // Fetch Shopify variant IDs from database
-    const variantIds = cart_items.map((item) => item.variant_id);
-    const variantRows = await db
-      .select({
-        id: variants.id,
-        shopifyVariantId: variants.shopifyVariantId,
-      })
-      .from(variants)
-      .where(inArray(variants.id, variantIds));
-
-    // Create a map for quick lookup
-    const variantMap = new Map(
-      variantRows.map((v) => [v.id, v.shopifyVariantId])
-    );
-
-    // Convert cart items to Shopify line items with proper variant IDs
-    const lineItems = cart_items
-      .map((item) => {
-        const shopifyVariantId = variantMap.get(item.variant_id);
-        if (!shopifyVariantId) {
-          console.error(
-            `Shopify variant ID not found for variant ${item.variant_id}`
-          );
-          return null;
-        }
-        return {
-          variantId: `gid://shopify/ProductVariant/${shopifyVariantId}`,
-          quantity: item.quantity,
-        };
-      })
-      .filter(
-        (item): item is { variantId: string; quantity: number } => item !== null
-      );
-
-    if (lineItems.length === 0) {
+    // Require a valid currency code to avoid Shopify "invalid money" errors
+    if (!SHOPIFY_CURRENCY_CODE) {
       return NextResponse.json(
-        { error: "No valid line items found" },
-        { status: 400 }
+        {
+          error:
+            "Missing SHOPIFY_CURRENCY_CODE env. Set it to your store's primary currency (e.g., USD, EUR, GBP).",
+        },
+        { status: 500 },
       );
     }
+
+    // Build custom line items for draft order (no Shopify variant required)
+    const lineItems = cart_items.map((item) => {
+      const custom = item as unknown as Record<string, unknown>;
+      const productTitle =
+        typeof custom.product_title === "string"
+          ? custom.product_title
+          : undefined;
+      const designName =
+        typeof custom.design_name === "string" ? custom.design_name : undefined;
+      const designUrl =
+        typeof custom.design_url === "string" ? custom.design_url : undefined;
+      const productType =
+        typeof custom.product_type === "string"
+          ? custom.product_type
+          : "Custom";
+      const selectedOptions =
+        custom.selected_options !== undefined ? custom.selected_options : null;
+
+      return {
+        title: `${productTitle || "Custom Merch"} - ${
+          designName || "Custom Design"
+        }`,
+        originalUnitPrice: {
+          amount: Number(item.price).toFixed(2),
+          currencyCode: SHOPIFY_CURRENCY_CODE,
+        },
+        quantity: item.quantity,
+        customAttributes: [
+          { key: "design_url", value: designUrl || "" },
+          { key: "product_type", value: productType },
+          {
+            key: "variant_options",
+            value: selectedOptions ? JSON.stringify(selectedOptions) : "",
+          },
+        ],
+      };
+    });
 
     // Calculate total amount (in kobo for Paystack, or in smallest unit for crypto)
     const totalAmount = cart_items.reduce(
       (sum, item) => sum + item.price * item.quantity,
-      0
+      0,
     );
     const tax = totalAmount * 0.075; // 7.5% VAT
     const shipping = totalAmount >= 50000 ? 0 : 2500;
     const finalTotal = totalAmount + tax + shipping;
 
-    // Create order in Shopify with manual fulfillment tags
-    let shopifyOrder;
+    // Determine currency based on payment method
+    const currency =
+      payment_method === "crypto"
+        ? crypto_currency || "USDC"
+        : SHOPIFY_CURRENCY_CODE || "NGN";
+
+    // Create draft order in Shopify for manual review/fulfillment
+    let shopifyDraftOrder;
     try {
-      shopifyOrder = await createOrder({
+      shopifyDraftOrder = await createDraftOrder({
         email,
         lineItems,
         shippingAddress: {
@@ -113,42 +127,86 @@ export async function POST(req: NextRequest) {
               phone: billing_address.phone,
             }
           : undefined,
-        financialStatus: "pending", // Always pending for manual review
+        financialStatus: "PENDING", // Always pending for manual review
         note: "MANUAL FULFILLMENT REQUIRED - Review in admin dashboard",
         tags: ["manual-review", "pending-admin"],
       });
+      if (!shopifyDraftOrder) {
+        throw new Error("Draft order creation returned no draft order");
+      }
     } catch (error) {
-      console.error("Shopify order creation error:", error);
+      console.error("Shopify draft order creation error:", error);
       return NextResponse.json(
         {
-          error: `Failed to create order: ${
+          error: `Failed to create draft order: ${
             error instanceof Error ? error.message : "Unknown error"
           }`,
         },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
-    // Save order to Supabase immediately (main source of truth)
+    // Save order to Supabase orders_log table (main source of truth)
+    let supabaseOrderId: string | null = null;
     try {
-      const shopifyOrderId = shopifyOrder.id.split("/").pop();
-
-      await supabase.from("orders").insert({
-        shopify_order_id: shopifyOrderId ? parseInt(shopifyOrderId) : null,
-        shopify_order_number: shopifyOrder.orderNumber || shopifyOrder.name,
-        customer_email: email,
-        shipping_address: shipping_address,
-        billing_address: billing_address || shipping_address,
-        line_items: cart_items,
-        total: finalTotal.toString(),
-        subtotal: totalAmount.toString(),
-        tax: tax.toString(),
-        shipping_cost: shipping.toString(),
-        payment_method: payment_method,
-        status: "paid_pending_fulfillment",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+      // Format line items for storage
+      const formattedLineItems = cart_items.map((item) => {
+        const custom = item as unknown as Record<string, unknown>;
+        return {
+          id: item.variant_id,
+          product_id: item.product_id,
+          variant_id: item.variant_id,
+          product_title:
+            typeof custom.product_title === "string"
+              ? custom.product_title
+              : item.product_title || "Custom Product",
+          design_name:
+            typeof custom.design_name === "string"
+              ? custom.design_name
+              : "Custom Design",
+          design_url:
+            typeof custom.design_url === "string" ? custom.design_url : null,
+          product_type:
+            typeof custom.product_type === "string"
+              ? custom.product_type
+              : "Custom",
+          quantity: item.quantity,
+          price: item.price,
+          selected_options: custom.selected_options || null,
+        };
       });
+
+      const { data: orderData, error: insertError } = await supabase
+        .from("orders_log")
+        .insert({
+          shopify_draft_order_id: shopifyDraftOrder.id,
+          order_number: shopifyDraftOrder.name,
+          customer_email: email,
+          customer_phone: shipping_address.phone,
+          shipping_address: shipping_address,
+          billing_address: billing_address || shipping_address,
+          line_items: formattedLineItems,
+          total_price: finalTotal.toString(),
+          subtotal: totalAmount.toString(),
+          tax: tax.toString(),
+          shipping_cost: shipping.toString(),
+          currency: currency,
+          payment_method: payment_method,
+          payment_status: "pending",
+          status: "pending_payment",
+          fulfillment_provider: "manual",
+          notes: "Order created via checkout - awaiting payment",
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .select()
+        .single();
+
+      if (!insertError && orderData) {
+        supabaseOrderId = orderData.id.toString();
+      } else {
+        console.error("Failed to insert order to orders_log:", insertError);
+      }
     } catch (error) {
       console.error("Failed to save order to Supabase:", error);
       // Log error but don't fail the request - Shopify order is already created
@@ -158,24 +216,35 @@ export async function POST(req: NextRequest) {
     let paymentUrl: string | null = null;
     let paymentReference: string | null = null;
 
-    if (payment_method === "card") {
-      // Initialize Paystack payment
+    if (payment_method === "card" || payment_method === "bank_transfer") {
+      // Use modular payment service
       try {
-        const paystackResponse = await initializePaystackPayment({
-          email,
-          amountKobo: Math.round(finalTotal * 100), // Convert to kobo
-          orderId: shopifyOrder.orderNumber || shopifyOrder.name,
-          callbackUrl: `${req.nextUrl.origin}/checkout/success?order=${
-            shopifyOrder.orderNumber || shopifyOrder.name
-          }&email=${encodeURIComponent(email)}`,
-        });
-        paymentUrl = paystackResponse.authorization_url;
-        paymentReference = paystackResponse.reference;
+        const paymentResponse = await initializePayment(
+          {
+            email,
+            amount: finalTotal,
+            currency: currency as string,
+            orderId: supabaseOrderId || shopifyDraftOrder.name,
+            callbackUrl: `${req.nextUrl.origin}/api/payment/verify`,
+            customer: {
+              name: `${shipping_address.first_name} ${shipping_address.last_name}`,
+              phone_number: shipping_address.phone,
+            },
+            metadata: {
+              draft_order_id: shopifyDraftOrder.id,
+              draft_order_name: shopifyDraftOrder.name,
+            },
+          },
+          payment_method,
+        );
+
+        paymentUrl = paymentResponse.payment_url;
+        paymentReference = paymentResponse.reference;
       } catch (error) {
-        console.error("Paystack initialization error:", error);
+        console.error("Payment initialization error:", error);
         return NextResponse.json(
           { error: "Failed to initialize payment" },
-          { status: 500 }
+          { status: 500 },
         );
       }
     } else if (payment_method === "crypto") {
@@ -183,16 +252,16 @@ export async function POST(req: NextRequest) {
       try {
         const solanaResponse = await createSolanaPaymentRequest({
           amount: finalTotal,
-          label: `Order #${shopifyOrder.orderNumber || shopifyOrder.name}`,
-          orderId: shopifyOrder.orderNumber || shopifyOrder.name,
-          memo: `Order ${shopifyOrder.orderNumber || shopifyOrder.name}`,
+          label: `Draft ${shopifyDraftOrder.name}`,
+          orderId: shopifyDraftOrder.name,
+          memo: `Draft ${shopifyDraftOrder.name}`,
         });
         // For crypto payments, redirect to payment URL
         if (solanaResponse.url) {
           return NextResponse.json({
             success: true,
-            order_id: shopifyOrder.id,
-            order_number: shopifyOrder.orderNumber || shopifyOrder.name,
+            draft_order_id: shopifyDraftOrder.id,
+            draft_order_name: shopifyDraftOrder.name,
             payment_url: solanaResponse.url,
             payment_reference: solanaResponse.reference,
             requires_redirect: true,
@@ -204,64 +273,43 @@ export async function POST(req: NextRequest) {
         console.error("Solana payment creation error:", error);
         return NextResponse.json(
           { error: "Failed to create crypto payment" },
-          { status: 500 }
-        );
-      }
-    } else if (payment_method === "bank_transfer") {
-      // For bank transfer, we might generate a virtual account or just return success
-      // For now, we'll treat it similar to card payment
-      try {
-        const paystackResponse = await initializePaystackPayment({
-          email,
-          amountKobo: Math.round(finalTotal * 100),
-          orderId: shopifyOrder.orderNumber || shopifyOrder.name,
-          callbackUrl: `${req.nextUrl.origin}/checkout/success?order=${
-            shopifyOrder.orderNumber || shopifyOrder.name
-          }&email=${encodeURIComponent(email)}`,
-        });
-        paymentUrl = paystackResponse.authorization_url;
-        paymentReference = paystackResponse.reference;
-      } catch (error) {
-        console.error("Paystack bank transfer error:", error);
-        return NextResponse.json(
-          { error: "Failed to initialize bank transfer" },
-          { status: 500 }
+          { status: 500 },
         );
       }
     }
 
     // Log payment transaction to database
-    if (paymentReference) {
+    if (paymentReference && supabaseOrderId) {
       try {
-        // Extract Shopify order ID from the GID
-        const shopifyOrderId = shopifyOrder.id.split("/").pop();
+        const paymentProvider =
+          payment_method === "crypto" ? "solana" : CONFIG.PAYMENT.provider;
 
+        // Update orders_log with payment reference
+        await supabase
+          .from("orders_log")
+          .update({
+            payment_reference: paymentReference,
+            payment_provider: paymentProvider,
+          })
+          .eq("id", supabaseOrderId);
+
+        // Log to payment_transactions table
         await supabase.from("payment_transactions").insert({
-          order_id: shopifyOrderId ? parseInt(shopifyOrderId) : null,
-          payment_method:
-            payment_method === "card"
-              ? "paystack"
-              : payment_method === "crypto"
-              ? "solana"
-              : "paystack",
-          payment_provider:
-            payment_method === "card"
-              ? "paystack"
-              : payment_method === "crypto"
-              ? "solana"
-              : "paystack",
+          order_id: parseInt(supabaseOrderId),
+          payment_method: payment_method,
+          payment_provider: paymentProvider,
           transaction_reference: paymentReference,
           amount: finalTotal.toString(),
-          currency:
-            payment_method === "crypto" ? crypto_currency || "USDC" : "NGN",
+          currency: currency,
           status: "pending",
           metadata: {
-            shopify_order_id: shopifyOrder.id,
-            shopify_order_number: shopifyOrder.orderNumber || shopifyOrder.name,
+            draft_order_id: shopifyDraftOrder.id,
+            draft_order_name: shopifyDraftOrder.name,
             email,
             payment_method,
             crypto_currency: crypto_currency || null,
           },
+          created_at: new Date().toISOString(),
         });
       } catch (error) {
         console.error("Failed to log payment transaction:", error);
@@ -271,10 +319,14 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      order_id: shopifyOrder.id,
-      order_number: shopifyOrder.orderNumber || shopifyOrder.name,
+      order_id: supabaseOrderId,
+      draft_order_id: shopifyDraftOrder.id,
+      draft_order_name: shopifyDraftOrder.name,
+      invoice_url: shopifyDraftOrder.invoiceUrl,
       payment_url: paymentUrl,
       payment_reference: paymentReference,
+      total: finalTotal,
+      currency: currency,
     });
   } catch (error) {
     console.error("Checkout error:", error);
@@ -285,7 +337,7 @@ export async function POST(req: NextRequest) {
             ? error.message
             : "An unexpected error occurred",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

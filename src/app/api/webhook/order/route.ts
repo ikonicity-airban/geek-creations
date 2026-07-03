@@ -1,11 +1,12 @@
 // app/api/webhook/order/route.ts
-import { NextRequest, NextResponse } from 'next/server';
-import crypto from 'crypto';
-import { createClient } from '@supabase/supabase-js';
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
+import crypto from "crypto";
+import { CONFIG } from "@/lib/config";
 
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+  CONFIG.DATABASE.supabaseUrl,
+  CONFIG.DATABASE.supabaseServiceRoleKey,
 );
 
 interface ShopifyOrder {
@@ -70,26 +71,26 @@ interface IkonshopItem {
 
 // Verify Shopify webhook signature
 function verifyShopifyWebhook(body: string, hmac: string): boolean {
-  const secret = process.env.SHOPIFY_WEBHOOK_SECRET!;
+  const secret = CONFIG.SHOPIFY.webhookSecret;
   const hash = crypto
-    .createHmac('sha256', secret)
-    .update(body, 'utf8')
-    .digest('base64');
+    .createHmac("sha256", secret)
+    .update(body, "utf8")
+    .digest("base64");
   return crypto.timingSafeEqual(Buffer.from(hash), Buffer.from(hmac));
 }
 
 // Fetch product metafield from Shopify
 async function getProductMetafield(variantId: number): Promise<string | null> {
-  const shopifyDomain = process.env.SHOPIFY_STORE_DOMAIN!;
-  const accessToken = process.env.SHOPIFY_ACCESS_TOKEN!;
+  const shopifyDomain = CONFIG.SHOPIFY.storeDomain;
+  const accessToken = CONFIG.SHOPIFY.accessToken;
 
   try {
     // First get product ID from variant
     const variantResponse = await fetch(
       `https://${shopifyDomain}/admin/api/2024-10/variants/${variantId}.json`,
       {
-        headers: { 'X-Shopify-Access-Token': accessToken },
-      }
+        headers: { "X-Shopify-Access-Token": accessToken },
+      },
     );
     const variantData = await variantResponse.json();
     const productId = variantData.variant?.product_id;
@@ -100,33 +101,33 @@ async function getProductMetafield(variantId: number): Promise<string | null> {
     const metafieldResponse = await fetch(
       `https://${shopifyDomain}/admin/api/2024-10/products/${productId}/metafields.json`,
       {
-        headers: { 'X-Shopify-Access-Token': accessToken },
-      }
+        headers: { "X-Shopify-Access-Token": accessToken },
+      },
     );
     const metafieldData = await metafieldResponse.json();
 
     const fulfillmentField = metafieldData.metafields?.find(
       (m: { namespace: string; key: string; value: string }) =>
-        m.namespace === 'custom' && m.key === 'fulfillment_provider'
+        m.namespace === "custom" && m.key === "fulfillment_provider",
     );
 
     return fulfillmentField?.value || null;
   } catch (error) {
-    console.error('Error fetching metafield:', error);
+    console.error("Error fetching metafield:", error);
     return null;
   }
 }
 
 // Printful fulfillment
 async function fulfillWithPrintful(order: ShopifyOrder, items: PrintfulItem[]) {
-  const apiKey = process.env.PRINTFUL_API_KEY!;
-  
+  const apiKey = CONFIG.POD.printful.apiKey;
+
   const printfulOrder = {
     external_id: `geeks-${order.id}`,
     recipient: {
       name: `${order.shipping_address.first_name} ${order.shipping_address.last_name}`,
       address1: order.shipping_address.address1,
-      address2: order.shipping_address.address2 || '',
+      address2: order.shipping_address.address2 || "",
       city: order.shipping_address.city,
       state_code: order.shipping_address.province,
       country_code: order.shipping_address.country,
@@ -134,18 +135,18 @@ async function fulfillWithPrintful(order: ShopifyOrder, items: PrintfulItem[]) {
       phone: order.shipping_address.phone,
       email: order.email,
     },
-    items: items.map(item => ({
+    items: items.map((item) => ({
       sync_variant_id: item.sync_variant_id,
       quantity: item.quantity,
       retail_price: item.retail_price,
     })),
   };
 
-  const response = await fetch('https://api.printful.com/orders', {
-    method: 'POST',
+  const response = await fetch("https://api.printful.com/orders", {
+    method: "POST",
     headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(printfulOrder),
   });
@@ -155,13 +156,13 @@ async function fulfillWithPrintful(order: ShopifyOrder, items: PrintfulItem[]) {
 
 // Printify fulfillment
 async function fulfillWithPrintify(order: ShopifyOrder, items: PrintifyItem[]) {
-  const apiKey = process.env.PRINTIFY_API_KEY!;
-  const shopId = process.env.PRINTIFY_SHOP_ID!;
+  const apiKey = CONFIG.POD.printify.apiKey;
+  const shopId = CONFIG.POD.printify.shopId;
 
   const printifyOrder = {
     external_id: `geeks-${order.id}`,
     label: `Order #${order.order_number}`,
-    line_items: items.map(item => ({
+    line_items: items.map((item) => ({
       product_id: item.product_id,
       variant_id: item.variant_id,
       quantity: item.quantity,
@@ -176,7 +177,7 @@ async function fulfillWithPrintify(order: ShopifyOrder, items: PrintifyItem[]) {
       country: order.shipping_address.country,
       region: order.shipping_address.province,
       address1: order.shipping_address.address1,
-      address2: order.shipping_address.address2 || '',
+      address2: order.shipping_address.address2 || "",
       city: order.shipping_address.city,
       zip: order.shipping_address.zip,
     },
@@ -185,13 +186,13 @@ async function fulfillWithPrintify(order: ShopifyOrder, items: PrintifyItem[]) {
   const response = await fetch(
     `https://api.printify.com/v1/shops/${shopId}/orders.json`,
     {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(printifyOrder),
-    }
+    },
   );
 
   return response.json();
@@ -199,20 +200,20 @@ async function fulfillWithPrintify(order: ShopifyOrder, items: PrintifyItem[]) {
 
 // Ikonshop fulfillment (crypto orders)
 async function fulfillWithIkonshop(order: ShopifyOrder, items: IkonshopItem[]) {
-  const apiKey = process.env.IKONSHOP_API_KEY!;
+  const apiKey = CONFIG.POD.ikonshop.apiKey;
 
   const ikonshopOrder = {
     order_id: `geeks-${order.id}`,
     customer_email: order.email,
     items: items,
-    payment_method: 'crypto', // USDC or SOL
+    payment_method: "crypto", // USDC or SOL
   };
 
-  const response = await fetch('https://api.ikonshop.com/v1/orders', {
-    method: 'POST',
+  const response = await fetch("https://api.ikonshop.com/v1/orders", {
+    method: "POST",
     headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(ikonshopOrder),
   });
@@ -225,9 +226,9 @@ async function logOrder(
   orderId: number,
   provider: string,
   status: string,
-  response: unknown
+  response: unknown,
 ): Promise<void> {
-  await supabase.from('orders_log').insert({
+  await supabase.from("orders_log").insert({
     shopify_order_id: orderId,
     fulfillment_provider: provider,
     status,
@@ -239,12 +240,12 @@ async function logOrder(
 export async function POST(req: NextRequest) {
   try {
     const rawBody = await req.text();
-    const hmac = req.headers.get('x-shopify-hmac-sha256');
+    const hmac = req.headers.get("x-shopify-hmac-sha256");
 
     if (!hmac || !verifyShopifyWebhook(rawBody, hmac)) {
       return NextResponse.json(
-        { error: 'Invalid webhook signature' },
-        { status: 401 }
+        { error: "Invalid webhook signature" },
+        { status: 401 },
       );
     }
 
@@ -252,12 +253,19 @@ export async function POST(req: NextRequest) {
 
     // Skip auto-fulfillment for manual review orders
     // Tags come as comma-separated string from Shopify webhook
-    const orderTags = order.tags ? order.tags.split(",").map(t => t.trim()) : [];
-    if (orderTags.includes("manual-review") || orderTags.includes("pending-admin")) {
-      console.log(`⏭️ Skipping auto-fulfillment for order ${order.id} - manual review required`);
+    const orderTags = order.tags
+      ? order.tags.split(",").map((t) => t.trim())
+      : [];
+    if (
+      orderTags.includes("manual-review") ||
+      orderTags.includes("pending-admin")
+    ) {
+      console.log(
+        `⏭️ Skipping auto-fulfillment for order ${order.id} - manual review required`,
+      );
       return NextResponse.json(
         { received: true, skipped: "manual-review" },
-        { status: 200 }
+        { status: 200 },
       );
     }
 
@@ -268,36 +276,38 @@ export async function POST(req: NextRequest) {
           const provider = await getProductMetafield(item.variant_id);
 
           if (!provider) {
-            console.error(`No fulfillment provider for variant ${item.variant_id}`);
-            await logOrder(order.id, 'unknown', 'error', {
-              error: 'No fulfillment provider configured',
+            console.error(
+              `No fulfillment provider for variant ${item.variant_id}`,
+            );
+            await logOrder(order.id, "unknown", "error", {
+              error: "No fulfillment provider configured",
             });
             continue;
           }
 
           let result;
           switch (provider.toLowerCase()) {
-            case 'printful':
+            case "printful":
               result = await fulfillWithPrintful(order, [
                 {
-                  sync_variant_id: parseInt(item.sku.split('-')[1] || '0'),
+                  sync_variant_id: parseInt(item.sku.split("-")[1] || "0"),
                   quantity: item.quantity,
                   retail_price: item.price,
                 },
               ]);
               break;
 
-            case 'printify':
+            case "printify":
               result = await fulfillWithPrintify(order, [
                 {
-                  product_id: item.sku.split('-')[0],
+                  product_id: item.sku.split("-")[0],
                   variant_id: item.variant_id,
                   quantity: item.quantity,
                 },
               ]);
               break;
 
-            case 'ikonshop':
+            case "ikonshop":
               result = await fulfillWithIkonshop(order, [
                 {
                   design_id: item.sku,
@@ -320,22 +330,22 @@ export async function POST(req: NextRequest) {
               throw new Error(`Unknown provider: ${provider}`);
           }
 
-          await logOrder(order.id, provider, 'success', result);
+          await logOrder(order.id, provider, "success", result);
           console.log(`✅ Order ${order.id} fulfilled via ${provider}`);
         }
       } catch (error) {
-        console.error('Fulfillment error:', error);
-        await logOrder(order.id, 'error', 'failed', { error: String(error) });
+        console.error("Fulfillment error:", error);
+        await logOrder(order.id, "error", "failed", { error: String(error) });
       }
     });
 
     // Return 200 immediately
     return NextResponse.json({ received: true }, { status: 200 });
   } catch (error) {
-    console.error('Webhook processing error:', error);
+    console.error("Webhook processing error:", error);
     return NextResponse.json(
-      { error: 'Webhook processing failed' },
-      { status: 500 }
+      { error: "Webhook processing failed" },
+      { status: 500 },
     );
   }
 }

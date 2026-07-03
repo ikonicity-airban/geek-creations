@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/mockup-carousel";
 import { buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { CONFIG } from "@/lib/config";
 
 // Types
 type Design = {
@@ -72,7 +73,7 @@ const RELATED_DESIGNS_LIMIT = 6;
 // API Functions
 async function getDesign(id: string): Promise<Design | null> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+    const baseUrl = CONFIG.SITE.url;
     const res = await fetch(`${baseUrl}/api/designs/${id}`, {
       cache: "no-store",
     });
@@ -89,12 +90,12 @@ async function getDesign(id: string): Promise<Design | null> {
 
 async function getProducts(): Promise<ProductOption[]> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+    const baseUrl = CONFIG.SITE.url;
     const res = await fetch(
       `${baseUrl}/api/products?limit=${PRODUCT_FETCH_LIMIT}`,
       {
         cache: "no-store",
-      }
+      },
     );
 
     if (!res.ok) return [];
@@ -139,10 +140,10 @@ async function getProducts(): Promise<ProductOption[]> {
 
 async function getRelatedDesigns(
   currentDesignId: string,
-  category: string | null
+  category: string | null,
 ): Promise<Design[]> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+    const baseUrl = CONFIG.SITE.url;
     const params = new URLSearchParams();
     if (category) params.set("category", category);
     params.set("limit", RELATED_DESIGNS_LIMIT.toString());

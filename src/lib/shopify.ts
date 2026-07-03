@@ -1,6 +1,8 @@
 // lib/shopify.ts - Shopify API utilities
-const shopifyDomain = process.env.SHOPIFY_STORE_DOMAIN;
-const accessToken = process.env.SHOPIFY_ACCESS_TOKEN;
+import { CONFIG } from "./config";
+
+const shopifyDomain = CONFIG.SHOPIFY.storeDomain;
+const accessToken = CONFIG.SHOPIFY.accessToken;
 
 if (!shopifyDomain || !accessToken) {
   console.error(
@@ -89,8 +91,6 @@ export interface ShopifyVariant {
   compareAtPrice?: string | null;
   sku: string | null;
   inventoryQuantity: number | null;
-  weight?: number | null;
-  weightUnit?: string | null;
   selectedOptions: ShopifySelectedOption[];
 }
 
@@ -181,8 +181,6 @@ export async function syncProducts(): Promise<ShopifyProduct[]> {
                   compareAtPrice
                   sku
                   inventoryQuantity
-                  weight
-                  weightUnit
                   selectedOptions {
                     name
                     value
@@ -218,10 +216,24 @@ export async function syncProducts(): Promise<ShopifyProduct[]> {
 }
 
 // Sync collections from Shopify
+interface RawShopifyCollection {
+  id: string;
+  title: string;
+  handle: string;
+  description: string;
+  image: {
+    src: string;
+    altText: string | null;
+  } | null;
+  productsCount: {
+    count: number;
+  };
+}
+
 interface SyncCollectionsResponse {
   collections: {
     edges: {
-      node: ShopifyCollection;
+      node: RawShopifyCollection;
     }[];
   };
 }
@@ -240,7 +252,9 @@ export async function syncCollections(): Promise<ShopifyCollection[]> {
               src
               altText
             }
-            productsCount
+            productsCount {
+              count
+            }
           }
         }
       }
@@ -252,7 +266,10 @@ export async function syncCollections(): Promise<ShopifyCollection[]> {
     variables: { first: 50 },
   });
 
-  return data.collections.edges.map((edge) => edge.node);
+  return data.collections.edges.map((edge) => ({
+    ...edge.node,
+    productsCount: edge.node.productsCount?.count ?? 0,
+  }));
 }
 
 // Create checkout session
@@ -304,12 +321,20 @@ export async function createCheckout(
   return data.checkoutCreate.checkout;
 }
 
-// Create order in Shopify
+// Create draft order in Shopify
+interface MoneyInput {
+  amount: string;
+  currencyCode: string;
+}
+
 interface CreateOrderInput {
   email: string;
   lineItems: Array<{
-    variantId: string;
+    title?: string;
     quantity: number;
+    variantId?: string;
+    originalUnitPrice?: MoneyInput;
+    customAttributes?: Array<{ key: string; value: string }>;
   }>;
   shippingAddress: {
     firstName: string;
@@ -333,17 +358,17 @@ interface CreateOrderInput {
     zip: string;
     phone: string;
   };
-  financialStatus?: "pending" | "paid" | "authorized";
+  financialStatus?: "PENDING" | "PAID" | "AUTHORIZED";
   note?: string;
   tags?: string[];
 }
 
-interface CreateOrderResponse {
-  orderCreate: {
-    order: {
+interface DraftOrderCreateResponse {
+  draftOrderCreate: {
+    draftOrder: {
       id: string;
       name: string;
-      orderNumber: number;
+      invoiceUrl: string | null;
     } | null;
     userErrors: Array<{
       field: string[];
@@ -352,14 +377,31 @@ interface CreateOrderResponse {
   };
 }
 
-export async function createOrder(input: CreateOrderInput) {
+interface DraftOrderCompleteResponse {
+  draftOrderComplete: {
+    draftOrder: {
+      id: string;
+      name: string;
+      order?: {
+        id: string;
+        name: string;
+      } | null;
+    } | null;
+    userErrors: Array<{
+      field: string[];
+      message: string;
+    }>;
+  };
+}
+
+export async function createDraftOrder(input: CreateOrderInput) {
   const mutation = `
-    mutation orderCreate($input: OrderInput!) {
-      orderCreate(input: $input) {
-        order {
+    mutation draftOrderCreate($input: DraftOrderInput!) {
+      draftOrderCreate(input: $input) {
+        draftOrder {
           id
           name
-          orderNumber
+          invoiceUrl
         }
         userErrors {
           field
@@ -369,45 +411,37 @@ export async function createOrder(input: CreateOrderInput) {
     }
   `;
 
-  interface OrderInputType {
-    email: string;
-    lineItems: Array<{
-      variantId: string;
-      quantity: number;
-    }>;
-    shippingAddress: {
-      firstName: string;
-      lastName: string;
-      address1: string;
-      address2: string;
-      city: string;
-      province: string;
-      country: string;
-      zip: string;
-      phone: string;
-    };
-    billingAddress?: {
-      firstName: string;
-      lastName: string;
-      address1: string;
-      address2: string;
-      city: string;
-      province: string;
-      country: string;
-      zip: string;
-      phone: string;
-    };
-    financialStatus: "pending" | "paid" | "authorized";
-    note?: string;
-    tags?: string[];
-  }
+  // Transform lineItems to ensure proper format for Shopify GraphQL
+  // For custom line items without variantId, we need to use originalUnitPriceWithCurrency
+  const formattedLineItems = input.lineItems.map((item) => {
+    // If we have a variantId, use it directly
+    if (item.variantId) {
+      return {
+        variantId: item.variantId,
+        quantity: item.quantity,
+        customAttributes: item.customAttributes || [],
+      };
+    }
 
-  const orderInput: OrderInputType = {
-    email: input.email,
-    lineItems: input.lineItems.map((item) => ({
-      variantId: item.variantId,
+    // For custom line items (no variant), use originalUnitPriceWithCurrency (Shopify 2024-10+)
+    return {
+      title: item.title || "Custom Item",
       quantity: item.quantity,
-    })),
+      requiresShipping: true,
+      taxable: true,
+      originalUnitPriceWithCurrency: item.originalUnitPrice
+        ? {
+            amount: item.originalUnitPrice.amount,
+            currencyCode: item.originalUnitPrice.currencyCode,
+          }
+        : undefined,
+      customAttributes: item.customAttributes || [],
+    };
+  });
+
+  const draftInput = {
+    email: input.email,
+    lineItems: formattedLineItems,
     shippingAddress: {
       firstName: input.shippingAddress.firstName,
       lastName: input.shippingAddress.lastName,
@@ -419,48 +453,128 @@ export async function createOrder(input: CreateOrderInput) {
       zip: input.shippingAddress.zip,
       phone: input.shippingAddress.phone,
     },
-    financialStatus: input.financialStatus || "pending",
+    billingAddress: input.billingAddress
+      ? {
+          firstName: input.billingAddress.firstName,
+          lastName: input.billingAddress.lastName,
+          address1: input.billingAddress.address1,
+          address2: input.billingAddress.address2 || "",
+          city: input.billingAddress.city,
+          province: input.billingAddress.province,
+          country: input.billingAddress.country,
+          zip: input.billingAddress.zip,
+          phone: input.billingAddress.phone,
+        }
+      : undefined,
+    note: input.note || "MANUAL FULFILLMENT REQUIRED",
+    tags: input.tags || ["manual-review"],
   };
 
-  if (input.billingAddress) {
-    orderInput.billingAddress = {
-      firstName: input.billingAddress.firstName,
-      lastName: input.billingAddress.lastName,
-      address1: input.billingAddress.address1,
-      address2: input.billingAddress.address2 || "",
-      city: input.billingAddress.city,
-      province: input.billingAddress.province,
-      country: input.billingAddress.country,
-      zip: input.billingAddress.zip,
-      phone: input.billingAddress.phone,
-    };
-  }
-
-  // Add note and tags for manual fulfillment
-  if (input.note) {
-    orderInput.note = input.note;
-  }
-
-  if (input.tags && input.tags.length > 0) {
-    orderInput.tags = input.tags;
-  }
-
-  const data = await shopifyFetch<CreateOrderResponse>({
+  const data = await shopifyFetch<DraftOrderCreateResponse>({
     query: mutation,
+    variables: { input: draftInput },
+  });
+
+  if (data.draftOrderCreate.userErrors?.length > 0) {
+    throw new Error(data.draftOrderCreate.userErrors[0].message);
+  }
+
+  return data.draftOrderCreate.draftOrder;
+}
+
+export async function completeDraftOrder(draftOrderId: string) {
+  const mutation = `
+    mutation draftOrderComplete($id: ID!) {
+      draftOrderComplete(id: $id) {
+        draftOrder {
+          id
+          name
+          order {
+            id
+            name
+          }
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }
+  `;
+
+  const data = await shopifyFetch<DraftOrderCompleteResponse>({
+    query: mutation,
+    variables: { id: draftOrderId },
+  });
+
+  if (data.draftOrderComplete.userErrors?.length > 0) {
+    throw new Error(data.draftOrderComplete.userErrors[0].message);
+  }
+
+  return data.draftOrderComplete.draftOrder?.order;
+}
+
+/**
+ * Complete a draft order and mark it as paid after payment verification
+ */
+export async function completePaidOrder(
+  draftOrderId: string,
+  paymentReference: string
+): Promise<{ orderId: string; orderName: string }> {
+  console.log("🚀 ~ completePaidOrder ~ paymentReference:", paymentReference);
+  // First, complete the draft order to convert it to an actual order
+  const order = await completeDraftOrder(draftOrderId);
+
+  if (!order) {
+    throw new Error("Failed to complete draft order");
+  }
+
+  // Mark order as paid using orderMarkAsPaid mutation
+  const markAsPaidMutation = `
+    mutation orderMarkAsPaid($input: OrderMarkAsPaidInput!) {
+      orderMarkAsPaid(input: $input) {
+        order {
+          id
+          name
+          displayFinancialStatus
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }
+  `;
+
+  const markAsPaidData = await shopifyFetch<{
+    orderMarkAsPaid: {
+      order: {
+        id: string;
+        name: string;
+        displayFinancialStatus: string;
+      } | null;
+      userErrors: Array<{ field: string[]; message: string }>;
+    };
+  }>({
+    query: markAsPaidMutation,
     variables: {
-      input: orderInput,
+      input: {
+        id: order.id,
+      },
     },
   });
 
-  if (data.orderCreate.userErrors && data.orderCreate.userErrors.length > 0) {
-    throw new Error(data.orderCreate.userErrors[0].message);
+  if (markAsPaidData.orderMarkAsPaid.userErrors?.length > 0) {
+    console.error(
+      "Failed to mark order as paid:",
+      markAsPaidData.orderMarkAsPaid.userErrors
+    );
   }
 
-  if (!data.orderCreate.order) {
-    throw new Error("Failed to create order");
-  }
-
-  return data.orderCreate.order;
+  return {
+    orderId: order.id,
+    orderName: order.name,
+  };
 }
 
 // Get product by handle
@@ -561,6 +675,13 @@ interface GetCollectionByHandleResponse {
   } | null;
 }
 
+/**
+ * getCollectionByHandle handleknaskljaklsdaksdkljda
+ * @param handle
+ * @returns nothing
+ *
+ * @example ajskdlajkljsdjakljkdaklsdjk
+ */
 export async function getCollectionByHandle(handle: string) {
   const query = `
     query GetCollection($handle: String!) {

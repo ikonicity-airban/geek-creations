@@ -3,9 +3,13 @@
 import React, { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 
+interface IFabricCanvasRef {
+  getZoom: () => number;
+  setZoom: (zoom: number) => void;
+}
 interface CanvasAreaProps {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
-  fabricCanvasRef: React.RefObject<any>;
+  fabricCanvasRef: React.RefObject<IFabricCanvasRef>;
   showGridlines: boolean;
   zoomLevel: number;
   isMobile?: boolean;
@@ -23,15 +27,15 @@ export function CanvasArea({
   // Apply zoom - simplified to avoid breaking canvas
   useEffect(() => {
     if (!fabricCanvasRef.current) return;
-    
+
     const canvas = fabricCanvasRef.current;
     const scale = Math.max(0.25, Math.min(2, zoomLevel / 100));
-    
+
     // Only update zoom if it's different to avoid constant re-renders
     // Use requestAnimationFrame to prevent render loops
     requestAnimationFrame(() => {
-      if (fabricCanvasRef.current && Math.abs(fabricCanvasRef.current.getZoom() - scale) > 0.01) {
-        fabricCanvasRef.current.setZoom(scale);
+      if (canvas && Math.abs(canvas.getZoom() - scale) > 0.01) {
+        canvas.setZoom(scale);
         // Don't call renderAll here - let fabric handle it
       }
     });
@@ -52,12 +56,8 @@ export function CanvasArea({
       }}
     >
       <div className="relative bg-white shadow-lg rounded-lg p-4">
-        <canvas
-          ref={canvasRef}
-          className="rounded-lg"
-        />
+        <canvas ref={canvasRef} className="rounded-lg" />
       </div>
     </div>
   );
 }
-

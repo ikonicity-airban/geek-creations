@@ -1,9 +1,7 @@
 "use client";
 
-import React from "react";
 import { ZoomIn, ZoomOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
 interface ZoomControlsProps {
   zoomLevel: number;
@@ -39,7 +37,7 @@ export function ZoomControls({
           onChange={(e) => onZoomChange?.(Number(e.target.value))}
           className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
         />
-        <span className="text-sm font-medium min-w-[3rem] text-center">
+        <span className="text-sm font-medium min-w-12 text-center">
           {zoomLevel}%
         </span>
         <Button
@@ -56,4 +54,3 @@ export function ZoomControls({
 
   return null; // Desktop zoom is handled in Toolbar
 }
-

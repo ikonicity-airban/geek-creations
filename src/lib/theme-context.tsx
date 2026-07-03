@@ -2,73 +2,133 @@
 
 import * as React from "react";
 
+export type ThemeMode = "light" | "dark" | "system";
+
 type ThemeContextValue = {
+  theme: ThemeMode;
+  setTheme: (theme: ThemeMode) => void;
   darkMode: boolean;
   setDarkMode: (value: boolean) => void;
   toggleDarkMode: () => void;
+  resolvedTheme: "light" | "dark";
 };
 
 const ThemeContext = React.createContext<ThemeContextValue | null>(null);
 
 const THEME_STORAGE_KEY = "geek-creations-theme";
 
-function getStoredTheme(): boolean | null {
+function getStoredTheme(): ThemeMode | null {
   if (typeof window === "undefined") return null;
   try {
     const stored = localStorage.getItem(THEME_STORAGE_KEY);
-    if (stored === null) return null;
-    return stored === "dark";
+    if (stored === "light" || stored === "dark" || stored === "system") {
+      return stored as ThemeMode;
+    }
+    return null;
   } catch {
     return null;
   }
 }
 
-function saveThemeToStorage(isDark: boolean): void {
+function saveThemeToStorage(theme: ThemeMode): void {
   if (typeof window === "undefined") return;
   try {
-    localStorage.setItem(THEME_STORAGE_KEY, isDark ? "dark" : "light");
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
   } catch {
-    // Ignore localStorage errors (e.g., quota exceeded, private browsing)
+    // Ignore localStorage errors
   }
+}
+
+function getSystemPreference(): "light" | "dark" {
+  if (typeof window === "undefined") return "light";
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
 }
 
 export function ThemeProvider({
   children,
-  defaultDarkMode = false,
+  defaultTheme = "system",
 }: {
   children: React.ReactNode;
-  defaultDarkMode?: boolean;
+  defaultTheme?: ThemeMode;
 }) {
-  // Initialize from localStorage or use default
-  const [darkMode, setDarkMode] = React.useState(() => {
+  const [theme, setThemeState] = React.useState<ThemeMode>(() => {
     const stored = getStoredTheme();
-    return stored !== null ? stored : defaultDarkMode;
+    return stored !== null ? stored : defaultTheme;
   });
 
-  // Apply theme to document on mount and when darkMode changes
+  const [systemPreference, setSystemPreference] = React.useState<
+    "light" | "dark"
+  >(() => getSystemPreference());
+
+  // Listen for system preference changes
   React.useEffect(() => {
-    if (darkMode) {
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleChange = (e: MediaQueryListEvent) => {
+      setSystemPreference(e.matches ? "dark" : "light");
+    };
+
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, []);
+
+  // Calculate resolved theme
+  const resolvedTheme: "light" | "dark" =
+    theme === "system" ? systemPreference : theme;
+
+  // Backward compatibility: darkMode boolean
+  const darkMode = resolvedTheme === "dark";
+
+  // Apply theme to document
+  React.useEffect(() => {
+    if (resolvedTheme === "dark") {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
     }
-  }, [darkMode]);
+  }, [resolvedTheme]);
 
-  // Save to localStorage whenever theme changes
-  React.useEffect(() => {
-    saveThemeToStorage(darkMode);
-  }, [darkMode]);
+  // Save theme preference
+  const setTheme = React.useCallback((newTheme: ThemeMode) => {
+    setThemeState(newTheme);
+    saveThemeToStorage(newTheme);
+  }, []);
+
+  // Backward compatibility: setDarkMode
+  const setDarkMode = React.useCallback(
+    (value: boolean) => {
+      setTheme(value ? "dark" : "light");
+    },
+    [setTheme],
+  );
+
+  // Backward compatibility: toggleDarkMode
+  const toggleDarkMode = React.useCallback(() => {
+    if (theme === "system") {
+      // If system, toggle to opposite of current resolved theme
+      setTheme(resolvedTheme === "dark" ? "light" : "dark");
+    } else {
+      // If explicit light/dark, toggle
+      setTheme(theme === "dark" ? "light" : "dark");
+    }
+  }, [theme, resolvedTheme, setTheme]);
 
   const value = React.useMemo<ThemeContextValue>(
     () => ({
+      theme,
+      setTheme,
       darkMode,
       setDarkMode,
-      toggleDarkMode: () => setDarkMode((v) => !v),
+      toggleDarkMode,
+      resolvedTheme,
     }),
-    [darkMode],
+    [theme, setTheme, darkMode, setDarkMode, toggleDarkMode, resolvedTheme],
   );
 
-  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+  return (
+    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
+  );
 }
 
 export function useTheme() {
@@ -78,5 +138,3 @@ export function useTheme() {
   }
   return ctx;
 }
-
-

@@ -15,7 +15,6 @@ import {
   Mail,
   MapPin,
   Phone,
-  Calendar,
   CheckCircle,
   Clock,
   XCircle,
@@ -23,6 +22,7 @@ import {
 } from "lucide-react";
 import type { ExtendedOrder, FulfillmentProvider } from "@/types/admin";
 import { fulfillOrder } from "@/app/admin/orders/actions";
+import Image from "next/image";
 
 interface OrderDetailModalProps {
   order: ExtendedOrder;
@@ -52,8 +52,9 @@ export default function OrderDetailModal({
       } else {
         setFulfillError(result.error || "Fulfillment failed");
       }
-    } catch (error: any) {
-      setFulfillError(error.message || "An error occurred");
+    } catch (error) {
+      console.log("🚀 ~ handleFulfill ~ error:", error);
+      setFulfillError((error as Error)?.message || "An error occurred");
     } finally {
       setFulfilling(false);
     }
@@ -126,7 +127,9 @@ export default function OrderDetailModal({
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Email</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Email
+                </p>
                 <p className="font-medium">{order.customer_email || "N/A"}</p>
               </div>
               <div>
@@ -159,7 +162,8 @@ export default function OrderDetailModal({
                   {order.shipping_address.city}
                   {order.shipping_address.province &&
                     `, ${order.shipping_address.province}`}
-                  {order.shipping_address.zip && ` ${order.shipping_address.zip}`}
+                  {order.shipping_address.zip &&
+                    ` ${order.shipping_address.zip}`}
                 </p>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   {order.shipping_address.country}
@@ -188,7 +192,8 @@ export default function OrderDetailModal({
                     className="flex items-start gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg"
                   >
                     {item.design_preview_url && (
-                      <img
+                      <Image
+                        fill
                         src={item.design_preview_url}
                         alt={item.title}
                         className="w-20 h-20 rounded object-cover"
@@ -213,13 +218,17 @@ export default function OrderDetailModal({
             <h3 className="font-semibold text-lg mb-3">Order Summary</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Total</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Total
+                </p>
                 <p className="font-semibold text-lg">
                   {formatPrice(order.retail_price)}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">POD Cost</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  POD Cost
+                </p>
                 <p className="font-semibold">{formatPrice(order.pod_cost)}</p>
               </div>
               <div>
@@ -231,7 +240,9 @@ export default function OrderDetailModal({
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Provider</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Provider
+                </p>
                 <Badge variant="outline" className="capitalize">
                   {order.fulfillment_provider || "N/A"}
                 </Badge>
@@ -286,4 +297,3 @@ export default function OrderDetailModal({
     </Dialog>
   );
 }
-

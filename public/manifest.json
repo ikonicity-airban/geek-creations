@@ -1,5 +1,5 @@
 {
-  "name": "Geek Creations - Nigerian Geek Culture Store",
+  "name": "Geek Creations",
   "short_name": "GeeksCreation",
   "description": "Premium Nigerian print-on-demand store for nerds, artists & dreamers. Anime, Tech, Afro-Geek designs.",
   "theme_color": "#401268",
@@ -72,7 +72,7 @@
       "form_factor": "wide"
     }
   ],
-  "categories": ["shopping", "lifestyle"],
+  "categories": ["shopping", "lifestyle", "entertainment", "social"],
   "shortcuts": [
     {
       "name": "Shop All",
@@ -81,7 +81,7 @@
       "url": "/collections/all",
       "icons": [
         {
-          "src": "/icon-96x96.png",
+          "src": "/android-chrome-192x192.png",
           "sizes": "96x96"
         }
       ]
@@ -93,7 +93,7 @@
       "url": "/editor",
       "icons": [
         {
-          "src": "/icon-96x96.png",
+          "src": "/android-chrome-192x192.png",
           "sizes": "96x96"
         }
       ]

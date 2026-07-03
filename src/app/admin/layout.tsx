@@ -120,12 +120,12 @@ export default function AdminLayout({
   return (
     <div
       className={cn(
-        "flex w-full flex-1 flex-col overflow-hidden bg-gray-50 dark:bg-gray-900 md:flex-row",
+        "flex w-full flex-1 flex-col overflow-hidden bg-gray-50  md:flex-row",
         "h-screen"
       )}
     >
       <AdminSidebar email={email} />
-      <div className="flex flex-1 overflow-y-auto bg-white dark:bg-gray-900">
+      <div className="flex flex-1 overflow-y-auto">
         <main className="flex h-full w-full flex-1 flex-col">{children}</main>
       </div>
     </div>

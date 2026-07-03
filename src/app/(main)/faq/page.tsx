@@ -222,8 +222,9 @@ export default function FAQPage() {
             Still have questions?
           </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-4">
-            Can't find the answer you're looking for? Please reach out to our
-            friendly support team.
+            {
+              "Can't find the answer you're looking for? Please reach out to our friendly support team."
+            }
           </p>
           <a
             href="/contact"

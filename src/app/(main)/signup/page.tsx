@@ -3,70 +3,67 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Mail, Lock, User, AlertCircle, CheckCircle2 } from "lucide-react";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Mail, Lock, User, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
 export default function SignupPage() {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    confirmPassword: "",
-    firstName: "",
-    lastName: "",
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
+  const signupSchema = z
+    .object({
+      email: z.string().email("Please enter a valid email address"),
+      password: z.string().min(6, "Password must be at least 6 characters"),
+      confirmPassword: z.string(),
+      firstName: z.string().min(1, "First name is required"),
+      lastName: z.string().min(1, "Last name is required"),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: "Passwords do not match",
+      path: ["confirmPassword"],
+    });
 
-    // Validation
-    if (
-      !formData.email ||
-      !formData.password ||
-      !formData.firstName ||
-      !formData.lastName
-    ) {
-      setError("Please fill in all fields");
-      setLoading(false);
-      return;
-    }
+  const form = useForm<z.infer<typeof signupSchema>>({
+    resolver: zodResolver(signupSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      confirmPassword: "",
+      firstName: "",
+      lastName: "",
+    },
+  });
 
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
-      setLoading(false);
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters");
-      setLoading(false);
-      return;
-    }
-
+  const handleSignup = async (values: z.infer<typeof signupSchema>) => {
     try {
       const { data, error: signUpError } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
+        email: values.email,
+        password: values.password,
         options: {
           data: {
-            first_name: formData.firstName,
-            last_name: formData.lastName,
+            first_name: values.firstName,
+            last_name: values.lastName,
           },
         },
       });
 
       if (signUpError) {
-        setError(signUpError.message);
-        setLoading(false);
+        form.setError("root", { message: signUpError.message });
         return;
       }
 
@@ -74,23 +71,18 @@ export default function SignupPage() {
         setSuccess(true);
         // Get redirect URL from query params
         const searchParams = new URLSearchParams(window.location.search);
-        const redirectTo = searchParams.get("redirect") || "/checkout";
+        const redirectTo = searchParams.get("redirect") || "/login";
         // Redirect to checkout after a brief delay
         setTimeout(() => {
           router.push(redirectTo);
         }, 2000);
       }
     } catch (err) {
-      setError("An unexpected error occurred. Please try again.");
-      setLoading(false);
+      console.log("🚀 ~ handleSignup ~ err:", err);
+      form.setError("root", {
+        message: "An unexpected error occurred. Please try again.",
+      });
     }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
   };
 
   return (
@@ -125,136 +117,158 @@ export default function SignupPage() {
               </p>
             </motion.div>
           ) : (
-            <form onSubmit={handleSignup} className="space-y-5">
-              {error && (
-                <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
-                  <p className="text-sm text-red-800 dark:text-red-200">
-                    {error}
-                  </p>
-                </div>
-              )}
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    First Name
-                  </label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <Input
-                      type="text"
-                      name="firstName"
-                      placeholder="John"
-                      value={formData.firstName}
-                      onChange={handleChange}
-                      className="pl-10"
-                      disabled={loading}
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Last Name
-                  </label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <Input
-                      type="text"
-                      name="lastName"
-                      placeholder="Doe"
-                      value={formData.lastName}
-                      onChange={handleChange}
-                      className="pl-10"
-                      disabled={loading}
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Email
-                </label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <Input
-                    type="email"
-                    name="email"
-                    placeholder="you@example.com"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="pl-10"
-                    disabled={loading}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Password
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <Input
-                    type="password"
-                    name="password"
-                    placeholder="At least 6 characters"
-                    value={formData.password}
-                    onChange={handleChange}
-                    className="pl-10"
-                    disabled={loading}
-                    required
-                    minLength={6}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Confirm Password
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <Input
-                    type="password"
-                    name="confirmPassword"
-                    placeholder="Confirm your password"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    className="pl-10"
-                    disabled={loading}
-                    required
-                    minLength={6}
-                  />
-                </div>
-              </div>
-
-              <Button
-                type="submit"
-                className="w-full font-semibold py-6 text-xs"
-                disabled={loading}
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(handleSignup)}
+                className="space-y-5"
               >
-                {loading
-                  ? "Creating Account..."
-                  : "Create Account & Continue to Checkout"}
-              </Button>
+                {form.formState.errors.root && (
+                  <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                    <p className="text-sm text-red-800 dark:text-red-200">
+                      {form.formState.errors.root.message}
+                    </p>
+                  </div>
+                )}
 
-              <div className="text-center text-xs text-gray-600 dark:text-gray-400">
-                Already have an account?{" "}
-                <Link
-                  href="/login"
-                  className="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold"
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="firstName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>First Name</FormLabel>
+                        <div className="relative">
+                          <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                          <FormControl>
+                            <Input
+                              type="text"
+                              placeholder="John"
+                              className="pl-10"
+                              disabled={form.formState.isSubmitting}
+                              {...field}
+                            />
+                          </FormControl>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="lastName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Last Name</FormLabel>
+                        <div className="relative">
+                          <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                          <FormControl>
+                            <Input
+                              type="text"
+                              placeholder="Doe"
+                              className="pl-10"
+                              disabled={form.formState.isSubmitting}
+                              {...field}
+                            />
+                          </FormControl>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <FormControl>
+                          <Input
+                            type="email"
+                            placeholder="you@example.com"
+                            className="pl-10"
+                            disabled={form.formState.isSubmitting}
+                            {...field}
+                          />
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="At least 6 characters"
+                            className="pl-10"
+                            disabled={form.formState.isSubmitting}
+                            {...field}
+                          />
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="confirmPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Confirm Password</FormLabel>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="Confirm your password"
+                            className="pl-10"
+                            disabled={form.formState.isSubmitting}
+                            {...field}
+                          />
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Button
+                  type="submit"
+                  className="w-full font-semibold py-6 text-xs"
+                  disabled={form.formState.isSubmitting}
                 >
-                  Sign in
-                </Link>
-              </div>
-            </form>
+                  {form.formState.isSubmitting
+                    ? "Creating Account..."
+                    : "Create Account & Continue to Checkout"}
+                </Button>
+              </form>
+            </Form>
           )}
+
+          <div className="text-center text-xs text-gray-600 dark:text-gray-400">
+            Already have an account?{" "}
+            <Link
+              href="/login"
+              className="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold"
+            >
+              Sign in
+            </Link>
+          </div>
         </div>
       </motion.div>
     </div>

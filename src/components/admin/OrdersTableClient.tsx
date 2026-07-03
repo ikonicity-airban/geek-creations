@@ -25,9 +25,18 @@ import {
   Eye,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import type { ExtendedOrder, OrderStats, FulfillmentProvider } from "@/types/admin";
-import { fulfillOrder, bulkFulfillOrders, getOrders, getOrderStats } from "@/app/admin/orders/actions";
+import type {
+  ExtendedOrder,
+  OrderStats,
+  FulfillmentProvider,
+} from "@/types/admin";
+import {
+  bulkFulfillOrders,
+  getOrders,
+  getOrderStats,
+} from "@/app/admin/orders/actions";
 import OrderDetailModal from "./OrderDetailModal";
+import Image from "next/image";
 
 interface OrdersTableClientProps {
   initialOrders: ExtendedOrder[];
@@ -42,12 +51,15 @@ export default function OrdersTableClient({
 }: OrdersTableClientProps) {
   const [orders, setOrders] = useState<ExtendedOrder[]>(initialOrders);
   const [stats, setStats] = useState<OrderStats>(initialStats);
-  const [filteredOrders, setFilteredOrders] = useState<ExtendedOrder[]>(initialOrders);
+  const [filteredOrders, setFilteredOrders] =
+    useState<ExtendedOrder[]>(initialOrders);
   const [selectedOrders, setSelectedOrders] = useState<Set<number>>(new Set());
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [shippingFilter, setShippingFilter] = useState<ShippingFilter>("all");
-  const [selectedOrder, setSelectedOrder] = useState<ExtendedOrder | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<ExtendedOrder | null>(
+    null
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const supabase = createClient();
 
@@ -144,15 +156,15 @@ export default function OrdersTableClient({
     try {
       const orderIds = Array.from(selectedOrders);
       const results = await bulkFulfillOrders(orderIds, provider);
-      
+
       // Show results
       const successCount = results.filter((r) => r.success).length;
       const failCount = results.filter((r) => !r.success).length;
-      
+
       alert(
         `Fulfillment completed: ${successCount} succeeded, ${failCount} failed`
       );
-      
+
       // Refresh orders
       await refreshOrders();
       setSelectedOrders(new Set());
@@ -207,7 +219,10 @@ export default function OrdersTableClient({
 
   const formatPrice = (price: number | string | null | undefined) => {
     const num = typeof price === "string" ? parseFloat(price) : price || 0;
-    return `₦${num.toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    return `₦${num.toLocaleString("en-NG", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
   };
 
   return (
@@ -291,9 +306,7 @@ export default function OrdersTableClient({
                 (filter) => (
                   <Button
                     key={filter}
-                    variant={
-                      shippingFilter === filter ? "default" : "outline"
-                    }
+                    variant={shippingFilter === filter ? "default" : "outline"}
                     onClick={() => setShippingFilter(filter)}
                     size="sm"
                     className="capitalize"
@@ -439,7 +452,8 @@ export default function OrdersTableClient({
                               {order.items.length !== 1 ? "s" : ""}
                             </span>
                             {order.items[0]?.design_preview_url && (
-                              <img
+                              <Image
+                                fill
                                 src={order.items[0].design_preview_url}
                                 alt="Design preview"
                                 className="w-10 h-10 rounded object-cover"
@@ -491,4 +505,3 @@ export default function OrdersTableClient({
     </>
   );
 }
-

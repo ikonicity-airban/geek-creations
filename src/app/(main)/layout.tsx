@@ -1,6 +1,7 @@
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { ThemeProvider } from "@/lib/theme-context";
+import { SearchDialog } from "@/components/search";
 
 export default function MainLayout({
   children,
@@ -44,6 +45,7 @@ export default function MainLayout({
         </div>
 
         <Navbar />
+        <SearchDialog />
 
         <div
           id="main-content"
