@@ -188,19 +188,6 @@ export const ProductionDemo = () => {
             ))}
           </div>
         </div>
-
-        {/* Placeholder Note */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="text-center mt-10"
-        >
-          <p className="text-xs text-muted-foreground">
-            * Enhanced animation with particle effects and production sequence
-            coming soon
-          </p>
-        </motion.div>
       </div>
     </section>
   );

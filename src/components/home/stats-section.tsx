@@ -1,14 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Users, Package, ShieldCheck, Globe } from "lucide-react";
+import { Package, ShieldCheck, Shirt, Truck } from "lucide-react";
 
 export const StatsSection = () => {
   const stats = [
-    { icon: Users, value: "10M+", label: "Sellers trust POD" },
-    { icon: Package, value: "59M+", label: "Orders delivered" },
-    { icon: ShieldCheck, value: "4.8★", label: "Avg. marketplace rating" },
-    { icon: Globe, value: "209", label: "Countries & territories" },
+    { icon: Package, value: "50+", label: "Unique designs" },
+    { icon: Shirt, value: "8", label: "Product types" },
+    { icon: ShieldCheck, value: "4.8★", label: "Customer rating" },
+    { icon: Truck, value: "48hrs", label: "Avg. production time" },
   ];
 
   return (

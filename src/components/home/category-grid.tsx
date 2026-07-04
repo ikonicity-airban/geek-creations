@@ -1,5 +1,6 @@
 "use client";
 
+import { ComponentType, SVGProps } from "react";
 import { motion } from "framer-motion";
 import { Shirt, Coffee, Smartphone, ShoppingBag } from "lucide-react";
 import Link from "next/link";
@@ -10,7 +11,7 @@ import { FollowerPointerCard } from "../ui/following-pointer";
 interface Category {
   id: string;
   name: string;
-  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  icon: ComponentType<SVGProps<SVGSVGElement>>;
   image?: string;
   count: string;
   handle: string;
@@ -23,7 +24,7 @@ export const CategoryGrid = () => {
       id: "1",
       name: "T-Shirts",
       icon: Shirt,
-      image: "/img/tshirt.jpg",
+      image: "/img/tshirt.png",
       count: "150+ designs",
       handle: "t-shirts",
       size: "large",
@@ -32,7 +33,7 @@ export const CategoryGrid = () => {
       id: "2",
       name: "Hoodies",
       icon: Shirt,
-      image: "/img/hoodie.jpg",
+      image: "/img/hoodie.png",
       count: "80+ designs",
       handle: "hoodies",
       size: "small",
@@ -41,7 +42,7 @@ export const CategoryGrid = () => {
       id: "3",
       name: "Mugs",
       icon: Coffee,
-      image: "/img/mug.jpg",
+      image: "/img/mug.png",
       count: "60+ designs",
       handle: "mugs",
       size: "medium",
@@ -50,7 +51,7 @@ export const CategoryGrid = () => {
       id: "4",
       name: "Phone Cases",
       icon: Smartphone,
-      image: "/img/phone-case.jpg",
+      image: "/img/phone-case.png",
       count: "120+ designs",
       handle: "phone-cases",
       size: "small",
@@ -59,7 +60,7 @@ export const CategoryGrid = () => {
       id: "5",
       name: "Tote Bags",
       icon: ShoppingBag,
-      image: "/img/tote.jpg",
+      image: "/img/tote.png",
       count: "40+ designs",
       handle: "tote-bags",
       size: "small",
@@ -99,13 +100,13 @@ export const CategoryGrid = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-8 sm:mb-10 md:mb-12"
+          className="text-center mb-12 sm:mb-16"
         >
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-2 sm:mb-3 text-foreground">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-3 text-foreground">
             Shop by Category
           </h1>
           <p className="text-sm sm:text-base md:text-lg px-4 text-muted-foreground">
-            Find your perfect product type
+            Find your perfect product canvas
           </p>
         </motion.div>
 
@@ -125,10 +126,7 @@ export const CategoryGrid = () => {
                   <div className="flex items-center gap-2 group">
                     <div className="w-6 h-6 sm:w-8 sm:h-8 overflow-hidden">
                       <Image
-                        src={
-                          category.image ||
-                          "/img/blank_isolated_white_and_black_t_shirt_front_view.png"
-                        }
+                        src={category.image || "/img/blank_isolated_white_and_black_t_shirt_front_view.png"}
                         alt={category.name}
                         width={32}
                         height={32}
@@ -147,29 +145,25 @@ export const CategoryGrid = () => {
                 <Link href={`/collections/${category.handle}`}>
                   <div className="h-full rounded-card overflow-hidden cursor-pointer transition-smooth flex flex-col relative border-hairline bg-card border-border shadow-card hover:shadow-card-hover hover:border-primary">
                     {category.image ? (
-                      <div className="relative w-full flex-1 min-h-[100px] sm:min-h-[120px] md:min-h-[140px] overflow-hidden">
+                      <div className="relative w-full flex-1 min-h-[120px] sm:min-h-[140px] md:min-h-[160px] overflow-hidden bg-muted">
                         <Image
-                          width={300}
-                          height={300}
+                          width={400}
+                          height={400}
                           src={category.image}
                           alt={category.name}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
                       </div>
                     ) : (
-                      <div
-                        className={`${getIconSize(
-                          category.size,
-                        )} mb-3 mt-4 mx-auto rounded-btn flex items-center justify-center shadow-card bg-primary`}
-                      >
+                      <div className={`${getIconSize(category.size)} mb-3 mt-4 mx-auto rounded-btn flex items-center justify-center shadow-card bg-primary`}>
                         <category.icon
                           className={getIconSize(category.size)}
                           style={{ color: "currentColor" }}
                         />
                       </div>
                     )}
-                    <div className="absolute bottom-0 left-0 right-0 px-3 py-2 sm:px-4 sm:py-3 flex items-center gap-2 justify-center bg-card/80 backdrop-blur-sm border-t border-border">
+                    <div className="absolute bottom-0 left-0 right-0 px-3 py-2 sm:px-4 sm:py-3 flex items-center gap-2 justify-center bg-card/85 backdrop-blur-xs border-t border-border">
                       <h5 className="text-xs sm:text-sm font-bold text-center text-card-foreground group-hover:text-primary">
                         {category.name}
                       </h5>

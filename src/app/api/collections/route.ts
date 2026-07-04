@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { db, collections } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { getAllCollections } from "@/lib/mock-data/collections";
+import { getCollections } from "@/lib/shopify-storefront";
 
 type DbCollection = typeof collections.$inferSelect;
 
@@ -22,8 +23,17 @@ export async function GET() {
       console.log("Database query failed, using mock data:", dbError);
     }
 
-    // Fallback to mock data if database is empty or has errors
+    // Fallback to Shopify Storefront API (or mock data if both are empty/fail)
     if (dbCollections.length === 0) {
+      try {
+        const shopifyCollections = await getCollections();
+        if (shopifyCollections && shopifyCollections.length > 0) {
+          return NextResponse.json({ collections: shopifyCollections });
+        }
+      } catch (shopifyError) {
+        console.warn("[collections:get] Shopify Storefront API failed, using mock data:", shopifyError);
+      }
+
       const mockCollections = getAllCollections();
       return NextResponse.json({
         collections: mockCollections.map((c) => ({

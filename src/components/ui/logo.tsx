@@ -19,7 +19,7 @@ export function Logo({ className }: { className?: string }) {
       )}
     >
       <Image
-        src={settings.logoUrl || "/logo-christmas.png"}
+        src={settings.logoUrl || "/logo.png"}
         alt={settings.siteName || "Geek Creations"}
         width={300}
         height={300}

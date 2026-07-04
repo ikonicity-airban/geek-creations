@@ -1,13 +1,16 @@
 "use client";
 
 import { Hero } from "@/components/home/hero";
+import { DualEntrySection } from "@/components/home/dual-entry-section";
 import { FeaturedCarousel } from "@/components/home/featured-carousel";
 import { CategoryGrid } from "@/components/home/category-grid";
 import { DesignGallery } from "@/components/home/design-gallery";
+import { ProductsShowcase } from "@/components/home/products-showcase";
 import { ProductionDemo } from "@/components/home/production-demo";
 import { FeaturesSection } from "@/components/home/features-section";
+import { StatsSection } from "@/components/home/stats-section";
 import { Testimonials } from "@/components/home/testimonials";
-import { ProductsShowcase } from "@/components/home/products-showcase";
+import { CTASection } from "@/components/home/cta-section";
 import { useTheme } from "@/lib/theme-context";
 
 // Main App Component - Homepage Structure
@@ -16,30 +19,39 @@ export default function HomePage() {
 
   return (
     <>
-      {/* Homepage Structure (Top → Bottom Flow) */}
-      {/* 1. Hero Banner - Instant brand impact + CTA */}
+      {/* 1. Hero Banner - untouched */}
       <Hero darkMode={darkMode} />
 
-      {/* 2. Featured Designs Carousel - Hook visitors with best sellers */}
+      {/* 2. The fork: design-first vs product-first, equal weight */}
+      <DualEntrySection />
+
+      {/* 3. Hook - trending designs, works for either path */}
       <FeaturedCarousel />
 
-      {/* 3. Category Grid - Easy navigation to product types (Bento Grid) */}
+      {/* 4. Product-first path */}
       <CategoryGrid />
 
-      {/* 4. All Designs Gallery - Core browsing experience */}
+      {/* 5. Design-first path - adjacent to CategoryGrid so both
+             browsing entry points read as equal options */}
       <DesignGallery />
 
-      {/* 5. Products Showcase - Featured products with links */}
+      {/* 6. Store Credibility Stats */}
+      <StatsSection />
+
+      {/* 7. Concrete purchasable items - bridges both paths to "buy now" */}
       <ProductsShowcase />
 
-      {/* 6. Production Demo - UI demonstration with animation */}
+      {/* 8. Process trust-builder: design -> product -> shipped */}
       <ProductionDemo />
 
-      {/* 7. Why Choose Us / Features - Build trust */}
+      {/* 9. Why buy from us */}
       <FeaturesSection />
 
-      {/* 8. Testimonials - Social proof */}
+      {/* 10. Social proof (customer reviews, not seller-success stories) */}
       <Testimonials />
+
+      {/* 11. Closing Call-To-Action */}
+      <CTASection />
     </>
   );
 }

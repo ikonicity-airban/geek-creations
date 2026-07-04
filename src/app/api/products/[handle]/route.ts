@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { products, variants } from "@/lib/db/schema";
 import type { Product, Variant } from "@/types";
 import { mockProducts } from "@/lib/mock-data/collections";
+import { getProductByHandle } from "@/lib/shopify-storefront";
 
 /**
  * GET /api/products/[handle]
@@ -33,8 +34,17 @@ export async function GET(
       console.log("Database query failed, using mock data:", dbError);
     }
 
-    // Fallback to mock data if not found in database
+    // Fallback to Shopify Storefront API (or mock data if both are empty/fail)
     if (!productRow) {
+      try {
+        const shopifyProduct = await getProductByHandle(handle);
+        if (shopifyProduct) {
+          return NextResponse.json({ product: shopifyProduct });
+        }
+      } catch (shopifyError) {
+        console.warn(`[products:get] Shopify Storefront API failed for handle ${handle}:`, shopifyError);
+      }
+
       const mockProduct = mockProducts.find((p) => p.handle === handle);
       if (mockProduct) {
         return NextResponse.json({ product: mockProduct });

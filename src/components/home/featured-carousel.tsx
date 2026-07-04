@@ -54,12 +54,16 @@ export const FeaturedCarousel = () => {
     loadFeatured();
   }, []);
 
+  // Card width constant (card width + gap)
+  const CARD_WIDTH = 400;
+  const DURATION_PER_ITEM = 10;
+  const totalWidth = featuredDesigns.length * CARD_WIDTH;
+
   // Auto-scroll animation
   useEffect(() => {
     if (featuredDesigns.length === 0 || isPaused) return;
 
-    const totalWidth = featuredDesigns.length * 320; // Responsive card width
-    const duration = featuredDesigns.length * 10; // 3s per item
+    const duration = featuredDesigns.length * DURATION_PER_ITEM;
 
     controls.start({
       x: -totalWidth / 2,
@@ -74,14 +78,14 @@ export const FeaturedCarousel = () => {
     return () => {
       controls.stop();
     };
-  }, [featuredDesigns, isPaused, controls]);
+  }, [featuredDesigns, isPaused, controls, totalWidth]);
 
   const togglePause = () => {
     if (isPaused) {
       controls.start({
         x: [-totalWidth / 2, 0],
         transition: {
-          duration: featuredDesigns.length * 3,
+          duration: featuredDesigns.length * DURATION_PER_ITEM,
           ease: "linear",
           repeat: Infinity,
           repeatType: "loop",
@@ -92,8 +96,6 @@ export const FeaturedCarousel = () => {
     }
     setIsPaused(!isPaused);
   };
-
-  const totalWidth = featuredDesigns.length * 400;
 
   return (
     <section
@@ -154,7 +156,7 @@ export const FeaturedCarousel = () => {
                 controls.start({
                   x: -totalWidth / 2,
                   transition: {
-                    duration: featuredDesigns.length * 3,
+                    duration: featuredDesigns.length * DURATION_PER_ITEM,
                     ease: "linear",
                     repeat: Infinity,
                     repeatType: "loop",
@@ -173,9 +175,6 @@ export const FeaturedCarousel = () => {
                   className="shrink-0 w-64  sm:w-72 md:w-80 lg:w-96"
                 >
                   <Link href={`/designs/${design.id}`}>
-                    {/* <FollowerPointerCard
-                      title={`${design.name} • ${design.priceRange}`}
-                    > */}
                     <div className="group relative overflow-hidden rounded-card cursor-pointer bg-card/90 backdrop-blur border-hairline border-border shadow-card transition-smooth hover:shadow-card-elevated">
                       {/* Gradient Glow */}
                       <div className="pointer-events-none absolute -top-24 -right-24 h-72 w-56 rounded-full blur-3xl opacity-50 transition-opacity duration-300 group-hover:opacity-80 bg-linear-to-r from-secondary/50 to-transparent" />
@@ -233,7 +232,6 @@ export const FeaturedCarousel = () => {
                         </div>
                       </div>
                     </div>
-                    {/* </FollowerPointerCard> */}
                   </Link>
                 </motion.div>
               ))}

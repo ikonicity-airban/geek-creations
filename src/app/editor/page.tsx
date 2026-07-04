@@ -117,6 +117,15 @@ function ProductCustomizerContent() {
   const [isProductSidebarCollapsed, setIsProductSidebarCollapsed] =
     useState(false);
 
+  const historyRef = useRef<string[]>([]);
+  const historyIndexRef = useRef<number>(-1);
+
+  // Sync ref values with state on every render
+  useEffect(() => {
+    historyRef.current = history;
+    historyIndexRef.current = historyIndex;
+  }, [history, historyIndex]);
+
   // Fetch products
   useEffect(() => {
     async function loadProducts() {
@@ -169,6 +178,8 @@ function ProductCustomizerContent() {
   useEffect(() => {
     if (!fabricCanvasRef.current || !selectedProduct) return;
 
+    let active = true;
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const fabric = (window as any).fabric as any;
     if (!fabric) return;
@@ -192,6 +203,8 @@ function ProductCustomizerContent() {
     // Load and add product guide as locked background
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     fabric.Image.fromURL(productImageUrl, (img: any) => {
+      if (!active) return;
+
       img.set({
         selectable: false,
         evented: false,
@@ -228,6 +241,10 @@ function ProductCustomizerContent() {
       canvas.sendToBack(img);
       canvas.renderAll();
     });
+
+    return () => {
+      active = false;
+    };
   }, [selectedProduct, selectedVariant]);
 
   // Initialize Fabric.js canvas
@@ -268,16 +285,17 @@ function ProductCustomizerContent() {
         canvas.on("selection:cleared", () => setActiveObject(null));
 
         // Save canvas state for history
-        let currentHistoryIndex = historyIndex;
         const saveState = () => {
           const json = JSON.stringify(canvas.toJSON());
-          setHistory((prev) => {
-            const newHistory = prev.slice(0, currentHistoryIndex + 1);
-            newHistory.push(json);
-            currentHistoryIndex = newHistory.length - 1;
-            setHistoryIndex(currentHistoryIndex);
-            return newHistory;
-          });
+          const currentHistory = historyRef.current;
+          const currentIndex = historyIndexRef.current;
+          const newHistory = currentHistory.slice(0, currentIndex + 1);
+          newHistory.push(json);
+          
+          historyRef.current = newHistory;
+          historyIndexRef.current = newHistory.length - 1;
+          setHistory(newHistory);
+          setHistoryIndex(newHistory.length - 1);
         };
         canvas.on("object:added", saveState);
         canvas.on("object:modified", saveState);
@@ -343,7 +361,7 @@ function ProductCustomizerContent() {
         script.parentNode.removeChild(script);
       }
     };
-  }, [isLoading, historyIndex]);
+  }, [isLoading]);
 
   const handleUndo = () => {
     if (historyIndex > 0 && fabricCanvasRef.current) {

@@ -28,7 +28,6 @@ export const DesignGallery = () => {
 
         const json = await res.json();
         const data = Array.isArray(json.data) ? json.data : [];
-        console.log("🚀 ~ loadDesigns ~ data:", data);
 
         const mapped: Design[] = data.map(
           (d: Record<string, string>, index: number) => ({
@@ -67,22 +66,6 @@ export const DesignGallery = () => {
           <p className="text-sm sm:text-base md:text-lg mb-4 sm:mb-6 max-w-2xl mx-auto px-4 text-muted-foreground">
             Browse our complete collection
           </p>
-
-          {/* Filters Bar */}
-          <div className="flex flex-wrap gap-2 sm:gap-3 justify-center mb-6 sm:mb-8 md:mb-10">
-            {["All", "Category", "Price", "Newest"].map((filter) => (
-              <button
-                key={filter}
-                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-btn text-xs sm:text-sm font-semibold transition-smooth border-hairline shadow-card active:scale-95 ${
-                  filter === "All"
-                    ? "bg-primary text-primary-foreground border-primary"
-                    : "bg-card text-card-foreground border-border hover:bg-accent hover:text-accent-foreground"
-                }`}
-              >
-                {filter}
-              </button>
-            ))}
-          </div>
         </motion.div>
 
         {/* Masonry/Grid Layout */}

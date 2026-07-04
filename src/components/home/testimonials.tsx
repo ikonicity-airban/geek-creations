@@ -7,37 +7,37 @@ export const Testimonials = () => {
   const testimonials = [
     {
       quote:
-        "Made ₦500k in my first month! The platform is so easy to use and the print quality is absolutely top-notch. My customers love the designs.",
+        "The print quality is incredible — my hoodie still looks brand new after multiple washes. Exactly what I saw on the site.",
       name: "Chidi Okonkwo",
-      designation: "Anime Merch Store Owner",
+      designation: "Verified Buyer",
       src: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=3560&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     },
     {
       quote:
-        "Finally, a Nigerian POD platform that actually works! Fast shipping, great customer support, and the designs print beautifully on every product.",
+        "Ordered a custom mug for my brother's birthday. Fast delivery within Lagos and the design came out crisp.",
       name: "Amina Bello",
-      designation: "Graphic Designer",
+      designation: "Verified Buyer",
       src: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=3540&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     },
     {
       quote:
-        "Perfect for our company swag. High quality prints and reasonable prices. The automated fulfillment saves us so much time. Highly recommend!",
+        "Got hoodies for my whole team with our own logo. Comfortable fabric, and support was responsive when I had sizing questions.",
       name: "Tunde Adeyemi",
-      designation: "Tech Startup Founder",
+      designation: "Verified Buyer",
       src: "https://images.unsplash.com/photo-1623582854588-d60de57fa33f?q=80&w=3540&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     },
     {
       quote:
-        "The zero inventory model is a game-changer. I can focus on creating amazing designs while they handle production and shipping seamlessly.",
+        "Love the anime designs! The fabric is so soft and fits perfectly. Will definitely be buying more from here.",
       name: "Kemi Adebayo",
-      designation: "Creative Entrepreneur",
+      designation: "Verified Buyer",
       src: "https://images.unsplash.com/photo-1636041293178-808a6762ab39?q=80&w=3464&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     },
     {
       quote:
-        "Outstanding quality and customer service. The platform's flexibility lets me experiment with different products without any risk. Love it!",
+        "Got the Afro-geek t-shirts and they're a huge hit. Fast shipping to Abuja and premium packaging. 5 stars!",
       name: "David Okafor",
-      designation: "E-commerce Store Owner",
+      designation: "Verified Buyer",
       src: "https://images.unsplash.com/photo-1624561172888-ac93c696e10c?q=80&w=2592&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     },
   ];
@@ -52,13 +52,13 @@ export const Testimonials = () => {
           className="text-center mb-20"
         >
           <span className="inline-block px-4 py-2 rounded-full font-semibold text-sm mb-4 bg-secondary/20 text-accent">
-            SUCCESS STORIES
+            REVIEWS
           </span>
           <h2 className="text-5xl md:text-6xl font-black mb-6 text-primary">
-            Loved by Creators
+            Customer Reviews
           </h2>
           <p className="text-lg md:text-xl max-w-2xl mx-auto ">
-            See what our community of designers and entrepreneurs are saying
+            See what our customers are saying about Geeks Creation
           </p>
         </motion.div>
 

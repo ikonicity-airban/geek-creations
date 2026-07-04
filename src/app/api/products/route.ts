@@ -4,6 +4,7 @@ import { db, products, variants, collections, collectionProducts } from "@/lib/d
 import { eq, and } from "drizzle-orm";
 import type { Product } from "@/types";
 import { mockProducts } from "@/lib/mock-data/collections";
+import { getProducts, getCollectionWithProducts } from "@/lib/shopify-storefront";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -53,8 +54,22 @@ export async function GET(req: NextRequest) {
       databaseActive = false;
     }
 
-    // Fallback to mock data if database is not active or returned 0 products
+    // Fallback to Shopify Storefront API (or mock data if both are empty/fail)
     if (!databaseActive || productRows.length === 0) {
+      try {
+        let shopifyProducts: Product[] = [];
+        if (collectionHandle && collectionHandle.toLowerCase() !== "all") {
+          shopifyProducts = await getCollectionWithProducts(collectionHandle, limit);
+        } else {
+          shopifyProducts = await getProducts(limit);
+        }
+        if (shopifyProducts && shopifyProducts.length > 0) {
+          return NextResponse.json({ products: shopifyProducts });
+        }
+      } catch (shopifyError) {
+        console.warn("[products:get] Shopify Storefront API failed, using mock data:", shopifyError);
+      }
+
       let filteredMock = mockProducts;
       if (collectionHandle && collectionHandle.toLowerCase() !== "all") {
         const { getProductsForCollection } = require("@/lib/mock-data/collections");

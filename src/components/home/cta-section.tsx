@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 export const CTASection = () => {
   return (
@@ -31,31 +32,30 @@ export const CTASection = () => {
           viewport={{ once: true }}
         >
           <h2 className="text-5xl md:text-7xl font-black mb-6" style={{ color: '#401268' }}>
-            Create and sell custom products
+            Wear your favorite designs
           </h2>
           <p className="text-2xl mb-12 max-w-2xl mx-auto" style={{ color: 'rgba(64, 18, 104, 0.8)' }}>
-            100% free to use • 1000+ products • Global delivery
+            Custom-printed, made to order, delivered across Nigeria
           </p>
-          <button
-            className="group px-12 py-6 rounded-full font-bold text-xl shadow-2xl transition-all hover:scale-105"
-            style={{
-              backgroundColor: '#401268',
-              color: '#ffffff',
-              borderRadius: '12px'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#2d0d4a';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#401268';
-            }}
-          >
-            Get started for free
-            <ArrowRight className="inline-block w-6 h-6 ml-2 group-hover:translate-x-2 transition-transform" />
-          </button>
-          <p className="mt-6" style={{ color: 'rgba(64, 18, 104, 0.7)' }}>
-            No credit card required
-          </p>
+          <Link href="/collections/all" className="inline-block">
+            <button
+              className="group px-12 py-6 rounded-full font-bold text-xl shadow-2xl transition-all hover:scale-105"
+              style={{
+                backgroundColor: '#401268',
+                color: '#ffffff',
+                borderRadius: '12px'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#2d0d4a';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#401268';
+              }}
+            >
+              Shop Now
+              <ArrowRight className="inline-block w-6 h-6 ml-2 group-hover:translate-x-2 transition-transform" />
+            </button>
+          </Link>
         </motion.div>
       </div>
     </section>

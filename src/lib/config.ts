@@ -92,8 +92,9 @@ export const CONFIG = {
 
   // Shopify
   SHOPIFY: {
-    storeDomain: process.env.SHOPIFY_STORE_DOMAIN || "",
+    storeDomain: process.env.SHOPIFY_STORE_DOMAIN || process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN || "",
     accessToken: process.env.SHOPIFY_ACCESS_TOKEN || "",
+    storefrontToken: process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN || "",
     clientId: process.env.SHOPIFY_Client_ID || "",
     webhookSecret: process.env.SHOPIFY_WEBHOOK_SECRET || "",
     currencyCode: process.env.SHOPIFY_CURRENCY_CODE || "NGN",

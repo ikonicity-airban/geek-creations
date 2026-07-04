@@ -124,7 +124,7 @@ export default function CollectionPage() {
   }
 
   return (
-    <div className="min-h-screen mt-10">
+    <div className="min-h-screen mt-[15vh]">
       {/* Hero Section with Collection Image */}
       {collection.image_url && (
         <div className="relative h-[40vh] overflow-hidden">
@@ -148,7 +148,9 @@ export default function CollectionPage() {
                       Home
                     </button>
                   </li>
-                  <IconChevronRight className="w-4 h-4" />
+                  <li className="flex items-center">
+                    <IconChevronRight className="w-4 h-4 text-white/50" />
+                  </li>
                   <li>
                     <button
                       onClick={() => router.push("/collections")}
@@ -157,7 +159,9 @@ export default function CollectionPage() {
                       Collections
                     </button>
                   </li>
-                  <IconChevronRight className="w-4 h-4" />
+                  <li className="flex items-center">
+                    <IconChevronRight className="w-4 h-4 text-white/50" />
+                  </li>
                   <li className="text-white font-semibold">
                     {collection.title}
                   </li>

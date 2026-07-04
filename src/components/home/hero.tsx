@@ -32,7 +32,7 @@ export const Hero = ({ darkMode }: { darkMode: boolean }) => {
   const yCard3 = useTransform(scrollYProgress, [0, 1], [0, -70]);
 
   // Parallax transforms for background media (sticky parallax effect)
-  const yBgMedia = useTransform(scrollYProgress, [0, 1], [0, 150]);
+  const yBgMedia = useTransform(scrollYProgress, [0, 1], [-100, 650]);
   const scaleBgMedia = useTransform(scrollYProgress, [0, 1], [1.05, 1.15]);
 
   // Framer Motion Animation Variants
@@ -135,7 +135,7 @@ export const Hero = ({ darkMode }: { darkMode: boolean }) => {
               loop
               muted
               playsInline
-              className="w-full h-full object-contain bg-top"
+              className="w-full h-screen md:h-full max-sm:object-cover "
             >
               <source src={bgVideo} type="video/mp4" />
             </video>
