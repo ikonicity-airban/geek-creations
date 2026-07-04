@@ -583,3 +583,17 @@ export const collectionTranslationsRelations = relations(
     }),
   }),
 );
+
+// Environment Variables (for Admin Dashboard)
+export const envVariables = pgTable(
+  "env_variables",
+  {
+    key: varchar("key", { length: 255 }).primaryKey(),
+    value: text("value").notNull(),
+    description: text("description"),
+    isSecret: boolean("is_secret").default(true),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+  }
+);
+

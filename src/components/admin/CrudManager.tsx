@@ -142,9 +142,9 @@ export default function CrudManager<T extends Record<string, unknown>>({
         if (field.type === "tags" && typeof value === "string") {
           payload[field.name] = value
             ? value
-                .split(",")
-                .map((t: string) => t.trim())
-                .filter(Boolean)
+              .split(",")
+              .map((t: string) => t.trim())
+              .filter(Boolean)
             : [];
         } else if (field.type === "number") {
           payload[field.name] = value !== undefined ? Number(value) : undefined;
@@ -173,8 +173,7 @@ export default function CrudManager<T extends Record<string, unknown>>({
       }
 
       toast.success(
-        `${config.entityName} ${
-          editingItem ? "updated" : "created"
+        `${config.entityName} ${editingItem ? "updated" : "created"
         } successfully`
       );
       setIsModalOpen(false);
@@ -184,8 +183,7 @@ export default function CrudManager<T extends Record<string, unknown>>({
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
       toast.error(
-        `Failed to ${
-          editingItem ? "update" : "create"
+        `Failed to ${editingItem ? "update" : "create"
         } ${config.entityName.toLowerCase()}: ${errorMessage}`
       );
     }
@@ -304,8 +302,8 @@ export default function CrudManager<T extends Record<string, unknown>>({
                         field.type === "tags"
                           ? "text"
                           : field.type === "number"
-                          ? "number"
-                          : field.type
+                            ? "number"
+                            : field.type
                       }
                       placeholder={field.placeholder}
                       value={String(formField.value ?? "")}
@@ -404,7 +402,8 @@ export default function CrudManager<T extends Record<string, unknown>>({
                     {display.imageUrl && (
                       <div className="w-16 h-16 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shrink-0">
                         <Image
-                          fill
+                          width={100}
+                          height={100}
                           src={display.imageUrl}
                           alt={display.primary}
                           className="w-full h-full object-cover"
@@ -508,8 +507,8 @@ export default function CrudManager<T extends Record<string, unknown>>({
                       {form.formState.isSubmitting
                         ? "Saving..."
                         : editingItem
-                        ? "Update"
-                        : "Create"}
+                          ? "Update"
+                          : "Create"}
                     </Button>
                   </div>
                 </form>

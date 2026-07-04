@@ -743,38 +743,38 @@ async function seed() {
     console.log("\n🎨 Seeding sample designs...");
     const sampleDesigns = [
       {
-        title: "Epic Anime Warrior",
-        description: "High-energy anime hero design perfect for tees",
+        title: "Epic Anime Warrior Tee",
+        description: "Anime character print graphic tee mockup",
         imageUrl:
-          "https://via.placeholder.com/3000x3000/401268/ffffff?text=Anime+Hero",
+          "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=1200&auto=format&fit=crop&q=80",
         thumbnailUrl:
-          "https://via.placeholder.com/600x600/401268/ffffff?text=Anime+Hero",
+          "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&auto=format&fit=crop&q=80",
         category: "Anime",
-        tags: ["anime", "hero", "japan", "manga"],
+        tags: ["anime", "hero", "japan", "tee"],
         isActive: true,
         sortOrder: 1,
       },
       {
-        title: "Minimal Tech Circuit",
-        description: "Clean circuit board pattern for tech lovers",
+        title: "Minimal Tech Hoodie",
+        description: "Premium cotton streetwear hoodie mockup",
         imageUrl:
-          "https://via.placeholder.com/3000x3000/c5a3ff/401268?text=Tech+Circuit",
+          "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=1200&auto=format&fit=crop&q=80",
         thumbnailUrl:
-          "https://via.placeholder.com/600x600/c5a3ff/401268?text=Tech+Circuit",
+          "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&auto=format&fit=crop&q=80",
         category: "Tech",
-        tags: ["tech", "circuit", "minimal", "geek"],
+        tags: ["tech", "circuit", "minimal", "hoodie"],
         isActive: true,
         sortOrder: 2,
       },
       {
-        title: "Gaming Legend Badge",
-        description: "Bold gaming emblem for true players",
+        title: "Gaming Legend Coffee Mug",
+        description: "Ceramic desk coffee mug mockup",
         imageUrl:
-          "https://via.placeholder.com/3000x3000/e2ae3d/401268?text=Gaming+Legend",
+          "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=1200&auto=format&fit=crop&q=80",
         thumbnailUrl:
-          "https://via.placeholder.com/600x600/e2ae3d/401268?text=Gaming+Legend",
+          "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=600&auto=format&fit=crop&q=80",
         category: "Gaming",
-        tags: ["gaming", "esports", "controller", "legend"],
+        tags: ["gaming", "mug", "coffee", "cup"],
         isActive: true,
         sortOrder: 3,
       },

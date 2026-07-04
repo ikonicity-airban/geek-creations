@@ -6,6 +6,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { Shield } from "lucide-react";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { cn } from "@/lib/utils";
+import { ThemeProvider } from "@/lib/theme-context";
 
 export default function AdminLayout({
   children,
@@ -99,17 +100,19 @@ export default function AdminLayout({
 
   // If on login page, render children directly without auth check
   if (isLoginPage) {
-    return <>{children}</>;
+    return <ThemeProvider><>{children}</></ThemeProvider>;
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
-        <div className="text-center">
-          <Shield className="w-16 h-16 mx-auto mb-4 text-indigo-500 animate-pulse" />
-          <p className="text-gray-400">Verifying access...</p>
+      <ThemeProvider>
+        <div className="min-h-screen flex items-center justify-center bg-gray-950">
+          <div className="text-center">
+            <Shield className="w-16 h-16 mx-auto mb-4 text-indigo-500 animate-pulse" />
+            <p className="text-gray-400 font-semibold">Verifying access...</p>
+          </div>
         </div>
-      </div>
+      </ThemeProvider>
     );
   }
 
@@ -118,16 +121,18 @@ export default function AdminLayout({
   }
 
   return (
-    <div
-      className={cn(
-        "flex w-full flex-1 flex-col overflow-hidden bg-gray-50  md:flex-row",
-        "h-screen"
-      )}
-    >
-      <AdminSidebar email={email} />
-      <div className="flex flex-1 overflow-y-auto">
-        <main className="flex h-full w-full flex-1 flex-col">{children}</main>
+    <ThemeProvider>
+      <div
+        className={cn(
+          "flex w-full flex-1 flex-col overflow-hidden bg-gray-50 dark:bg-gray-900 md:flex-row",
+          "h-screen"
+        )}
+      >
+        <AdminSidebar email={email} />
+        <div className="flex flex-1 overflow-y-auto">
+          <main className="flex h-full w-full flex-1 flex-col">{children}</main>
+        </div>
       </div>
-    </div>
+    </ThemeProvider>
   );
 }

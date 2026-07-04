@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -26,6 +26,20 @@ export const Tabs = ({
   const [active, setActive] = useState<Tab>(propTabs[0]);
   const [tabs, setTabs] = useState<Tab[]>(propTabs);
 
+  useEffect(() => {
+    const currentActiveValue = active.value;
+    const newTabs = [...propTabs];
+    const activeIdx = newTabs.findIndex((t) => t.value === currentActiveValue);
+    if (activeIdx > -1) {
+      const [selected] = newTabs.splice(activeIdx, 1);
+      newTabs.unshift(selected);
+      setActive(selected);
+    } else {
+      setActive(newTabs[0]);
+    }
+    setTabs(newTabs);
+  }, [propTabs]);
+
   const moveSelectedTabToTop = (idx: number) => {
     const newTabs = [...propTabs];
     const selectedTab = newTabs.splice(idx, 1);
@@ -40,7 +54,7 @@ export const Tabs = ({
     <>
       <div
         className={cn(
-          "flex flex-row items-center justify-start perspective-[1000px] relative overflow-auto sm:overflow-visible no-visible-scrollbar max-w-full w-full",
+          "flex flex-row items-center justify-start perspective-[1000px] relative overflow-auto sm:overflow-visible no-visible-scrollbar max-w-full w-full h-full",
           containerClassName
         )}
       >
@@ -114,7 +128,7 @@ export const FadeInDiv = ({
           animate={{
             y: isActive(tab) ? [0, 40, 0] : 0,
           }}
-          className={cn("w-full h-full absolute top-0 left-0", className)}
+          className={cn("w-full min-h-fit absolute top-0 left-0", className)}
         >
           {tab.content}
         </motion.div>

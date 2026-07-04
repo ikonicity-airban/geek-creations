@@ -94,9 +94,9 @@ export const Navbar = ({ children, className }: NavbarProps) => {
   const [width, setWidth] = useState<number>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("navbar-width");
-      return saved ? parseFloat(saved) : 70;
+      return saved ? parseFloat(saved) : 60;
     }
-    return 70;
+    return 60;
   });
   const [isResizing, setIsResizing] = useState<boolean>(false);
 
@@ -128,7 +128,7 @@ export const Navbar = ({ children, className }: NavbarProps) => {
       <motion.div
         ref={ref}
         className={cn(
-          "fixed inset-x-0 top-[10px] md:top-[5vh] z-50 w-full",
+          "fixed inset-x-0 top-2.5 md:top-[5vh] z-50 w-full",
           className
         )}
       >
@@ -157,7 +157,7 @@ export const NavBody = ({ children, className, visible }: NavBodyProps) => {
     }
   }, [width, isResizing]);
 
-  const displayWidth = visible ? width : 100;
+  const displayWidth = visible ? width : 70;
 
   return (
     <motion.div
@@ -172,11 +172,11 @@ export const NavBody = ({ children, className, visible }: NavBodyProps) => {
       }}
       transition={{
         type: "spring",
-        stiffness: isResizing ? 400 : 200,
+        stiffness: isResizing ? 400 : 150,
         damping: isResizing ? 30 : 50,
       }}
       className={cn(
-        "relative z-60 mx-auto hidden w-full max-w-7xl md:min-w-[600px] flex-row items-center justify-between self-start rounded-full bg-transparent px-4 py-2 lg:flex dark:bg-transparent",
+        "relative z-60 mx-auto hidden w-full max-w-7xl min-w-fit  flex-row items-center justify-between self-start rounded-full bg-transparent px-4 py-2 lg:flex dark:bg-transparent",
         visible && "bg-white/80 dark:bg-neutral-950/80",
         isResizing && "select-none",
         className

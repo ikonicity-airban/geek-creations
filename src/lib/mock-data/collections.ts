@@ -73,7 +73,7 @@ export const mockProducts: Product[] = [
     status: "active",
     fulfillment_provider: "printful",
     images: createImages(
-      "/img/blank_isolated_white_and_black_t_shirt_front_view.png",
+      "/img/pretty-woman-wearing-tshirt.jpg",
       "Anime Hero Classic Tee"
     ),
     variants: createVariants("prod-1", 5500),
@@ -208,7 +208,7 @@ export const mockProducts: Product[] = [
     tags: ["minimalist", "classic", "simple", "cotton"],
     status: "active",
     fulfillment_provider: "printful",
-    images: createImages("/img/tote.jpg", "Minimalist Classic Tee"),
+    images: createImages("/img/tshirt.jpg", "Minimalist Classic Tee"),
     variants: createVariants("prod-8", 5000),
     created_at: now,
     updated_at: now,
@@ -224,7 +224,7 @@ export const mockCollections: Collection[] = [
     handle: "anime",
     description:
       "Celebrate your favorite anime characters and moments with our exclusive anime-themed collection. From classic heroes to modern legends, find the perfect design to express your passion.",
-    image_url: "/img/blank_isolated_white_and_black_t_shirt_front_view.png",
+    image_url: "/img/pretty-woman-wearing-tshirt.jpg",
     product_count: 2,
     published: true,
     created_at: now,
@@ -325,3 +325,92 @@ export function getCollectionByHandle(handle: string): Collection | undefined {
 export function getAllCollections(): Collection[] {
   return mockCollections;
 }
+
+export interface Design {
+  id: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+  thumbnailUrl: string;
+  category: string;
+  tags: string[];
+  isActive: boolean;
+  sortOrder: number;
+  slug: string;
+}
+
+export const mockDesigns: Design[] = [
+  {
+    id: "design-1",
+    title: "Epic Anime Warrior Tee",
+    description: "Anime character print graphic tee mockup",
+    imageUrl: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=1200&auto=format&fit=crop&q=80",
+    thumbnailUrl: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&auto=format&fit=crop&q=80",
+    category: "Anime",
+    tags: ["anime", "hero", "japan", "tee"],
+    isActive: true,
+    sortOrder: 1,
+    slug: "epic-anime-warrior-tee"
+  },
+  {
+    id: "design-2",
+    title: "Minimal Tech Hoodie",
+    description: "Premium cotton streetwear hoodie mockup",
+    imageUrl: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=1200&auto=format&fit=crop&q=80",
+    thumbnailUrl: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&auto=format&fit=crop&q=80",
+    category: "Tech",
+    tags: ["tech", "circuit", "minimal", "hoodie"],
+    isActive: true,
+    sortOrder: 2,
+    slug: "minimal-tech-hoodie"
+  },
+  {
+    id: "design-3",
+    title: "Gaming Legend Coffee Mug",
+    description: "Ceramic desk coffee mug mockup",
+    imageUrl: "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=1200&auto=format&fit=crop&q=80",
+    thumbnailUrl: "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=600&auto=format&fit=crop&q=80",
+    category: "Gaming",
+    tags: ["gaming", "mug", "coffee", "cup"],
+    isActive: true,
+    sortOrder: 3,
+    slug: "gaming-legend-mug"
+  },
+  {
+    id: "design-4",
+    title: "Cyberpunk Phone Case",
+    description: "Impact-resistant printed phone case mockup",
+    imageUrl: "https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=1200&auto=format&fit=crop&q=80",
+    thumbnailUrl: "https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=600&auto=format&fit=crop&q=80",
+    category: "Sci-Fi",
+    tags: ["cyberpunk", "phone-case", "neon", "iphone"],
+    isActive: true,
+    sortOrder: 4,
+    slug: "cyberpunk-phone-case"
+  },
+  {
+    id: "design-5",
+    title: "Afro-Futurism Canvas Tote",
+    description: "Durable canvas shopper tote bag mockup",
+    imageUrl: "https://images.unsplash.com/photo-1544816155-12df9643f363?w=1200&auto=format&fit=crop&q=80",
+    thumbnailUrl: "https://images.unsplash.com/photo-1544816155-12df9643f363?w=600&auto=format&fit=crop&q=80",
+    category: "Afro",
+    tags: ["afro", "tote", "bag", "canvas"],
+    isActive: true,
+    sortOrder: 5,
+    slug: "afro-futurism-tote"
+  },
+  {
+    id: "design-6",
+    title: "Retro Wave Framed Poster",
+    description: "Giclée gallery art print framed poster mockup",
+    imageUrl: "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=1200&auto=format&fit=crop&q=80",
+    thumbnailUrl: "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=600&auto=format&fit=crop&q=80",
+    category: "Retro",
+    tags: ["retro", "poster", "wall-art", "framed"],
+    isActive: true,
+    sortOrder: 6,
+    slug: "retro-wave-poster"
+  }
+];
+

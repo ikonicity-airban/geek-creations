@@ -16,6 +16,7 @@ import { motion } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 
 interface AdminSidebarProps {
   email: string;
@@ -97,6 +98,23 @@ export function AdminSidebar({ email }: AdminSidebarProps) {
           </div>
         </div>
         <div className="flex flex-col gap-2">
+          <div className={cn(
+            "px-3 py-1 flex items-center justify-between gap-2 border-b border-neutral-200 dark:border-neutral-700/50 pb-2 mb-1",
+            !open && "border-0 pb-0 mb-0"
+          )}>
+            {open ? (
+              <>
+                <span className="text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
+                  Theme
+                </span>
+                <ThemeToggle variant="minimal" showLabel={true} />
+              </>
+            ) : (
+              <div className="flex w-full justify-center">
+                <ThemeToggle variant="icon-only" />
+              </div>
+            )}
+          </div>
           <div className="px-3 py-2 rounded-lg bg-neutral-200 dark:bg-neutral-700/50">
             <SidebarLink
               link={{

@@ -244,20 +244,31 @@ export const Hero = ({ darkMode }: { darkMode: boolean }) => {
           {/* Centered Heading */}
           <motion.h1
             variants={itemVariants}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-[6.5rem] font-extrabold tracking-tight leading-15"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-[6.5rem] font-extrabold tracking-tight leading-20"
             style={{
-              fontFamily: "var(--font-archivo-black), 'Archivo Black', 'Inter', sans-serif",
-              color: darkMode ? "#f8f6f0" : "#401268",
+              fontFamily: "var(--font-archivo-black), 'Archivo Black', 'Inter', 'Arial Black', sans-serif",
             }}
           >
-            Geek Creations
+            <span className="bg-clip-text text-transparent bg-linear-to-r from-indigo-ink via-honey-bronze to-scarlet-rush dark:from-mauve dark:via-honey-bronze dark:to-scarlet-rush select-text drop-shadow-sm"
+              style={{
+                fontFamily: "var(--font-archivo-black), 'Archivo Black', 'Inter', 'Arial Black', sans-serif",
+              }}
+            >
+              Geek Creations
+            </span>
             <br />
-            <span className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl over-the-rainbow leading-0"> {" "}
+            <span
+              className="text-lg font-black sm:text-xl md:text-2xl lg:text-3xl over-the-rainbow leading-0 text-shadow-gray-400 text-shadow-sm text-foreground/80"
+              style={{
+                color: darkMode ? "#f8f6f0" : "#401268",
+              }}
+            >
+              {" "}
               Print{" "}
               <FlipWords
                 words={["T-Shirts", "Hoodies", "Mugs", "Phone Cases", "Tote Bags", "Designs"]}
                 duration={3000}
-                className="text-accent p-0 inline-block font-black"
+                className="p-0 inline-block font-black text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-shadow-sm"
               />{" "}
               on Demand
             </span>
@@ -266,7 +277,7 @@ export const Hero = ({ darkMode }: { darkMode: boolean }) => {
           {/* Subheading Description */}
           <motion.p
             variants={itemVariants}
-            className="text-base font-(--font-over-the-rainbow) md:text-xl leading-relaxed max-w-2xl mx-auto px-4"
+            className="text-base font-(--font-over-the-rainbow) md:text-lg leading-relaxed max-w-2xl mx-auto px-4"
             style={{
               color: darkMode ? "rgba(248, 246, 240, 0.85)" : "rgba(64, 18, 104, 0.75)",
             }}
