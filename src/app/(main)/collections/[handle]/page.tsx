@@ -11,6 +11,7 @@ import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { IconChevronRight } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 
 interface Collection {
   id: string;
@@ -257,18 +258,16 @@ export default function CollectionPage() {
               <Button
                 variant={viewMode === "grid" ? "default" : "ghost"}
                 onClick={() => setViewMode("grid")}
-                className={`p-2 h-9 w-9 rounded-btn flex items-center justify-center transition-smooth ${
-                  viewMode === "grid" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
-                }`}
+                className={`p-2 h-9 w-9 rounded-btn flex items-center justify-center transition-smooth ${viewMode === "grid" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+                  }`}
               >
                 <Grid3x3 className="w-4 h-4" />
               </Button>
               <Button
                 variant={viewMode === "list" ? "default" : "ghost"}
                 onClick={() => setViewMode("list")}
-                className={`p-2 h-9 w-9 rounded-btn flex items-center justify-center transition-smooth ${
-                  viewMode === "list" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
-                }`}
+                className={`p-2 h-9 w-9 rounded-btn flex items-center justify-center transition-smooth ${viewMode === "list" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+                  }`}
               >
                 <Rows3 className="w-4 h-4" />
               </Button>
