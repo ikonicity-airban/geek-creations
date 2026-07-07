@@ -360,10 +360,10 @@ export const Hero = ({ darkMode }: { darkMode: boolean }) => {
 
               <div className="text-left">
                 <p className="text-xs font-bold leading-tight" style={{ color: darkMode ? "#f8f6f0" : "#401268" }}>
-                  Join 1,200+ Creators
+                  1,200+ Happy Customers
                 </p>
                 <p className="text-[10px]" style={{ color: darkMode ? "rgba(248, 246, 240, 0.65)" : "rgba(64, 18, 104, 0.65)" }}>
-                  Daily payouts & custom packaging
+                  4.8★ Rating | Fast Nationwide Delivery
                 </p>
               </div>
             </div>

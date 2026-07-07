@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Package, Truck, Shield, Zap } from "lucide-react";
+import { Coffee, Truck, Shield, Image } from "lucide-react";
 
 interface Feature {
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
@@ -12,24 +12,24 @@ interface Feature {
 export const FeaturesSection = () => {
   const features: Feature[] = [
     {
-      icon: Package,
-      title: "Zero Inventory",
-      description: "No upfront costs, no storage needed. We handle everything.",
+      icon: Image,
+      title: "Curated Designs",
+      description: "Choose from hundreds of unique designs made by artists, or upload your own.",
     },
     {
       icon: Truck,
       title: "Fast Shipping",
-      description: "Nigerian and international delivery with live tracking.",
+      description: "Quick shipping across Nigeria and global delivery with live tracking.",
     },
     {
       icon: Shield,
       title: "Premium Quality",
-      description: "High-quality prints on premium materials guaranteed.",
+      description: "Durable prints on comfortable fabrics and top-grade materials, guaranteed.",
     },
     {
-      icon: Zap,
-      title: "Automated Fulfillment",
-      description: "Orders process automatically from design to delivery.",
+      icon: Coffee,
+      title: "Interactive Customizer",
+      description: "Choose your favorite artwork and preview it on any canvas instantly.",
     },
   ];
 
@@ -46,7 +46,7 @@ export const FeaturesSection = () => {
             Why Choose Us
           </h2>
           <p className="text-sm sm:text-base md:text-lg max-w-2xl mx-auto px-4 text-muted-foreground">
-            Everything you need to succeed, built for creators
+            Vibrant geek merch, premium materials, and custom prints delivered to your door
           </p>
         </motion.div>
 

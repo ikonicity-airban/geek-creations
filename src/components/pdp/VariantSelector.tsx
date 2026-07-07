@@ -124,7 +124,7 @@ export default function VariantSelector({
     <div className="space-y-6">
       {options.map((option) => (
         <div key={option.name}>
-          <label className="block text-sm font-bold mb-3">{option.name}</label>
+          <label className="block text-sm font-bold mb-2 text-foreground">{option.name}</label>
           <div className="flex flex-wrap gap-2">
             {option.values.map((value) => {
               const isSelected = selectedOptions[option.name] === value;
@@ -140,6 +140,11 @@ export default function VariantSelector({
                     !isDisabled && handleOptionChange(option.name, value)
                   }
                   disabled={isDisabled}
+                  className={`rounded-btn font-semibold transition-smooth text-xs ${
+                    isSelected
+                      ? "bg-primary text-primary-foreground border-transparent"
+                      : "bg-card text-foreground border-hairline border-border hover:bg-muted hover:border-primary"
+                  }`}
                 >
                   {value}
                 </Button>
@@ -154,29 +159,29 @@ export default function VariantSelector({
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="p-4 rounded-lg bg-card"
+          className="p-4 rounded-card bg-card/60 border-hairline border-border backdrop-blur-xs shadow-sm"
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-semibold">
+              <p className="text-sm font-bold text-foreground">
                 Selected: {selectedVariant.title}
               </p>
               {!selectedVariant.available && (
-                <p className="text-xs mt-1 text-accent">Out of Stock</p>
+                <p className="text-xs mt-1 text-destructive font-bold uppercase tracking-wider">Out of Stock</p>
               )}
               {selectedVariant.available &&
                 selectedVariant.inventory_quantity > 0 && (
-                  <p className="text-xs mt-1 opacity-70">
+                  <p className="text-xs mt-1 text-muted-foreground font-semibold">
                     {selectedVariant.inventory_quantity} in stock
                   </p>
                 )}
             </div>
             <div className="text-right">
-              <p className="text-lg font-black text-primary">
+              <p className="text-lg font-black text-accent">
                 ₦{selectedVariant.price.toLocaleString()}
               </p>
               {selectedVariant.compare_at_price && (
-                <p className="text-sm line-through opacity-60">
+                <p className="text-xs line-through opacity-60 text-muted-foreground">
                   ₦{selectedVariant.compare_at_price.toLocaleString()}
                 </p>
               )}

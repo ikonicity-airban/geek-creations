@@ -168,13 +168,15 @@ async function getRelatedDesigns(
 }
 
 // Components
+import { ArrowRight } from "lucide-react";
+
 function NotFoundState() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center px-6 bg-background">
-      <div className="text-center space-y-6 max-w-md">
+    <main className="min-h-screen flex flex-col items-center justify-center px-6 bg-transparent">
+      <div className="text-center p-8 bg-card rounded-card border-hairline border-border shadow-card max-w-md mx-auto space-y-6">
         <div className="space-y-2">
-          <h3 className="text-4xl font-bold">Design Not Found</h3>
-          <p className="text-lg text-muted-foreground">
+          <h3 className="text-3xl font-bold text-foreground">Design Not Found</h3>
+          <p className="text-sm text-muted-foreground">
             The design you&apos;re looking for doesn&apos;t exist or has been
             removed.
           </p>
@@ -183,7 +185,7 @@ function NotFoundState() {
           href="/designs"
           className={buttonVariants({
             className:
-              "inline-block px-6 py-3 rounded-lg hover:opacity-90 transition-opacity",
+              "w-full inline-block py-3 rounded-btn font-semibold hover:opacity-90 transition-smooth",
           })}
         >
           Browse All Designs
@@ -197,7 +199,7 @@ function CategoryBadge({ category }: { category: string }) {
   return (
     <Badge
       variant="outline"
-      className="px-3 py-1 rounded-full text-xs font-semibold bg-accent/15 text-accent"
+      className="px-3 py-1 rounded-full text-xs font-semibold bg-secondary/25 border-hairline border-border text-primary uppercase tracking-wider"
     >
       {category}
     </Badge>
@@ -206,7 +208,7 @@ function CategoryBadge({ category }: { category: string }) {
 
 function TagBadge({ tag }: { tag: string }) {
   return (
-    <span className="px-3 py-1 rounded-full text-xs font-semibold bg-accent/15 text-accent">
+    <span className="px-2.5 py-0.5 rounded-full text-2xs font-semibold bg-accent/15 text-accent border-hairline border-accent/25">
       #{tag}
     </span>
   );
@@ -232,10 +234,10 @@ function ProductCard({
 
   return (
     <Link href={`/products/${product.handle}?design=${designId}`}>
-      <Card className="group overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-lg cursor-pointer h-full flex flex-col">
+      <div className="group rounded-card overflow-hidden bg-card border-hairline border-border hover:border-primary shadow-card hover:shadow-card-hover transition-smooth flex flex-col h-full cursor-pointer">
         {/* Mockup Carousel */}
         {mockupImages.length > 0 && (
-          <div className="relative flex-1 min-h-[200px] sm:min-h-[250px] lg:min-h-[280px]">
+          <div className="relative flex-1 min-h-[200px] sm:min-h-[250px] lg:min-h-[280px] border-b border-hairline border-border/50">
             <MockupCarousel
               images={mockupImages}
               title={`${product.label} with design`}
@@ -265,23 +267,23 @@ function ProductCard({
 
         {/* Product Info */}
         <div className="p-4 space-y-2">
-          <h3 className="text-sm font-semibold text-primary group-hover:underline">
+          <h4 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
             {product.label}
-          </h3>
-          <div className="text-lg font-bold text-primary">{product.price}</div>
-          <p className="text-xs text-muted-foreground">
+          </h4>
+          <div className="text-base font-black text-accent">{product.price}</div>
+          <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider text-2xs opacity-75">
             Printful/Printify fulfillment
           </p>
         </div>
-      </Card>
+      </div>
     </Link>
   );
 }
 
 function DesignImage({ imageUrl, title }: { imageUrl: string; title: string }) {
   return (
-    <div className="rounded-2xl overflow-hidden shadow-lg border bg-card">
-      <div className="relative aspect-4/3 w-full">
+    <div className="rounded-card overflow-hidden bg-card border-hairline border-border shadow-card">
+      <div className="relative aspect-[4/3] w-full bg-muted/10">
         <Image
           fill
           src={imageUrl}
@@ -300,7 +302,7 @@ function DesignHeader({ design }: { design: Design }) {
     <div className="space-y-4">
       {design.category && <CategoryBadge category={design.category} />}
 
-      <h3 className="text-4xl lg:text-5xl font-black leading-tight">
+      <h3 className="text-3xl sm:text-4xl lg:text-5xl font-black leading-tight text-foreground">
         {design.title}
       </h3>
 
@@ -331,8 +333,8 @@ function ProductOptionsSection({
 }) {
   return (
     <div className="space-y-4 pt-4">
-      <h2 className="text-xl font-bold text-primary">Choose a product</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-3">
+      <h3 className="text-lg font-bold text-foreground">Choose a product</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {products.map((product) => (
           <ProductCard
             key={product.handle}
@@ -350,39 +352,45 @@ function RelatedDesignsSection({ designs }: { designs: Design[] }) {
   if (designs.length === 0) return null;
 
   return (
-    <section className="mt-16 pt-12 border-t">
+    <section className="mt-16 pt-12 border-t border-hairline border-border/30">
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold text-primary">Related Designs</h2>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <h2 className="text-2xl font-black text-foreground">Related Designs</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {designs.map((design) => (
             <Link
               key={design.id}
               href={`/designs/${design.id}`}
-              className="group rounded-2xl overflow-hidden border bg-card transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
+              className="group rounded-card overflow-hidden bg-card border-hairline border-border hover:border-primary shadow-card hover:shadow-card-hover transition-smooth flex flex-col h-full"
             >
-              <div className="aspect-4/5 overflow-hidden">
+              <div className="aspect-[4/5] overflow-hidden bg-muted/20 border-b border-hairline border-border/50">
                 <Image
                   width={400}
                   height={500}
                   src={design.thumbnailUrl || design.imageUrl}
                   alt={design.title}
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
               </div>
-              <div className="p-4 space-y-2">
-                {design.category && (
-                  <span className="inline-block px-2 py-1 rounded-full text-xs font-semibold bg-secondary/20 text-primary">
-                    {design.category}
-                  </span>
-                )}
-                <h3 className="text-lg font-bold text-primary group-hover:underline">
-                  {design.title}
-                </h3>
-                {design.description && (
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    {design.description}
-                  </p>
-                )}
+              <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
+                <div className="space-y-2">
+                  {design.category && (
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-secondary/25 text-primary border-hairline border-border/50">
+                      {design.category}
+                    </span>
+                  )}
+                  <h4 className="text-base font-bold text-foreground group-hover:text-primary transition-colors">
+                    {design.title}
+                  </h4>
+                  {design.description && (
+                    <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+                      {design.description}
+                    </p>
+                  )}
+                </div>
+                <div className="flex items-center text-primary text-xs font-bold pt-3 border-t border-hairline border-border/30 gap-1 uppercase tracking-wider">
+                  View Details
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                </div>
               </div>
             </Link>
           ))}
@@ -415,10 +423,10 @@ export default async function DesignDetailPage({
     productOptions.length > 0 ? productOptions : DEFAULT_PRODUCT_TYPES;
 
   return (
-    <main className="min-h-screen bg-background">
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 py-12 lg:py-16">
+    <main className="min-h-screen bg-transparent pt-32 pb-16">
+      <section className="container-lg container-padding">
         <Breadcrumb
-          className="my-10"
+          className="mb-8"
           items={[
             { label: "Home", href: "/" },
             { label: "Designs", href: "/designs" },
