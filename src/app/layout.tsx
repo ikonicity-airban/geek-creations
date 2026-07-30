@@ -61,6 +61,8 @@ export const viewport: Viewport = {
   ],
 };
 
+import { ThemeProvider } from "@/lib/theme-context";
+
 // Generate metadata dynamically from site settings
 export async function generateMetadata() {
   return await generateSiteMetadata();
@@ -77,6 +79,31 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Anti-FOUC Instant Theme Initialization Script */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var stored = localStorage.getItem('geek-creations-theme');
+                  var isDark = false;
+                  if (stored === 'dark') {
+                    isDark = true;
+                  } else if (stored === 'light') {
+                    isDark = false;
+                  } else {
+                    isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  }
+                  if (isDark) {
+                    document.documentElement.classList.add('dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
         {/* Structured Data (JSON-LD) - Dynamically generated */}
         <Script
           id="structured-data"
@@ -87,17 +114,19 @@ export default async function RootLayout({
         />
       </head>
       <body
-        className={`${poppins.variable} ${orbitron.variable} ${spaceMono.variable} ${overTheRainbow.variable} ${archivoBlack.variable} antialiased `}
+        className={`${poppins.variable} ${orbitron.variable} ${spaceMono.variable} ${overTheRainbow.variable} ${archivoBlack.variable} antialiased`}
       >
         <SiteSettingsProvider>
-          <SearchProvider>
-            <LocaleProvider>
-              <CartProvider>
-                {children}
-                <Toaster position="top-right" richColors />
-              </CartProvider>
-            </LocaleProvider>
-          </SearchProvider>
+          <ThemeProvider>
+            <SearchProvider>
+              <LocaleProvider>
+                <CartProvider>
+                  {children}
+                  <Toaster position="top-right" richColors />
+                </CartProvider>
+              </LocaleProvider>
+            </SearchProvider>
+          </ThemeProvider>
         </SiteSettingsProvider>
       </body>
     </html>

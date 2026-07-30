@@ -8,7 +8,7 @@ import { buttonVariants } from "../ui/button";
 import { useRef } from "react";
 import { FlipWords } from "@/components/ui/flip-words";
 
-export const Hero = ({ darkMode }: { darkMode: boolean }) => {
+export const Hero = ({ darkMode }: { darkMode?: boolean }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Hook scroll progress specifically for this container
@@ -118,10 +118,7 @@ export const Hero = ({ darkMode }: { darkMode: boolean }) => {
   return (
     <section
       ref={containerRef}
-      className="relative w-full min-h-screen flex flex-col justify-between overflow-hidden pt-40 pb-12 sm:pb-20 md:pb-24"
-      style={{
-        backgroundColor: darkMode ? "#401268" : "#f8f6f0",
-      }}
+      className="relative w-full min-h-screen flex flex-col justify-between overflow-hidden pt-40 -mt-20 bg-[#f8f6f0] dark:bg-[#401268] transition-colors duration-300"
     >
       {/* Background Media Container */}
       {(bgVideo || bgImage) && (
@@ -135,7 +132,7 @@ export const Hero = ({ darkMode }: { darkMode: boolean }) => {
               loop
               muted
               playsInline
-              className="w-full h-screen md:h-full max-sm:object-cover "
+              className="w-full h-screen md:h-full max-sm:object-cover"
             >
               <source src={bgVideo} type="video/mp4" />
             </video>
@@ -148,36 +145,21 @@ export const Hero = ({ darkMode }: { darkMode: boolean }) => {
               />
             )
           )}
+          {/* Subtle gradient overlay */}
+          <div className="absolute inset-0 bg-linear-to-b from-porcelain/60 via-porcelain/30 to-porcelain dark:from-indigo-ink/90 dark:via-indigo-ink/70 dark:to-indigo-ink backdrop-blur-[2px] transition-colors duration-300" />
         </motion.div>
       )}
 
       {/* Readability Overlay */}
-      <div
-        className="absolute inset-0 z-0 pointer-events-none transition-colors duration-300"
-        style={{
-          backgroundColor: darkMode
-            ? "rgba(64, 18, 104, 0.82)"
-            : "rgba(248, 246, 240, 0.72)",
-          backdropFilter: (bgVideo || bgImage) ? "blur(8px)" : "none",
-          WebkitBackdropFilter: (bgVideo || bgImage) ? "blur(8px)" : "none",
-        }}
-      />
+      <div className="absolute inset-0 z-0 pointer-events-none transition-colors duration-300 bg-[rgba(248,246,240,0.72)] dark:bg-[rgba(64,18,104,0.82)] backdrop-blur-md" />
 
-      {/* Subtle top light reflection or background gradient stripe for custom feel */}
-      <div
-        className="absolute top-0 left-0 right-0 h-[500px] pointer-events-none opacity-20 dark:opacity-10 z-0"
-        style={{
-          background: "radial-gradient(ellipse at top, #c5a3ff 0%, transparent 60%)",
-        }}
-      />
-
-      {/* Floating Decorative Elements (Parallax Left & Right) */}
+      {/* Floating Decorative Elements */}
       <motion.div
         style={{ y: yLeftDecor, rotate: rotateDecor }}
         className="absolute left-6 sm:left-12 md:left-20 top-[20%] z-10 pointer-events-none select-none hidden sm:block animate-pulse"
       >
         <svg width="40" height="80" viewBox="0 0 40 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="opacity-40 dark:opacity-60">
-          <path d="M10 0L30 20L10 40L30 60L10 80" stroke={darkMode ? "#c5a3ff" : "#401268"} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M10 0L30 20L10 40L30 60L10 80" className="stroke-[#401268] dark:stroke-[#c5a3ff]" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </motion.div>
       <motion.div
@@ -188,8 +170,7 @@ export const Hero = ({ darkMode }: { darkMode: boolean }) => {
           {[...Array(9)].map((_, i) => (
             <div
               key={i}
-              className="w-1.5 h-1.5 rounded-full"
-              style={{ backgroundColor: darkMode ? "#e2ae3d" : "#e2ae3d" }}
+              className="w-1.5 h-1.5 rounded-full bg-[#e2ae3d]"
             />
           ))}
         </div>
@@ -203,8 +184,7 @@ export const Hero = ({ darkMode }: { darkMode: boolean }) => {
           {[...Array(9)].map((_, i) => (
             <div
               key={i}
-              className="w-1.5 h-1.5 rounded-full"
-              style={{ backgroundColor: darkMode ? "#c5a3ff" : "#401268" }}
+              className="w-1.5 h-1.5 rounded-full bg-[#401268] dark:bg-[#c5a3ff]"
             />
           ))}
         </div>
@@ -214,7 +194,7 @@ export const Hero = ({ darkMode }: { darkMode: boolean }) => {
         className="absolute right-10 sm:right-16 md:right-32 bottom-[30%] z-10 pointer-events-none select-none hidden sm:block"
       >
         <svg width="40" height="80" viewBox="0 0 40 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="opacity-40 dark:opacity-60">
-          <path d="M30 0L10 20L30 40L10 60L30 80" stroke={darkMode ? "#e2ae3d" : "#e21b35"} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M30 0L10 20L30 40L10 60L30 80" className="stroke-[#e21b35] dark:stroke-[#e2ae3d]" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </motion.div>
 
@@ -228,14 +208,7 @@ export const Hero = ({ darkMode }: { darkMode: boolean }) => {
         >
           {/* Top Pill Badge */}
           <motion.div variants={itemVariants} className="inline-block">
-            <span
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-black tracking-wide uppercase transition-all shadow-sm"
-              style={{
-                backgroundColor: darkMode ? "rgba(197, 163, 255, 0.15)" : "rgba(64, 18, 104, 0.06)",
-                border: darkMode ? "1px solid rgba(197, 163, 255, 0.25)" : "1px solid rgba(64, 18, 104, 0.1)",
-                color: darkMode ? "#f8f6f0" : "#401268",
-              }}
-            >
+            <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-[10px] font-black tracking-wide uppercase transition-all shadow-sm bg-[rgba(64,18,104,0.06)] dark:bg-[rgba(197,163,255,0.15)] border border-[rgba(64,18,104,0.1)] dark:border-[rgba(197,163,255,0.25)] text-[#401268] dark:text-[#f8f6f0]">
               <Sparkles className="w-3.5 h-3.5 text-honey-bronze fill-honey-bronze" />
               20+ Premium Designs Ready
             </span>
@@ -244,7 +217,7 @@ export const Hero = ({ darkMode }: { darkMode: boolean }) => {
           {/* Centered Heading */}
           <motion.h1
             variants={itemVariants}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-[6.5rem] font-extrabold tracking-tight leading-20"
+            className="text-6xl lg:text-[6.5rem] font-extrabold tracking-tight md:leading-20 leading-15"
             style={{
               fontFamily: "var(--font-archivo-black), 'Archivo Black', 'Inter', 'Arial Black', sans-serif",
             }}
@@ -257,12 +230,7 @@ export const Hero = ({ darkMode }: { darkMode: boolean }) => {
               Geek Creations
             </span>
             <br />
-            <span
-              className="text-lg font-black sm:text-xl md:text-2xl lg:text-3xl over-the-rainbow leading-0 text-shadow-gray-400 text-shadow-sm text-foreground/80"
-              style={{
-                color: darkMode ? "#f8f6f0" : "#401268",
-              }}
-            >
+            <span className="text-lg font-black sm:text-xl md:text-2xl lg:text-3xl over-the-rainbow leading-0 text-shadow-gray-400 text-shadow-sm text-[#401268] dark:text-[#f8f6f0]">
               {" "}
               Print{" "}
               <FlipWords
@@ -277,10 +245,7 @@ export const Hero = ({ darkMode }: { darkMode: boolean }) => {
           {/* Subheading Description */}
           <motion.p
             variants={itemVariants}
-            className="text-base font-(--font-over-the-rainbow) md:text-lg leading-relaxed max-w-2xl mx-auto px-4"
-            style={{
-              color: darkMode ? "rgba(248, 246, 240, 0.85)" : "rgba(64, 18, 104, 0.75)",
-            }}
+            className="text-base font-(--font-over-the-rainbow) md:text-lg leading-relaxed max-w-2xl mx-auto px-4 text-[rgba(64,18,104,0.75)] dark:text-[rgba(248,246,240,0.85)]"
           >
             Choose from curated designs or upload your own. We handle printing,
             shipping, and crypto payments.
@@ -300,16 +265,12 @@ export const Hero = ({ darkMode }: { darkMode: boolean }) => {
                   className={buttonVariants({
                     variant: "default",
                     size: "lg",
-                    className: "group w-full sm:w-auto px-8 py-4 font-bold text-base flex items-center justify-center gap-2 rounded-full shadow-lg",
+                    className: "group w-full sm:w-auto px-8 py-4 font-bold text-base flex items-center justify-center gap-2 rounded-full shadow-lg bg-[#401268] dark:bg-[#c5a3ff] text-white dark:text-[#010110]",
                   })}
-                  style={{
-                    backgroundColor: "#401268",
-                    color: "#ffffff",
-                  }}
                 >
-                  <IconPhoto className="w-5 h-5 text-white" />
+                  <IconPhoto className="w-5 h-5 text-white dark:text-[#010110]" />
                   Browse Designs
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform text-white" />
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform text-white dark:text-[#010110]" />
                 </motion.button>
               </Link>
 
@@ -339,30 +300,22 @@ export const Hero = ({ darkMode }: { darkMode: boolean }) => {
                     src={url}
                     alt={`Customer Avatar ${idx + 1}`}
                     whileHover={{ y: -6, zIndex: 10 }}
-                    className="w-10 h-10 rounded-full border-2 object-cover cursor-pointer shadow-md transition-all size-10"
-                    style={{
-                      borderColor: darkMode ? "#401268" : "#f8f6f0",
-                    }}
+                    className="w-10 h-10 rounded-full border-2 object-cover cursor-pointer shadow-md transition-all size-10 border-[#f8f6f0] dark:border-[#401268]"
                   />
                 ))}
                 <motion.div
                   whileHover={{ y: -4 }}
-                  className="w-10 h-10 rounded-full border-2 flex items-center justify-center text-xs font-black shadow-md cursor-pointer select-none size-10"
-                  style={{
-                    backgroundColor: darkMode ? "#c5a3ff" : "#401268",
-                    borderColor: darkMode ? "#401268" : "#f8f6f0",
-                    color: darkMode ? "#401268" : "#ffffff",
-                  }}
+                  className="w-10 h-10 rounded-full border-2 flex items-center justify-center text-xs font-black shadow-md cursor-pointer select-none size-10 bg-[#401268] dark:bg-[#c5a3ff] border-[#f8f6f0] dark:border-[#401268] text-white dark:text-[#401268]"
                 >
                   +
                 </motion.div>
               </div>
 
               <div className="text-left">
-                <p className="text-xs font-bold leading-tight" style={{ color: darkMode ? "#f8f6f0" : "#401268" }}>
+                <p className="text-xs font-bold leading-tight text-[#401268] dark:text-[#f8f6f0]">
                   1,200+ Happy Customers
                 </p>
-                <p className="text-[10px]" style={{ color: darkMode ? "rgba(248, 246, 240, 0.65)" : "rgba(64, 18, 104, 0.65)" }}>
+                <p className="text-[10px] text-[rgba(64,18,104,0.65)] dark:text-[rgba(248,246,240,0.65)]">
                   4.8★ Rating | Fast Nationwide Delivery
                 </p>
               </div>
@@ -372,64 +325,55 @@ export const Hero = ({ darkMode }: { darkMode: boolean }) => {
       </div>
 
       {/* Showcase Cards - Sliding entry + individual scroll-based parallax */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 mt-12 md:mt-16">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 mt-30 md:mt-16">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8 items-center max-w-5xl mx-auto">
 
           {/* Card 1: Left card - beautiful-floral-still-life.jpg */}
           <motion.div
-            style={{
-              y: yCard1,
-              borderColor: darkMode ? "rgba(197, 163, 255, 0.15)" : "rgba(255, 255, 255, 0.8)",
-            }}
+            style={{ y: yCard1 }}
             variants={cardVariantsLeft}
             initial="hidden"
             animate="visible"
-            className="w-full aspect-[4/3] sm:aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl hover:shadow-[0_24px_50px_rgba(64,18,104,0.25)] transition-shadow duration-300 relative border-4 cursor-pointer"
+            className="w-full aspect-[4/3] sm:aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl hover:shadow-[0_24px_50px_rgba(64,18,104,0.25)] transition-shadow duration-300 relative border-4 border-white/80 dark:border-[rgba(197,163,255,0.15)] cursor-pointer"
           >
             <img
               src="/img/beautiful-floral-still-life.jpg"
               alt="Beautiful floral still life print"
               className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+            <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
           </motion.div>
 
           {/* Card 2: Center card - pretty-woman-wearing-tshirt.jpg */}
           <motion.div
-            style={{
-              y: yCard2,
-              borderColor: darkMode ? "rgba(197, 163, 255, 0.25)" : "rgba(255, 255, 255, 0.95)",
-            }}
+            style={{ y: yCard2 }}
             variants={cardVariantsCenter}
             initial="hidden"
             animate="visible"
-            className="w-full aspect-[4/3] sm:aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl hover:shadow-[0_24px_50px_rgba(64,18,104,0.3)] transition-shadow duration-300 relative border-4 z-20 cursor-pointer"
+            className="w-full aspect-[4/3] sm:aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl hover:shadow-[0_24px_50px_rgba(64,18,104,0.3)] transition-shadow duration-300 relative border-4 border-white/95 dark:border-[rgba(197,163,255,0.25)] z-20 cursor-pointer"
           >
             <img
               src="/img/pretty-woman-wearing-tshirt.jpg"
               alt="Pretty woman wearing custom printed t-shirt"
               className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+            <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
           </motion.div>
 
           {/* Card 3: Right card - hero_girl.png */}
           <motion.div
-            style={{
-              y: yCard3,
-              borderColor: darkMode ? "rgba(197, 163, 255, 0.15)" : "rgba(255, 255, 255, 0.8)",
-            }}
+            style={{ y: yCard3 }}
             variants={cardVariantsRight}
             initial="hidden"
             animate="visible"
-            className="w-full aspect-[4/3] sm:aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl hover:shadow-[0_24px_50px_rgba(64,18,104,0.25)] transition-shadow duration-300 relative border-4 cursor-pointer"
+            className="w-full aspect-[4/3] sm:aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl hover:shadow-[0_24px_50px_rgba(64,18,104,0.25)] transition-shadow duration-300 relative border-4 border-white/80 dark:border-[rgba(197,163,255,0.15)] cursor-pointer"
           >
             <img
               src="/img/hero_girl.png"
               alt="Woman wearing custom prints"
               className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+            <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
           </motion.div>
 
         </div>

@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { AnimatedTestimonials } from "@/components/ui/animated-carousel";
+import { useTheme } from "@/lib/theme-context";
 
 export const Testimonials = () => {
   const testimonials = [
@@ -43,8 +44,14 @@ export const Testimonials = () => {
   ];
 
   return (
-    <section className="py-32 bg-background">
-      <div className="max-w-7xl mx-auto px-6">
+    <section
+      className="py-32 relative overflow-hidden bg-cover bg-center bg-no-repeat transition-all duration-300 bg-[url('/img/brand-bg-light.png')] dark:bg-[url('/img/brand-bg-dark.png')]"
+    >
+      {/* Readability Overlay */}
+      <div
+        className="absolute inset-0 pointer-events-none transition-all duration-300 bg-[rgba(248,246,240,0.88)] dark:bg-[rgba(1,1,16,0.88)]"
+      />
+      <div className="max-w-7xl mx-auto px-6 relative z-10">
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}

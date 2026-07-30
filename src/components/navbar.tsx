@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Home,
@@ -13,6 +13,7 @@ import {
   Menu,
   X,
   User,
+  LogOut,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -27,10 +28,12 @@ import {
 import { cn } from "@/lib/utils";
 import { Logo } from "./ui/logo";
 import { Button } from "./ui/button";
-import { IconUserShield } from "@tabler/icons-react";
 import { CurrencySwitcher, LanguageSwitcher } from "@/components/locale";
 import { SearchTrigger } from "@/components/search";
 import { ThemeToggle } from "@/components/theme";
+import { UserDropdown } from "@/components/user-dropdown";
+import { createClient } from "@/lib/supabase/client";
+import { User as SupabaseUser } from "@supabase/supabase-js";
 
 /* === REUSABLE NAV ITEM WITH HOVER PILL === */
 const NavItem = ({
@@ -84,10 +87,9 @@ const NavItem = ({
 };
 
 /* === DESKTOP NAVBAR CONTENT === */
-const DesktopNavbarContent = () => {
+const DesktopNavbarContent = ({ user }: { user: SupabaseUser | null }) => {
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
   const [isDesignsOpen, setIsDesignsOpen] = useState(false);
-  const [isAccountOpen, setIsAccountOpen] = useState(false);
 
   const { cart } = useCart();
   const isCondensed = useNavbarVisibility();
@@ -99,13 +101,6 @@ const DesktopNavbarContent = () => {
     { name: "Hoodies", href: "/collections/hoodies" },
     { name: "Mugs", href: "/collections/mugs" },
     { name: "Phone Cases", href: "/collections/phone-cases" },
-  ];
-
-  const accountMenu = [
-    { name: "My Orders", href: "/account/orders" },
-    { name: "Addresses", href: "/account/addresses" },
-    { name: "Login / Register", href: "/account" },
-    { name: "Logout", href: "/account/logout" },
   ];
 
   return (
@@ -169,6 +164,7 @@ const DesktopNavbarContent = () => {
               </div>
             )}
           </div>
+
           <NavItem
             href="/editor"
             hoverKey="editor"
@@ -241,34 +237,8 @@ const DesktopNavbarContent = () => {
             </Button>
           </Link>
 
-          {/* Account Dropdown */}
-          <div
-            className="relative hidden md:block"
-            onMouseEnter={() => setIsAccountOpen(true)}
-            onMouseLeave={() => setIsAccountOpen(false)}
-          >
-            <Button
-              variant={"ghost"}
-              size={"icon"}
-              className=" rounded-full bg-muted shadow-card hover:shadow-card-hover transition-smooth active:scale-95 hover:border border-accent"
-              aria-label="Account"
-            >
-              <IconUserShield className="w-4 h-4 sm:w-5 sm:h-5 text-foreground" />
-            </Button>
-            {isAccountOpen && (
-              <div className="absolute right-0 top-full mt-2 w-44 sm:w-52 rounded-btn border-hairline border-border bg-card shadow-card-elevated p-2 z-50">
-                {accountMenu.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="block rounded-md px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm text-card-foreground hover:bg-accent transition-smooth"
-                  >
-                    {item.name}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
+          {/* Account Dropdown - ONLY SHOWN WHEN AUTHENTICATED */}
+          {user && <UserDropdown user={user} />}
         </div>
       </div>
     </>
@@ -282,7 +252,7 @@ interface MobileLink {
   icon: React.ReactNode;
 }
 
-const MobileNavbarContent = () => {
+const MobileNavbarContent = ({ user }: { user: SupabaseUser | null }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { cart } = useCart();
 
@@ -305,7 +275,9 @@ const MobileNavbarContent = () => {
       icon: <MessageCircle className="w-5 h-5" />,
     },
     { name: "About", href: "/about", icon: <Info className="w-5 h-5" /> },
-    { name: "Account", href: "/account", icon: <User className="w-5 h-5" /> },
+    ...(user
+      ? [{ name: "Account", href: "/account", icon: <User className="w-5 h-5" /> }]
+      : []),
   ];
 
   return (
@@ -416,19 +388,25 @@ const MobileNavbarContent = () => {
                 </div>
               </div>
 
-              {/* User Info / Login */}
-              <div className="mt-4 p-4 rounded-btn bg-muted">
-                <p className="text-sm text-muted-foreground mb-2">
-                  Not logged in
-                </p>
-                <Link
-                  href="/account"
-                  onClick={() => setIsOpen(false)}
-                  className="inline-block px-4 py-2 rounded-btn bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-smooth"
-                >
-                  Sign In / Register
-                </Link>
-              </div>
+              {/* User Info - ONLY SHOWN WHEN AUTHENTICATED */}
+              {user && (
+                <div className="mt-4 p-4 rounded-btn bg-muted border border-border/50">
+                  <p className="text-xs font-bold uppercase text-muted-foreground mb-1">
+                    Signed in as
+                  </p>
+                  <p className="text-sm font-semibold text-foreground truncate mb-3">
+                    {user.email}
+                  </p>
+                  <Link
+                    href="/account/logout"
+                    onClick={() => setIsOpen(false)}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-btn bg-destructive/10 text-destructive text-sm font-semibold hover:bg-destructive/20 transition-smooth"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Sign Out</span>
+                  </Link>
+                </div>
+              )}
             </nav>
           </motion.div>
         )}
@@ -439,13 +417,32 @@ const MobileNavbarContent = () => {
 
 /* === FINAL NAVBAR COMPONENT === */
 export const Navbar = () => {
+  const [user, setUser] = useState<SupabaseUser | null>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data.user ?? null);
+    });
+
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setUser(session?.user ?? null);
+      }
+    );
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
+
   return (
     <ResizableNavbar>
       <NavBody>
-        <DesktopNavbarContent />
+        <DesktopNavbarContent user={user} />
       </NavBody>
       <MobileNav>
-        <MobileNavbarContent />
+        <MobileNavbarContent user={user} />
       </MobileNav>
     </ResizableNavbar>
   );

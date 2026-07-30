@@ -62,8 +62,11 @@ export function ThemeProvider({
     "light" | "dark"
   >(() => getSystemPreference());
 
-  // Listen for system preference changes
+  // Track if mounted to avoid hydration mismatch
+  const [mounted, setMounted] = React.useState(false);
+
   React.useEffect(() => {
+    setMounted(true);
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     const handleChange = (e: MediaQueryListEvent) => {
       setSystemPreference(e.matches ? "dark" : "light");
@@ -74,20 +77,28 @@ export function ThemeProvider({
   }, []);
 
   // Calculate resolved theme
-  const resolvedTheme: "light" | "dark" =
-    theme === "system" ? systemPreference : theme;
+  const resolvedTheme: "light" | "dark" = React.useMemo(() => {
+    if (!mounted && typeof window !== "undefined") {
+      return document.documentElement.classList.contains("dark") ? "dark" : "light";
+    }
+    if (theme === "system") {
+      return systemPreference;
+    }
+    return theme;
+  }, [theme, systemPreference, mounted]);
 
   // Backward compatibility: darkMode boolean
   const darkMode = resolvedTheme === "dark";
 
   // Apply theme to document
   React.useEffect(() => {
+    if (!mounted) return;
     if (resolvedTheme === "dark") {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
     }
-  }, [resolvedTheme]);
+  }, [resolvedTheme, mounted]);
 
   // Save theme preference
   const setTheme = React.useCallback((newTheme: ThemeMode) => {

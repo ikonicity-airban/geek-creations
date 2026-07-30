@@ -41,47 +41,49 @@ export function Toolbar({
   isMobile = false,
 }: ToolbarProps) {
   return (
-    <div className="bg-white border-b border-primary/20 px-4 py-3 flex items-center justify-between gap-4">
+    <div className="bg-card border-b border-border px-4 py-2.5 flex items-center justify-between gap-4 select-none z-10 shrink-0">
       {/* Left side - Mode toggle */}
       <div className="flex items-center gap-2">
         <Button
           variant={editMode === "edit" ? "default" : "outline"}
           size="sm"
           onClick={() => onEditModeChange("edit")}
-          className="gap-2"
+          className="gap-1.5 h-8 text-xs font-semibold"
         >
-          <Edit className="w-4 h-4" />
+          <Edit className="w-3.5 h-3.5" />
           Edit
         </Button>
         <Button
           variant={editMode === "preview" ? "default" : "outline"}
           size="sm"
           onClick={() => onEditModeChange("preview")}
-          className="gap-2"
+          className="gap-1.5 h-8 text-xs font-semibold"
         >
-          <Eye className="w-4 h-4" />
+          <Eye className="w-3.5 h-3.5" />
           Preview
         </Button>
       </div>
 
       {/* Center - Undo/Redo (desktop only) */}
       {!isMobile && (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <Button
             variant="ghost"
-            size="icon-sm"
+            size="sm"
             onClick={onUndo}
             disabled={!canUndo}
-            className="gap-2"
+            className="h-8 w-8 p-0"
+            title="Undo"
           >
             <Undo2 className="w-4 h-4" />
           </Button>
           <Button
             variant="ghost"
-            size="icon-sm"
+            size="sm"
             onClick={onRedo}
             disabled={!canRedo}
-            className="gap-2"
+            className="h-8 w-8 p-0"
+            title="Redo"
           >
             <Redo2 className="w-4 h-4" />
           </Button>
@@ -91,34 +93,36 @@ export function Toolbar({
       {/* Right side - Gridlines toggle and zoom (desktop) */}
       <div className="flex items-center gap-2 ml-auto">
         <Button
-          variant={showGridlines ? "default" : "outline"}
+          variant={showGridlines ? "secondary" : "outline"}
           size="sm"
           onClick={onToggleGridlines}
-          className="gap-2"
+          className="gap-1.5 h-8 text-xs font-semibold"
         >
-          <Grid3x3 className="w-4 h-4" />
+          <Grid3x3 className="w-3.5 h-3.5" />
           {!isMobile && <span>Grid</span>}
         </Button>
         {!isMobile && (
-          <div className="flex items-center gap-1 border-l border-primary/20 pl-2">
+          <div className="flex items-center gap-1 border-l border-border pl-2">
             <Button
               variant="ghost"
-              size="icon-sm"
+              size="sm"
               onClick={onZoomOut}
               disabled={zoomLevel <= 25}
+              className="h-8 w-8 p-0"
             >
-              <ZoomOut className="w-4 h-4" />
+              <ZoomOut className="w-3.5 h-3.5" />
             </Button>
-            <span className="text-sm font-medium min-w-12 text-center">
+            <span className="text-xs font-bold min-w-10 text-center text-muted-foreground">
               {zoomLevel}%
             </span>
             <Button
               variant="ghost"
-              size="icon-sm"
+              size="sm"
               onClick={onZoomIn}
               disabled={zoomLevel >= 200}
+              className="h-8 w-8 p-0"
             >
-              <ZoomIn className="w-4 h-4" />
+              <ZoomIn className="w-3.5 h-3.5" />
             </Button>
           </div>
         )}

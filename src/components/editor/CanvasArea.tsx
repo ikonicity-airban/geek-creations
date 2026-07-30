@@ -24,19 +24,15 @@ export function CanvasArea({
 }: CanvasAreaProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Apply zoom - simplified to avoid breaking canvas
   useEffect(() => {
     if (!fabricCanvasRef.current) return;
 
     const canvas = fabricCanvasRef.current;
     const scale = Math.max(0.25, Math.min(2, zoomLevel / 100));
 
-    // Only update zoom if it's different to avoid constant re-renders
-    // Use requestAnimationFrame to prevent render loops
     requestAnimationFrame(() => {
       if (canvas && Math.abs(canvas.getZoom() - scale) > 0.01) {
         canvas.setZoom(scale);
-        // Don't call renderAll here - let fabric handle it
       }
     });
   }, [zoomLevel, fabricCanvasRef]);
@@ -45,18 +41,25 @@ export function CanvasArea({
     <div
       ref={containerRef}
       className={cn(
-        "relative flex-1 flex items-center justify-center bg-gray-50 overflow-auto",
+        "relative flex-1 h-full w-full flex items-center justify-center bg-muted/20 overflow-auto p-2 sm:p-4 select-none",
         isMobile && "pb-20"
       )}
       style={{
         backgroundImage: showGridlines
-          ? `repeating-linear-gradient(0deg, transparent, transparent 19px, rgba(64, 18, 104, 0.1) 19px, rgba(64, 18, 104, 0.1) 20px),
-             repeating-linear-gradient(90deg, transparent, transparent 19px, rgba(64, 18, 104, 0.1) 19px, rgba(64, 18, 104, 0.1) 20px)`
+          ? `repeating-linear-gradient(0deg, transparent, transparent 24px, rgba(150, 150, 150, 0.12) 24px, rgba(150, 150, 150, 0.12) 25px),
+             repeating-linear-gradient(90deg, transparent, transparent 24px, rgba(150, 150, 150, 0.12) 24px, rgba(150, 150, 150, 0.12) 25px)`
           : "none",
       }}
     >
-      <div className="relative bg-white shadow-lg rounded-lg p-4">
-        <canvas ref={canvasRef} className="rounded-lg" />
+      {/* Maximum Y-Spacious Canvas Stage Container */}
+      <div className="relative bg-card shadow-2xl rounded-3xl p-3 border border-border/80 flex items-center justify-center">
+        <canvas
+          ref={canvasRef}
+          width={500}
+          height={560}
+          className="rounded-2xl border border-border/40 bg-white"
+          style={{ width: "500px", height: "560px" }}
+        />
       </div>
     </div>
   );

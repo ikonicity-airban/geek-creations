@@ -8,6 +8,7 @@ import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
+import { useTheme } from "@/lib/theme-context";
 
 export const ProductsShowcase = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -30,8 +31,14 @@ export const ProductsShowcase = () => {
   }, []);
 
   return (
-    <section className="section-padding overflow-hidden bg-background">
-      <div className="container-lg container-padding">
+    <section
+      className="section-padding overflow-hidden relative bg-cover bg-center bg-no-repeat transition-all duration-300 bg-[url('/img/brand-bg-light.png')] dark:bg-[url('/img/brand-bg-dark.png')]"
+    >
+      {/* Readability Overlay */}
+      <div
+        className="absolute inset-0 pointer-events-none transition-all duration-300 bg-[rgba(248,246,240,0.88)] dark:bg-[rgba(1,1,10,0.88)]"
+      />
+      <div className="container-lg container-padding relative z-10">
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}

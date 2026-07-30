@@ -6,6 +6,7 @@ import { Product } from "@/types";
 
 interface ProductPreviewProps {
   product: Product | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   variant: any;
   canvasDataUrl?: string;
 }
@@ -23,9 +24,12 @@ export function ProductPreview({
       : product.images[0]?.src;
 
   return (
-    <div className="bg-white rounded-xl p-4 border border-primary/20">
-      <h3 className="text-sm font-semibold text-primary mb-3">Preview</h3>
-      <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden">
+    <div className="bg-card rounded-2xl p-4 border border-border shadow-sm">
+      <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">
+        Real Product & Design Preview
+      </h3>
+      <div className="relative aspect-square bg-white rounded-xl overflow-hidden border border-border/50 shadow-inner">
+        {/* Real Product Image */}
         {productImage && (
           <Image
             src={productImage}
@@ -34,26 +38,32 @@ export function ProductPreview({
             className="object-contain"
           />
         )}
+
+        {/* Design Overlay placed in exact print surface position */}
         {canvasDataUrl && (
           <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage: `url(${canvasDataUrl})`,
-              backgroundSize: "contain",
-              backgroundPosition: "center",
-              backgroundRepeat: "no-repeat",
-              mixBlendMode: "multiply",
-            }}
-          />
+            className="absolute inset-0 flex items-center justify-center p-8 pointer-events-none"
+          >
+            <div
+              className="w-full h-full"
+              style={{
+                backgroundImage: `url(${canvasDataUrl})`,
+                backgroundSize: "contain",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+              }}
+            />
+          </div>
         )}
       </div>
-      <div className="mt-3 text-sm">
-        <div className="font-semibold text-primary">{product.title}</div>
+      <div className="mt-3 text-xs">
+        <div className="font-bold text-foreground truncate">{product.title}</div>
         {variant && (
-          <div className="text-gray-600 text-xs">{variant.title}</div>
+          <div className="text-muted-foreground font-medium text-[11px]">
+            {variant.title}
+          </div>
         )}
       </div>
     </div>
   );
 }
-

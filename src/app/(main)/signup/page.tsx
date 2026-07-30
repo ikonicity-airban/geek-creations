@@ -16,9 +16,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Mail, Lock, User, CheckCircle2 } from "lucide-react";
+import { Mail, Lock, User, CheckCircle2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { AuthTestimonialSide } from "@/components/auth/auth-testimonial-side";
+import { Logo } from "@/components/ui/logo";
+import { MerchandiseDoodleBackground } from "@/components/auth/merchandise-doodle-bg";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function SignupPage() {
   const [success, setSuccess] = useState(false);
@@ -69,10 +73,8 @@ export default function SignupPage() {
 
       if (data.user) {
         setSuccess(true);
-        // Get redirect URL from query params
         const searchParams = new URLSearchParams(window.location.search);
-        const redirectTo = searchParams.get("redirect") || "/login";
-        // Redirect to checkout after a brief delay
+        const redirectTo = searchParams.get("redirect") || "/account";
         setTimeout(() => {
           router.push(redirectTo);
         }, 2000);
@@ -86,191 +88,229 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 py-20">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md"
-      >
-        <div className="backdrop-blur rounded-2xl p-8 shadow-xl border bg-card">
-          <div className="text-center mb-8">
-            <h3 className="max-sm:text-xl font-black text-gray-900 dark:text-white mb-2">
-              Create Your Account
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Sign up to complete your checkout
-            </p>
-          </div>
+    <div className="h-screen max-h-screen w-full flex bg-background text-foreground overflow-hidden">
+      {/* Left Column (60% width): Form Side */}
+      <div className="w-full lg:w-[60%] h-full flex flex-col justify-between p-6 sm:p-8 lg:p-10 z-10 order-1 overflow-hidden">
+        {/* Top Header: Centered Logo with Back Link */}
+        <div className="relative flex items-center justify-between w-full pb-4 border-b border-border/40">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Shop
+          </Link>
 
-          {success ? (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="text-center py-8"
-            >
-              <CheckCircle2 className="w-16 h-16 mx-auto mb-4 text-green-500" />
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                Account Created!
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
-                Redirecting to checkout...
-              </p>
-            </motion.div>
-          ) : (
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(handleSignup)}
-                className="space-y-5"
-              >
-                {form.formState.errors.root && (
-                  <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                    <p className="text-sm text-red-800 dark:text-red-200">
-                      {form.formState.errors.root.message}
-                    </p>
-                  </div>
-                )}
-
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="firstName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>First Name</FormLabel>
-                        <div className="relative">
-                          <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                          <FormControl>
-                            <Input
-                              type="text"
-                              placeholder="John"
-                              className="pl-10"
-                              disabled={form.formState.isSubmitting}
-                              {...field}
-                            />
-                          </FormControl>
-                        </div>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="lastName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Last Name</FormLabel>
-                        <div className="relative">
-                          <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                          <FormControl>
-                            <Input
-                              type="text"
-                              placeholder="Doe"
-                              className="pl-10"
-                              disabled={form.formState.isSubmitting}
-                              {...field}
-                            />
-                          </FormControl>
-                        </div>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                        <FormControl>
-                          <Input
-                            type="email"
-                            placeholder="you@example.com"
-                            className="pl-10"
-                            disabled={form.formState.isSubmitting}
-                            {...field}
-                          />
-                        </FormControl>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Password</FormLabel>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                        <FormControl>
-                          <Input
-                            type="password"
-                            placeholder="At least 6 characters"
-                            className="pl-10"
-                            disabled={form.formState.isSubmitting}
-                            {...field}
-                          />
-                        </FormControl>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="confirmPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Confirm Password</FormLabel>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                        <FormControl>
-                          <Input
-                            type="password"
-                            placeholder="Confirm your password"
-                            className="pl-10"
-                            disabled={form.formState.isSubmitting}
-                            {...field}
-                          />
-                        </FormControl>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <Button
-                  type="submit"
-                  className="w-full font-semibold py-6 text-xs"
-                  disabled={form.formState.isSubmitting}
-                >
-                  {form.formState.isSubmitting
-                    ? "Creating Account..."
-                    : "Create Account & Continue to Checkout"}
-                </Button>
-              </form>
-            </Form>
-          )}
-
-          <div className="text-center text-xs text-gray-600 dark:text-gray-400">
-            Already have an account?{" "}
-            <Link
-              href="/login"
-              className="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold"
-            >
-              Sign in
-            </Link>
-          </div>
+          <div className="w-16" /> {/* Balance flex header */}
         </div>
-      </motion.div>
+
+        {/* Form Dedicated Internal Scroll Area */}
+        <ScrollArea className="flex-1 my-auto max-h-[calc(100vh-130px)] max-w-lg w-full mx-auto py-2">
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="space-y-5"
+          >
+            {/* Title */}
+            <div className="text-center sm:text-left">
+              <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground mb-2">
+                Create Account
+              </h1>
+              <p className="text-xs sm:text-sm text-muted-foreground">
+                Join Geek Creations to start designing cups, sweaters, jotters, and apparel
+              </p>
+            </div>
+
+            {success ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-center py-8 px-6 rounded-2xl bg-card border border-border shadow-lg"
+              >
+                <CheckCircle2 className="w-14 h-14 mx-auto mb-3 text-emerald-500" />
+                <h3 className="text-xl font-extrabold text-foreground mb-2">
+                  Account Created!
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  Redirecting to your account dashboard...
+                </p>
+              </motion.div>
+            ) : (
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(handleSignup)}
+                  className="space-y-3.5"
+                >
+                  {form.formState.errors.root && (
+                    <div className="p-3 bg-destructive/15 border border-destructive/30 rounded-xl">
+                      <p className="text-xs font-semibold text-destructive">
+                        {form.formState.errors.root.message}
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <FormField
+                      control={form.control}
+                      name="firstName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-[11px] font-bold uppercase tracking-wider">
+                            First Name
+                          </FormLabel>
+                          <div className="relative">
+                            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                            <FormControl>
+                              <Input
+                                type="text"
+                                placeholder="John"
+                                className="pl-9 h-10 rounded-xl bg-card border-border text-xs"
+                                disabled={form.formState.isSubmitting}
+                                {...field}
+                              />
+                            </FormControl>
+                          </div>
+                          <FormMessage className="text-[11px]" />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="lastName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-[11px] font-bold uppercase tracking-wider">
+                            Last Name
+                          </FormLabel>
+                          <div className="relative">
+                            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                            <FormControl>
+                              <Input
+                                type="text"
+                                placeholder="Doe"
+                                className="pl-9 h-10 rounded-xl bg-card border-border text-xs"
+                                disabled={form.formState.isSubmitting}
+                                {...field}
+                              />
+                            </FormControl>
+                          </div>
+                          <FormMessage className="text-[11px]" />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-[11px] font-bold uppercase tracking-wider">
+                          Email Address
+                        </FormLabel>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                          <FormControl>
+                            <Input
+                              type="email"
+                              placeholder="name@example.com"
+                              className="pl-9 h-10 rounded-xl bg-card border-border text-xs"
+                              disabled={form.formState.isSubmitting}
+                              {...field}
+                            />
+                          </FormControl>
+                        </div>
+                        <FormMessage className="text-[11px]" />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-[11px] font-bold uppercase tracking-wider">
+                          Password
+                        </FormLabel>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                          <FormControl>
+                            <Input
+                              type="password"
+                              placeholder="At least 6 characters"
+                              className="pl-9 h-10 rounded-xl bg-card border-border text-xs"
+                              disabled={form.formState.isSubmitting}
+                              {...field}
+                            />
+                          </FormControl>
+                        </div>
+                        <FormMessage className="text-[11px]" />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="confirmPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-[11px] font-bold uppercase tracking-wider">
+                          Confirm Password
+                        </FormLabel>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                          <FormControl>
+                            <Input
+                              type="password"
+                              placeholder="Confirm password"
+                              className="pl-9 h-10 rounded-xl bg-card border-border text-xs"
+                              disabled={form.formState.isSubmitting}
+                              {...field}
+                            />
+                          </FormControl>
+                        </div>
+                        <FormMessage className="text-[11px]" />
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button
+                    type="submit"
+                    className="w-full h-11 rounded-xl font-bold text-xs bg-primary text-primary-foreground shadow-lg hover:opacity-95 transition-all mt-3"
+                    disabled={form.formState.isSubmitting}
+                  >
+                    {form.formState.isSubmitting
+                      ? "Creating Account..."
+                      : "Create Account"}
+                  </Button>
+                </form>
+              </Form>
+            )}
+
+            {/* Footer link */}
+            <div className="text-center text-xs text-muted-foreground pt-3 border-t border-border/40">
+              Already have an account?{" "}
+              <Link
+                href="/login"
+                className="text-primary hover:underline font-bold"
+              >
+                Sign in
+              </Link>
+            </div>
+          </motion.div>
+        </ScrollArea>
+
+        {/* Bottom spacing */}
+        <div className="text-center text-[10px] text-muted-foreground pt-2">
+          Protected by Supabase Authentication
+        </div>
+      </div>
+
+      {/* Right Column (40% width): Visual & Testimonials Side */}
+      <AuthTestimonialSide />
     </div>
   );
 }

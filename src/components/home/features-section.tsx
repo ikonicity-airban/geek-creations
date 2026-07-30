@@ -3,6 +3,8 @@
 import { motion } from "framer-motion";
 import { Coffee, Truck, Shield, Image } from "lucide-react";
 
+import { useTheme } from "@/lib/theme-context";
+
 interface Feature {
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   title: string;
@@ -34,8 +36,14 @@ export const FeaturesSection = () => {
   ];
 
   return (
-    <section className="section-padding bg-background">
-      <div className="container-lg container-padding">
+    <section
+      className="section-padding relative overflow-hidden bg-cover bg-center bg-no-repeat transition-all duration-300 bg-[url('/img/brand-bg-light.png')] dark:bg-[url('/img/brand-bg-dark.png')]"
+    >
+      {/* Readability Overlay */}
+      <div
+        className="absolute inset-0 pointer-events-none transition-all duration-300 bg-[rgba(248,246,240,0.88)] dark:bg-[rgba(1,1,16,0.88)]"
+      />
+      <div className="container-lg container-padding relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

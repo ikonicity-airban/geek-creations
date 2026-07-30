@@ -14,11 +14,15 @@ import { buttonVariants } from "./ui/button";
 import { cn } from "@/lib/utils";
 import { CurrencySwitcher, LanguageSwitcher } from "@/components/locale";
 import { useSiteSettings } from "@/contexts/SiteSettingsContext";
+import { useTheme } from "@/lib/theme-context";
 
 export const Footer = () => {
+  const { darkMode } = useTheme();
   const { settings } = useSiteSettings();
   const [email, setEmail] = useState("");
   const [openSection, setOpenSection] = useState<string | null>(null);
+
+  const bgImage = darkMode ? "/img/brand-bg-dark.png" : "/img/brand-bg-light.png";
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -102,9 +106,16 @@ export const Footer = () => {
   ];
 
   return (
-    <footer className="relative py-12 sm:py-16 md:py-20 px-4 sm:px-6 md:px-8 overflow-hidden bg-background">
+    <footer
+      className="relative py-12 sm:py-16 md:py-20 px-4 sm:px-6 md:px-8 overflow-hidden bg-cover bg-center bg-no-repeat transition-all duration-300 bg-[url('/img/brand-bg-light.png')] dark:bg-[url('/img/brand-bg-dark.png')]"
+    >
+      {/* Readability Overlay */}
+      <div
+        className="absolute inset-0 pointer-events-none transition-all duration-300 bg-[rgba(248,246,240,0.92)] dark:bg-[rgba(1,1,16,0.92)]"
+      />
+
       {/* Background decoration */}
-      <div className="absolute inset-0 opacity-20 sm:opacity-30 pointer-events-none">
+      <div className="absolute inset-0 opacity-15 sm:opacity-25 pointer-events-none z-0">
         <div
           className="absolute top-10 left-5 sm:top-20 sm:left-10 w-32 h-32 sm:w-64 sm:h-64 rounded-full"
           style={{

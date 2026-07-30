@@ -1,66 +1,35 @@
 "use client";
 
-import { motion, useAnimation } from "framer-motion";
-import { useState, useEffect, useRef } from "react";
-import { Package, Zap, Truck } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import { useState, useRef } from "react";
+import { Play, Pause } from "lucide-react";
+import { useTheme } from "@/lib/theme-context";
 
 export const ProductionDemo = () => {
-  const [currentStep, setCurrentStep] = useState(0);
-  const controls = useAnimation();
-  const isMountedRef = useRef(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isPlaying, setIsPlaying] = useState(true);
 
-  const steps = [
-    { name: "Design", icon: "🎨", color: "#c5a3ff" },
-    { name: "Product", icon: "👕", color: "#401268" },
-    { name: "Production", icon: "🖨️", color: "#e2ae3d" },
-    { name: "Package", icon: "📦", color: "#e21b35" },
-  ];
-
-  useEffect(() => {
-    // Mark component as mounted
-    isMountedRef.current = true;
-
-    // Small delay to ensure component is fully mounted
-    const timeoutId = setTimeout(() => {
-      const sequence = async () => {
-        if (!isMountedRef.current) return;
-
-        for (let i = 0; i < steps.length; i++) {
-          if (!isMountedRef.current) return;
-          setCurrentStep(i);
-          await controls.start({
-            scale: [1, 1.2, 1],
-            rotate: [0, 10, -10, 0],
-            transition: { duration: 1 },
-          });
-          await new Promise((resolve) => setTimeout(resolve, 1500));
-        }
-        // Reset and loop
-        if (isMountedRef.current) {
-          setCurrentStep(0);
-          setTimeout(() => sequence(), 1000);
-        }
-      };
-      sequence();
-    }, 100);
-
-    return () => {
-      isMountedRef.current = false;
-      clearTimeout(timeoutId);
-    };
-  }, [controls, steps.length]);
-
-  // Particle positions for zaps (deterministic for React purity)
-  const particles = Array.from({ length: 12 }, (_, i) => ({
-    id: i,
-    angle: (i * 360) / 12,
-    distance: 60 + (i % 4) * 10,
-  }));
+  const togglePlay = () => {
+    if (!videoRef.current) return;
+    if (isPlaying) {
+      videoRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      videoRef.current.play().catch((err) => console.log("Video play failed:", err));
+      setIsPlaying(true);
+    }
+  };
 
   return (
-    <section className="py-20 relative overflow-hidden bg-background">
-      <div className="max-w-[1024px] mx-auto px-8 md:px-12">
+    <section
+      className="py-20 relative overflow-hidden bg-cover bg-center bg-no-repeat transition-all duration-300 bg-[url('/img/brand-bg-light.png')] dark:bg-[url('/img/brand-bg-dark.png')]"
+    >
+      {/* Readability Overlay */}
+      <div
+        className="absolute inset-0 pointer-events-none transition-all duration-300 bg-[rgba(248,246,240,0.88)] dark:bg-[rgba(1,1,16,0.88)]"
+      />
+
+      <div className="max-w-[1024px] mx-auto px-8 md:px-12 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -75,120 +44,62 @@ export const ProductionDemo = () => {
           </p>
         </motion.div>
 
-        {/* Production Animation Container */}
+        {/* Video Player Mockup Container */}
         <div className="relative max-w-3xl mx-auto">
-          {/* Main Animation Area */}
-          <div className="relative h-64 rounded-2xl flex items-center justify-center bg-muted border-2 border-secondary/20">
-            {/* Central Product Display */}
-            <motion.div animate={controls} className="relative z-10">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="relative rounded-2xl overflow-hidden border-2 border-secondary/20 shadow-2xl bg-black aspect-video group cursor-pointer"
+            onClick={togglePlay}
+          >
+            <video
+              ref={videoRef}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover"
+            >
+              <source src="/1111312_Sketch_Cloth_3840x2160.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+
+            {/* Glassmorphic Play/Pause Button Overlay */}
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
               <div
-                className="w-36 h-36 rounded-xl flex flex-col items-center justify-center"
-                style={{
-                  backgroundColor: steps[currentStep].color,
-                  borderRadius: "16px",
-                  boxShadow: "0 8px 24px rgba(64,18,104,0.2)",
-                }}
+                className="w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white shadow-lg hover:scale-110 transition-transform duration-300"
               >
-                <div className="text-4xl mb-2">{steps[currentStep].icon}</div>
-                <div className="text-white font-bold text-base">
-                  {steps[currentStep].name}
-                </div>
+                {isPlaying ? (
+                  <Pause className="w-8 h-8 fill-current text-white" />
+                ) : (
+                  <Play className="w-8 h-8 fill-current translate-x-0.5 text-white" />
+                )}
               </div>
-            </motion.div>
-
-            {/* Particle Zaps Animation */}
-            {currentStep === 0 && (
-              <div className="absolute inset-0">
-                {particles.map((particle) => {
-                  const x =
-                    Math.cos((particle.angle * Math.PI) / 180) *
-                    particle.distance;
-                  const y =
-                    Math.sin((particle.angle * Math.PI) / 180) *
-                    particle.distance;
-
-                  return (
-                    <motion.div
-                      key={particle.id}
-                      initial={{ opacity: 0, scale: 0 }}
-                      animate={{
-                        opacity: [0, 1, 0],
-                        scale: [0, 1, 0],
-                        x: [0, x],
-                        y: [0, y],
-                      }}
-                      transition={{
-                        duration: 1.5,
-                        repeat: Infinity,
-                        delay: particle.id * 0.1,
-                        ease: "easeOut",
-                      }}
-                      className="absolute top-1/2 left-1/2 w-2 h-2 rounded-full"
-                      style={{
-                        backgroundColor: "#c5a3ff",
-                        boxShadow: "0 0 10px #c5a3ff",
-                      }}
-                    />
-                  );
-                })}
-              </div>
-            )}
-
-            {/* Step Indicators */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-              {steps.map((step, index) => (
-                <motion.div
-                  key={index}
-                  className={cn(
-                    index === currentStep ? "" : "bg-primary/20",
-                    "w-2.5 h-2.5 rounded-full"
-                  )}
-                  style={{
-                    backgroundColor:
-                      index === currentStep ? step.color : undefined,
-                  }}
-                  animate={{
-                    scale: index === currentStep ? 1.5 : 1,
-                  }}
-                  transition={{ duration: 0.3 }}
-                />
-              ))}
             </div>
-          </div>
 
-          {/* Step Labels */}
-          <div className="grid grid-cols-4 gap-3 mt-6">
-            {steps.map((step, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="text-center"
-              >
-                <div
-                  className={cn(
-                    index === currentStep ? "" : "bg-secondary/10 text-primary",
-                    "w-12 h-12 rounded-xl mx-auto mb-2 flex items-center justify-center"
-                  )}
-                  style={{
-                    backgroundColor:
-                      index === currentStep ? step.color : undefined,
-                    color: index === currentStep ? "#ffffff" : undefined,
-                  }}
-                >
-                  {index === 0 && <Package className="w-6 h-6" />}
-                  {index === 1 && <Package className="w-6 h-6" />}
-                  {index === 2 && <Zap className="w-6 h-6" />}
-                  {index === 3 && <Truck className="w-6 h-6" />}
-                </div>
-                <h4 className="text-sm font-bold text-primary">{step.name}</h4>
-              </motion.div>
-            ))}
-          </div>
+            {/* Phase Badges Overlay */}
+            <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center z-10 pointer-events-none">
+              <div className="flex gap-2">
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-black/60 backdrop-blur-xs text-white border border-white/10 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-[#c5a3ff] animate-pulse" /> Design
+                </span>
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-black/60 backdrop-blur-xs text-white border border-white/10 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-[#401268] animate-pulse" /> Product
+                </span>
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-black/60 backdrop-blur-xs text-white border border-white/10 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-[#e2ae3d] animate-pulse" /> Print
+                </span>
+              </div>
+              <span className="px-3 py-1 rounded-full text-[10px] uppercase tracking-wider font-extrabold bg-primary text-primary-foreground shadow-lg">
+                Production Process
+              </span>
+            </div>
+          </motion.div>
         </div>
       </div>
     </section>
   );
 };
+
